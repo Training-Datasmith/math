@@ -22,16 +22,6 @@ final class IntegerOverflowException extends RuntimeException implements MathExc
      *
      * @pure
      */
-    public function __construct(string $message)
-    {
-        parent::__construct($message);
-    }
-
-    /**
-     * @internal
-     *
-     * @pure
-     */
     public static function integerOutOfRange(BigInteger $value): self
     {
         $message = '%s is out of range [%d, %d] and cannot be represented as an integer.';

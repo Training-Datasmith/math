@@ -16,16 +16,6 @@ final class DivisionByZeroException extends RuntimeException implements MathExce
      *
      * @pure
      */
-    public function __construct(string $message)
-    {
-        parent::__construct($message);
-    }
-
-    /**
-     * @internal
-     *
-     * @pure
-     */
     public static function divisionByZero(): self
     {
         return new self('Division by zero.');

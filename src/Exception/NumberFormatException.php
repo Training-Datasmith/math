@@ -21,16 +21,6 @@ final class NumberFormatException extends RuntimeException implements MathExcept
      *
      * @pure
      */
-    public function __construct(string $message)
-    {
-        parent::__construct($message);
-    }
-
-    /**
-     * @internal
-     *
-     * @pure
-     */
     public static function invalidFormat(string $value): self
     {
         return new self(sprintf(

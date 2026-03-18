@@ -16,16 +16,6 @@ final class RoundingNecessaryException extends RuntimeException implements MathE
      *
      * @pure
      */
-    public function __construct(string $message)
-    {
-        parent::__construct($message);
-    }
-
-    /**
-     * @internal
-     *
-     * @pure
-     */
     public static function decimalScaleTooSmall(): self
     {
         return new self('This decimal number cannot be represented at the requested scale without rounding.');

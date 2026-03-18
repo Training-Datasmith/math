@@ -122,7 +122,7 @@ final class DecimalHelper
         $value = str_pad($value, $targetLength, '0', STR_PAD_LEFT);
 
         if ($negative) {
-            $value = '-' . $value;
+            return '-' . $value;
         }
 
         return $value;
@@ -169,7 +169,7 @@ final class DecimalHelper
         }
 
         if ($negative) {
-            $value = '-' . $value;
+            return '-' . $value;
         }
 
         return $value;

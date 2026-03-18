@@ -16,16 +16,6 @@ final class NegativeNumberException extends RuntimeException implements MathExce
      *
      * @pure
      */
-    public function __construct(string $message)
-    {
-        parent::__construct($message);
-    }
-
-    /**
-     * @internal
-     *
-     * @pure
-     */
     public static function squareRootOfNegativeNumber(): self
     {
         return new self('Cannot calculate the square root of a negative number.');

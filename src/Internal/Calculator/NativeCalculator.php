@@ -77,7 +77,7 @@ final readonly class NativeCalculator extends Calculator
         $result = $aNeg === $bNeg ? $this->doAdd($aDig, $bDig) : $this->doSub($aDig, $bDig);
 
         if ($aNeg) {
-            $result = $this->neg($result);
+            return $this->neg($result);
         }
 
         return $result;
@@ -127,7 +127,7 @@ final readonly class NativeCalculator extends Calculator
         $result = $this->doMul($aDig, $bDig);
 
         if ($aNeg !== $bNeg) {
-            $result = $this->neg($result);
+            return $this->neg($result);
         }
 
         return $result;
@@ -218,7 +218,7 @@ final readonly class NativeCalculator extends Calculator
         $result = $this->pow($aa, $e / 2);
 
         if ($odd === 1) {
-            $result = $this->mul($result, $a);
+            return $this->mul($result, $a);
         }
 
         return $result;
@@ -333,7 +333,7 @@ final readonly class NativeCalculator extends Calculator
         }
 
         if ($carry === 1) {
-            $result = '1' . $result;
+            return '1' . $result;
         }
 
         return $result;
@@ -411,7 +411,7 @@ final readonly class NativeCalculator extends Calculator
         $result = ltrim($result, '0');
 
         if ($invert) {
-            $result = $this->neg($result);
+            return $this->neg($result);
         }
 
         return $result;

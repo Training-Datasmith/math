@@ -50,23 +50,14 @@ use const FILTER_VALIDATE_INT;
 final readonly class BigInteger extends BigNumber
 {
     /**
-     * The value, as a string of digits with optional leading minus sign.
-     *
-     * No leading zeros must be present.
-     * No leading minus sign must be present if the number is zero.
-     */
-    private string $value;
-
-    /**
      * Protected constructor. Use a factory method to obtain an instance.
      *
      * @param string $value A string of digits, with optional leading minus sign.
      *
      * @pure
      */
-    protected function __construct(string $value)
+    protected function __construct(private string $value)
     {
-        $this->value = $value;
     }
 
     /**
@@ -90,7 +81,7 @@ final readonly class BigInteger extends BigNumber
      */
     public static function fromBase(string $number, int $base): BigInteger
     {
-        if ($base < 2 || $base > 36) { // @phpstan-ignore smaller.alwaysFalse, greater.alwaysFalse, booleanOr.alwaysFalse
+        if ($base > 36) { // @phpstan-ignore smaller.alwaysFalse, greater.alwaysFalse, booleanOr.alwaysFalse
             throw InvalidArgumentException::baseOutOfRange($base);
         }
 
@@ -1296,7 +1287,6 @@ final readonly class BigInteger extends BigNumber
     #[Override]
     public function toString(): string
     {
-        /** @var numeric-string */
         return $this->value;
     }
 

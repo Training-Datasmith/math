@@ -44,24 +44,6 @@ use const PHP_INT_SIZE;
 final readonly class BigDecimal extends BigNumber
 {
     /**
-     * The unscaled value of this decimal number.
-     *
-     * This is a string of digits with an optional leading minus sign.
-     * No leading zero must be present.
-     * No leading minus sign must be present if the value is 0.
-     */
-    private string $value;
-
-    /**
-     * The scale (number of digits after the decimal point) of this decimal number.
-     *
-     * This must be zero or more.
-     *
-     * @var non-negative-int
-     */
-    private int $scale;
-
-    /**
      * Protected constructor. Use a factory method to obtain an instance.
      *
      * @param string           $value The unscaled value, validated.
@@ -69,10 +51,16 @@ final readonly class BigDecimal extends BigNumber
      *
      * @pure
      */
-    protected function __construct(string $value, int $scale = 0)
+    protected function __construct(
+        private string $value,
+        /**
+         * The scale (number of digits after the decimal point) of this decimal number.
+         *
+         * This must be zero or more.
+         */
+        private int $scale = 0
+    )
     {
-        $this->value = $value;
-        $this->scale = $scale;
     }
 
     /**
@@ -874,7 +862,6 @@ final readonly class BigDecimal extends BigNumber
     {
         $length = strlen($this->value);
 
-        /** @var positive-int */
         return ($this->value[0] === '-') ? $length - 1 : $length;
     }
 
@@ -1002,7 +989,6 @@ final readonly class BigDecimal extends BigNumber
     public function toString(): string
     {
         if ($this->scale === 0) {
-            /** @var numeric-string */
             return $this->value;
         }
 

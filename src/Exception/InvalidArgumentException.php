@@ -16,16 +16,6 @@ final class InvalidArgumentException extends \InvalidArgumentException implement
      *
      * @pure
      */
-    public function __construct(string $message)
-    {
-        parent::__construct($message);
-    }
-
-    /**
-     * @internal
-     *
-     * @pure
-     */
     public static function baseOutOfRange(int $base): self
     {
         return new self(sprintf('Base %d is out of range [2, 36].', $base));

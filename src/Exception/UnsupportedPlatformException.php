@@ -16,16 +16,6 @@ final class UnsupportedPlatformException extends RuntimeException implements Mat
      *
      * @pure
      */
-    public function __construct(string $message)
-    {
-        parent::__construct($message);
-    }
-
-    /**
-     * @internal
-     *
-     * @pure
-     */
     public static function unsupportedFloatFormat(): self
     {
         return new self('Unsupported float format: expected IEEE-754 double.');
