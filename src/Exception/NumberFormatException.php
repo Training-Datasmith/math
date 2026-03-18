@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Brick\Math\Exception;
 
+use function dechex;
+
+use function ord;
+
 use RuntimeException;
 
-use function dechex;
-use function ord;
 use function sprintf;
 use function strtoupper;
 

@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Brick\Math;
 
+use function array_map;
+use function assert;
+use function bin2hex;
+
 use Brick\Math\Exception\DivisionByZeroException;
 use Brick\Math\Exception\IntegerOverflowException;
 use Brick\Math\Exception\InvalidArgumentException;
@@ -16,22 +20,25 @@ use Brick\Math\Exception\RoundingNecessaryException;
 use Brick\Math\Internal\Calculator;
 use Brick\Math\Internal\CalculatorRegistry;
 use Brick\Math\Internal\Safe;
-use LogicException;
-use Override;
-use Throwable;
 
-use function array_map;
-use function assert;
-use function bin2hex;
 use function chr;
 use function count_chars;
+
+use const FILTER_VALIDATE_INT;
+
 use function filter_var;
 use function hex2bin;
 use function in_array;
 use function intdiv;
 use function is_string;
+
+use LogicException;
+
 use function ltrim;
 use function ord;
+
+use Override;
+
 use function preg_match;
 use function preg_quote;
 use function random_bytes;
@@ -40,7 +47,7 @@ use function strlen;
 use function strtolower;
 use function substr;
 
-use const FILTER_VALIDATE_INT;
+use Throwable;
 
 /**
  * An arbitrarily large integer number.

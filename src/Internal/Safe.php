@@ -7,9 +7,10 @@ namespace Brick\Math\Internal;
 use Brick\Math\Exception\IntegerOverflowException;
 
 use function is_int;
-use function sprintf;
 
 use const PHP_INT_MIN;
+
+use function sprintf;
 
 /**
  * Helpers for arithmetic operations that throw on native integer overflow.

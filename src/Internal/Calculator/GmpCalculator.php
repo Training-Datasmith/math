@@ -6,9 +6,9 @@ namespace Brick\Math\Internal\Calculator;
 
 use Brick\Math\Internal\Calculator;
 use GMP;
-use Override;
 
 use function gmp_add;
+
 use function gmp_and;
 use function gmp_div_q;
 use function gmp_div_qr;
@@ -25,6 +25,8 @@ use function gmp_sqrt;
 use function gmp_strval;
 use function gmp_sub;
 use function gmp_xor;
+
+use Override;
 
 /**
  * Calculator implementation built around the GMP library.

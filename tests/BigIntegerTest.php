@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Brick\Math\Tests;
 
+use function abs;
+use function bin2hex;
+
 use Brick\Math\BigDecimal;
 use Brick\Math\BigInteger;
 use Brick\Math\BigNumber;
@@ -18,25 +21,30 @@ use Brick\Math\Exception\RoundingNecessaryException;
 use Brick\Math\Internal\Calculator;
 use Brick\Math\Internal\CalculatorRegistry;
 use Brick\Math\RoundingMode;
-use Generator;
-use LogicException;
-use PHPUnit\Framework\Attributes\DataProvider;
 
-use function abs;
-use function bin2hex;
 use function count;
+
+use Generator;
+
 use function getenv;
 use function hex2bin;
 use function in_array;
+
+use const INF;
+
+use LogicException;
+
+use const PHP_INT_MAX;
+use const PHP_INT_MIN;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+
 use function serialize;
 use function sprintf;
+
 use function strlen;
 use function strtoupper;
 use function unserialize;
-
-use const INF;
-use const PHP_INT_MAX;
-use const PHP_INT_MIN;
 
 /**
  * Unit tests for class BigInteger.

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Brick\Math;
 
+use function assert;
+
 use Brick\Math\Exception\DivisionByZeroException;
 use Brick\Math\Exception\InvalidArgumentException;
 use Brick\Math\Exception\MathException;
@@ -13,26 +15,32 @@ use Brick\Math\Exception\UnsupportedPlatformException;
 use Brick\Math\Internal\CalculatorRegistry;
 use Brick\Math\Internal\DecimalHelper;
 use Brick\Math\Internal\Safe;
-use LogicException;
-use Override;
 
-use function assert;
 use function chr;
+
 use function in_array;
 use function ini_set;
 use function intdiv;
 use function is_infinite;
 use function is_nan;
 use function json_encode;
+
+use LogicException;
+
 use function max;
+
+use Override;
+
 use function pack;
+
+use const PHP_INT_SIZE;
+
 use function rtrim;
 use function str_repeat;
 use function strlen;
 use function substr;
-use function unpack;
 
-use const PHP_INT_SIZE;
+use function unpack;
 
 /**
  * An arbitrarily large decimal number.
@@ -59,8 +67,7 @@ final readonly class BigDecimal extends BigNumber
          * This must be zero or more.
          */
         private int $scale = 0
-    )
-    {
+    ) {
     }
 
     /**

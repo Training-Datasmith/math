@@ -9,11 +9,13 @@ use Brick\Math\RoundingMode;
 use function ltrim;
 use function rtrim;
 use function str_pad;
-use function str_repeat;
-use function strlen;
-use function substr;
 
 use const STR_PAD_LEFT;
+
+use function str_repeat;
+use function strlen;
+
+use function substr;
 
 /**
  * Shared helper for decimal operations.

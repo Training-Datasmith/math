@@ -10,12 +10,16 @@ use Brick\Math\Exception\MathException;
 use Brick\Math\Exception\RoundingNecessaryException;
 use Brick\Math\Internal\DecimalHelper;
 use Brick\Math\Internal\Safe;
-use LogicException;
-use Override;
 
 use function is_finite;
+
+use LogicException;
+
 use function max;
 use function min;
+
+use Override;
+
 use function strlen;
 use function substr;
 

@@ -7,12 +7,15 @@ namespace Brick\Math\Tests;
 use Brick\Math\BigDecimal;
 use Brick\Math\BigInteger;
 use Brick\Math\BigRational;
-use PHPUnit\Framework\TestCase;
 
 use function count;
+
 use function ctype_digit;
 use function explode;
 use function ltrim;
+
+use PHPUnit\Framework\TestCase;
+
 use function preg_quote;
 use function str_ends_with;
 use function strlen;

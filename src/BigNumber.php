@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Brick\Math;
 
+use function assert;
+
 use Brick\Math\Exception\DivisionByZeroException;
 use Brick\Math\Exception\IntegerOverflowException;
 use Brick\Math\Exception\InvalidArgumentException;
@@ -11,23 +13,31 @@ use Brick\Math\Exception\MathException;
 use Brick\Math\Exception\NumberFormatException;
 use Brick\Math\Exception\RoundingNecessaryException;
 use Brick\Math\Internal\Safe;
-use JsonSerializable;
-use Override;
-use Stringable;
-
-use function assert;
-use function filter_var;
-use function is_int;
-use function is_null;
-use function ltrim;
-use function preg_match;
-use function str_contains;
-use function str_repeat;
-use function strlen;
-use function substr;
 
 use const FILTER_VALIDATE_INT;
+
+use function filter_var;
+
+use function is_int;
+use function is_null;
+
+use JsonSerializable;
+
+use function ltrim;
+
+use Override;
+
+use function preg_match;
+
 use const PREG_UNMATCHED_AS_NULL;
+
+use function str_contains;
+use function str_repeat;
+
+use Stringable;
+
+use function strlen;
+use function substr;
 
 /**
  * Base class for arbitrary-precision numbers.

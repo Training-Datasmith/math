@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Brick\Math\Exception;
 
-use RuntimeException;
-use Throwable;
-
 use function get_debug_type;
+
+use RuntimeException;
+
 use function sprintf;
+
+use Throwable;
 
 /**
  * Exception thrown when random byte generation fails.

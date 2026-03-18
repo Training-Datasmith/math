@@ -8,10 +8,11 @@ use Brick\Math\Exception\IntegerOverflowException;
 use Brick\Math\Internal\Safe;
 use Brick\Math\Tests\AbstractTestCase;
 
-use function sprintf;
-
 use const PHP_INT_MAX;
+
 use const PHP_INT_MIN;
+
+use function sprintf;
 
 final class SafeTest extends AbstractTestCase
 {

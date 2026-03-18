@@ -23,7 +23,7 @@ if ($maxDigits < 1) {
     exit(1);
 }
 
-(new class($maxDigits) {
+(new class ($maxDigits) {
     private readonly Calculator\GmpCalculator $gmp;
 
     private readonly Calculator\BcMathCalculator $bcmath;

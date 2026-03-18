@@ -14,19 +14,24 @@ use Brick\Math\Exception\NumberFormatException;
 use Brick\Math\Exception\RoundingNecessaryException;
 use Brick\Math\RoundingMode;
 use Generator;
-use LogicException;
-use PHPUnit\Framework\Attributes\DataProvider;
-
-use function is_infinite;
-use function is_nan;
-use function serialize;
-use function sprintf;
-use function unserialize;
 
 use const INF;
+
+use function is_infinite;
+
+use function is_nan;
+
+use LogicException;
+
 use const PHP_FLOAT_EPSILON;
 use const PHP_INT_MAX;
 use const PHP_INT_MIN;
+
+use PHPUnit\Framework\Attributes\DataProvider;
+
+use function serialize;
+use function sprintf;
+use function unserialize;
 
 /**
  * Unit tests for class BigRational.

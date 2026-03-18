@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Brick\Math\Internal\Calculator;
 
-use Brick\Math\Internal\Calculator;
-use Override;
-
 use function bcadd;
 use function bcdiv;
+
 use function bcmod;
 use function bcmul;
 use function bcpow;
 use function bcpowmod;
 use function bcsqrt;
 use function bcsub;
+
+use Brick\Math\Internal\Calculator;
+use Override;
 
 /**
  * Calculator implementation built around the bcmath library.

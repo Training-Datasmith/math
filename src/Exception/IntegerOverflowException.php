@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Brick\Math\Exception;
 
 use Brick\Math\BigInteger;
+
+use const PHP_INT_MAX;
+
+use const PHP_INT_MIN;
+
 use RuntimeException;
 
 use function sprintf;
-
-use const PHP_INT_MAX;
-use const PHP_INT_MIN;
 
 /**
  * Exception thrown when a native integer overflow occurs.

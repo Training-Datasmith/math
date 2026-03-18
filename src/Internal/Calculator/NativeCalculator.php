@@ -4,22 +4,28 @@ declare(strict_types=1);
 
 namespace Brick\Math\Internal\Calculator;
 
-use Brick\Math\Internal\Calculator;
-use Override;
-
 use function assert;
+
+use Brick\Math\Internal\Calculator;
+
 use function in_array;
 use function intdiv;
 use function is_int;
 use function ltrim;
-use function str_pad;
-use function str_repeat;
-use function strcmp;
-use function strlen;
-use function substr;
+
+use Override;
 
 use const PHP_INT_SIZE;
+
+use function str_pad;
+
 use const STR_PAD_LEFT;
+
+use function str_repeat;
+use function strcmp;
+
+use function strlen;
+use function substr;
 
 /**
  * Calculator implementation using only native PHP code.
