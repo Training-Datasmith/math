@@ -1,14 +1,13 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Brick\Math;
 
 /**
  * Specifies rounding behavior by defining how discarded digits affect the returned result when an exact value cannot
  * be represented at the requested scale.
  */
-enum RoundingMode
+enum Rounding_Mode
 {
     /**
      * Asserts that the requested operation has an exact result, hence no rounding is necessary.
@@ -17,7 +16,6 @@ enum RoundingMode
      * cannot be represented at the requested scale, a RoundingNecessaryException is thrown.
      */
     case Unnecessary;
-
     /**
      * Rounds away from zero.
      *
@@ -25,7 +23,6 @@ enum RoundingMode
      * Note that this rounding mode never decreases the magnitude of the calculated value.
      */
     case Up;
-
     /**
      * Rounds towards zero.
      *
@@ -33,7 +30,6 @@ enum RoundingMode
      * Note that this rounding mode never increases the magnitude of the calculated value.
      */
     case Down;
-
     /**
      * Rounds towards positive infinity.
      *
@@ -41,7 +37,6 @@ enum RoundingMode
      * Note that this rounding mode never decreases the calculated value.
      */
     case Ceiling;
-
     /**
      * Rounds towards negative infinity.
      *
@@ -49,7 +44,6 @@ enum RoundingMode
      * Note that this rounding mode never increases the calculated value.
      */
     case Floor;
-
     /**
      * Rounds towards "nearest neighbor" unless both neighbors are equidistant, in which case round up.
      *
@@ -57,28 +51,24 @@ enum RoundingMode
      * Note that this is the rounding mode commonly taught at school.
      */
     case HalfUp;
-
     /**
      * Rounds towards "nearest neighbor" unless both neighbors are equidistant, in which case round down.
      *
      * Behaves as for Up if the discarded fraction is > 0.5; otherwise, behaves as for Down.
      */
     case HalfDown;
-
     /**
      * Rounds towards "nearest neighbor" unless both neighbors are equidistant, in which case round towards positive infinity.
      *
      * If the result is positive, behaves as for HalfUp; if negative, behaves as for HalfDown.
      */
     case HalfCeiling;
-
     /**
      * Rounds towards "nearest neighbor" unless both neighbors are equidistant, in which case round towards negative infinity.
      *
      * If the result is positive, behaves as for HalfDown; if negative, behaves as for HalfUp.
      */
     case HalfFloor;
-
     /**
      * Rounds towards the "nearest neighbor" unless both neighbors are equidistant, in which case rounds towards the even neighbor.
      *

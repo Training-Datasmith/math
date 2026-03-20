@@ -1,28 +1,21 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Brick\Math;
 
-use Brick\Math\Exception\DivisionByZeroException;
+use Brick\Math\Exception\Division_By_Zero_Exception;
 use Brick\Math\Exception\InvalidArgumentException;
-use Brick\Math\Exception\MathException;
-use Brick\Math\Exception\RoundingNecessaryException;
-use Brick\Math\Internal\DecimalHelper;
+use Brick\Math\Exception\Math_Exception;
+use Brick\Math\Exception\Rounding_Necessary_Exception;
+use Brick\Math\Internal\Decimal_Helper;
 use Brick\Math\Internal\Safe;
-
 use function is_finite;
-
 use LogicException;
-
 use function max;
 use function min;
-
 use Override;
-
 use function strlen;
 use function substr;
-
 /**
  * An arbitrarily large rational number.
  *
@@ -31,18 +24,16 @@ use function substr;
  * Fractions are automatically simplified to lowest terms. For example, `2/4` becomes `1/2`.
  * The denominator is always strictly positive; the sign is carried by the numerator.
  */
-final readonly class BigRational extends BigNumber
+final readonly class Big_Rational extends Big_Number
 {
     /**
      * The numerator.
      */
-    private BigInteger $numerator;
-
+    private Big_Integer $numerator;
     /**
      * The denominator. Always strictly positive.
      */
-    private BigInteger $denominator;
-
+    private Big_Integer $denominator;
     /**
      * Protected constructor. Use a factory method to obtain an instance.
      *
@@ -54,30 +45,25 @@ final readonly class BigRational extends BigNumber
      *
      * @pure
      */
-    protected function __construct(BigInteger $numerator, BigInteger $denominator, bool $checkDenominator, bool $simplify)
+    protected function __construct(Big_Integer $numerator, Big_Integer $denominator, bool $check_denominator, bool $simplify)
     {
-        if ($checkDenominator) {
-            if ($denominator->isZero()) {
-                throw DivisionByZeroException::zeroDenominator();
+        if ($check_denominator) {
+            if ($denominator->is_zero()) {
+                throw Division_By_Zero_Exception::zero_denominator();
             }
-
-            if ($denominator->isNegative()) {
+            if ($denominator->is_negative()) {
                 $numerator = $numerator->negated();
                 $denominator = $denominator->negated();
             }
         }
-
         if ($simplify) {
             $gcd = $numerator->gcd($denominator);
-
             $numerator = $numerator->quotient($gcd);
             $denominator = $denominator->quotient($gcd);
         }
-
         $this->numerator = $numerator;
         $this->denominator = $denominator;
     }
-
     /**
      * Creates a BigRational out of a numerator and a denominator.
      *
@@ -92,77 +78,63 @@ final readonly class BigRational extends BigNumber
      *
      * @pure
      */
-    public static function ofFraction(
-        BigNumber|int|string $numerator,
-        BigNumber|int|string $denominator,
-    ): BigRational {
-        $numerator = BigInteger::of($numerator);
-        $denominator = BigInteger::of($denominator);
-
-        return new BigRational($numerator, $denominator, true, true);
+    public static function of_fraction(Big_Number|int|string $numerator, Big_Number|int|string $denominator): Big_Rational
+    {
+        $numerator = Big_Integer::of($numerator);
+        $denominator = Big_Integer::of($denominator);
+        return new Big_Rational($numerator, $denominator, true, true);
     }
-
     /**
      * Returns a BigRational representing zero.
      *
      * @pure
      */
-    public static function zero(): BigRational
+    public static function zero(): Big_Rational
     {
         /** @var BigRational|null $zero */
         static $zero;
-
         if ($zero === null) {
-            $zero = new BigRational(BigInteger::zero(), BigInteger::one(), false, false);
+            $zero = new Big_Rational(Big_Integer::zero(), Big_Integer::one(), false, false);
         }
-
         return $zero;
     }
-
     /**
      * Returns a BigRational representing one.
      *
      * @pure
      */
-    public static function one(): BigRational
+    public static function one(): Big_Rational
     {
         /** @var BigRational|null $one */
         static $one;
-
         if ($one === null) {
-            $one = new BigRational(BigInteger::one(), BigInteger::one(), false, false);
+            $one = new Big_Rational(Big_Integer::one(), Big_Integer::one(), false, false);
         }
-
         return $one;
     }
-
     /**
      * Returns a BigRational representing ten.
      *
      * @pure
      */
-    public static function ten(): BigRational
+    public static function ten(): Big_Rational
     {
         /** @var BigRational|null $ten */
         static $ten;
-
         if ($ten === null) {
-            $ten = new BigRational(BigInteger::ten(), BigInteger::one(), false, false);
+            $ten = new Big_Rational(Big_Integer::ten(), Big_Integer::one(), false, false);
         }
-
         return $ten;
     }
-
     /**
      * Returns the numerator of this rational number.
      *
      * @pure
      */
-    public function getNumerator(): BigInteger
+    public function get_numerator(): Big_Integer
     {
         return $this->numerator;
     }
-
     /**
      * Returns the denominator of this rational number.
      *
@@ -170,11 +142,10 @@ final readonly class BigRational extends BigNumber
      *
      * @pure
      */
-    public function getDenominator(): BigInteger
+    public function get_denominator(): Big_Integer
     {
         return $this->denominator;
     }
-
     /**
      * Returns the integral part of this rational number.
      *
@@ -188,11 +159,10 @@ final readonly class BigRational extends BigNumber
      *
      * @pure
      */
-    public function getIntegralPart(): BigInteger
+    public function get_integral_part(): Big_Integer
     {
         return $this->numerator->quotient($this->denominator);
     }
-
     /**
      * Returns the fractional part of this rational number.
      *
@@ -206,11 +176,10 @@ final readonly class BigRational extends BigNumber
      *
      * @pure
      */
-    public function getFractionalPart(): BigRational
+    public function get_fractional_part(): Big_Rational
     {
-        return new BigRational($this->numerator->remainder($this->denominator), $this->denominator, false, false);
+        return new Big_Rational($this->numerator->remainder($this->denominator), $this->denominator, false, false);
     }
-
     /**
      * Returns the sum of this number and the given one.
      *
@@ -220,25 +189,20 @@ final readonly class BigRational extends BigNumber
      *
      * @pure
      */
-    public function plus(BigNumber|int|string $that): BigRational
+    public function plus(Big_Number|int|string $that): Big_Rational
     {
-        $that = BigRational::of($that);
-
-        if ($that->isZero()) {
+        $that = Big_Rational::of($that);
+        if ($that->is_zero()) {
             return $this;
         }
-
-        if ($this->isZero()) {
+        if ($this->is_zero()) {
             return $that;
         }
-
-        $numerator = $this->numerator->multipliedBy($that->denominator);
-        $numerator = $numerator->plus($that->numerator->multipliedBy($this->denominator));
-        $denominator = $this->denominator->multipliedBy($that->denominator);
-
-        return new BigRational($numerator, $denominator, false, true);
+        $numerator = $this->numerator->multiplied_by($that->denominator);
+        $numerator = $numerator->plus($that->numerator->multiplied_by($this->denominator));
+        $denominator = $this->denominator->multiplied_by($that->denominator);
+        return new Big_Rational($numerator, $denominator, false, true);
     }
-
     /**
      * Returns the difference of this number and the given one.
      *
@@ -248,25 +212,20 @@ final readonly class BigRational extends BigNumber
      *
      * @pure
      */
-    public function minus(BigNumber|int|string $that): BigRational
+    public function minus(Big_Number|int|string $that): Big_Rational
     {
-        $that = BigRational::of($that);
-
-        if ($that->isZero()) {
+        $that = Big_Rational::of($that);
+        if ($that->is_zero()) {
             return $this;
         }
-
-        if ($this->isZero()) {
+        if ($this->is_zero()) {
             return $that->negated();
         }
-
-        $numerator = $this->numerator->multipliedBy($that->denominator);
-        $numerator = $numerator->minus($that->numerator->multipliedBy($this->denominator));
-        $denominator = $this->denominator->multipliedBy($that->denominator);
-
-        return new BigRational($numerator, $denominator, false, true);
+        $numerator = $this->numerator->multiplied_by($that->denominator);
+        $numerator = $numerator->minus($that->numerator->multiplied_by($this->denominator));
+        $denominator = $this->denominator->multiplied_by($that->denominator);
+        return new Big_Rational($numerator, $denominator, false, true);
     }
-
     /**
      * Returns the product of this number and the given one.
      *
@@ -276,20 +235,16 @@ final readonly class BigRational extends BigNumber
      *
      * @pure
      */
-    public function multipliedBy(BigNumber|int|string $that): BigRational
+    public function multiplied_by(Big_Number|int|string $that): Big_Rational
     {
-        $that = BigRational::of($that);
-
-        if ($that->isZero() || $this->isZero()) {
-            return BigRational::zero();
+        $that = Big_Rational::of($that);
+        if ($that->is_zero() || $this->is_zero()) {
+            return Big_Rational::zero();
         }
-
-        $numerator = $this->numerator->multipliedBy($that->numerator);
-        $denominator = $this->denominator->multipliedBy($that->denominator);
-
-        return new BigRational($numerator, $denominator, false, true);
+        $numerator = $this->numerator->multiplied_by($that->numerator);
+        $denominator = $this->denominator->multiplied_by($that->denominator);
+        return new Big_Rational($numerator, $denominator, false, true);
     }
-
     /**
      * Returns the result of the division of this number by the given one.
      *
@@ -300,20 +255,16 @@ final readonly class BigRational extends BigNumber
      *
      * @pure
      */
-    public function dividedBy(BigNumber|int|string $that): BigRational
+    public function divided_by(Big_Number|int|string $that): Big_Rational
     {
-        $that = BigRational::of($that);
-
-        if ($that->isZero()) {
-            throw DivisionByZeroException::divisionByZero();
+        $that = Big_Rational::of($that);
+        if ($that->is_zero()) {
+            throw Division_By_Zero_Exception::division_by_zero();
         }
-
-        $numerator = $this->numerator->multipliedBy($that->denominator);
-        $denominator = $this->denominator->multipliedBy($that->numerator);
-
-        return new BigRational($numerator, $denominator, true, true);
+        $numerator = $this->numerator->multiplied_by($that->denominator);
+        $denominator = $this->denominator->multiplied_by($that->numerator);
+        return new Big_Rational($numerator, $denominator, true, true);
     }
-
     /**
      * Returns this number exponentiated to the given value.
      *
@@ -324,32 +275,22 @@ final readonly class BigRational extends BigNumber
      *
      * @pure
      */
-    public function power(int $exponent): BigRational
+    public function power(int $exponent): Big_Rational
     {
         if ($exponent === 0) {
-            return BigRational::one();
+            return Big_Rational::one();
         }
-
         if ($exponent === 1) {
             return $this;
         }
-
         if ($exponent < 0) {
-            if ($this->isZero()) {
-                throw DivisionByZeroException::zeroToNegativePower();
+            if ($this->is_zero()) {
+                throw Division_By_Zero_Exception::zero_to_negative_power();
             }
-
             return $this->reciprocal()->power(Safe::neg($exponent));
         }
-
-        return new BigRational(
-            $this->numerator->power($exponent),
-            $this->denominator->power($exponent),
-            false,
-            false,
-        );
+        return new Big_Rational($this->numerator->power($exponent), $this->denominator->power($exponent), false, false);
     }
-
     /**
      * Returns the reciprocal of this BigRational.
      *
@@ -359,134 +300,104 @@ final readonly class BigRational extends BigNumber
      *
      * @pure
      */
-    public function reciprocal(): BigRational
+    public function reciprocal(): Big_Rational
     {
-        if ($this->isZero()) {
-            throw DivisionByZeroException::reciprocalOfZero();
+        if ($this->is_zero()) {
+            throw Division_By_Zero_Exception::reciprocal_of_zero();
         }
-
-        return new BigRational($this->denominator, $this->numerator, true, false);
+        return new Big_Rational($this->denominator, $this->numerator, true, false);
     }
-
     #[Override]
     public function negated(): static
     {
-        return new BigRational($this->numerator->negated(), $this->denominator, false, false);
+        return new Big_Rational($this->numerator->negated(), $this->denominator, false, false);
     }
-
     #[Override]
-    public function compareTo(BigNumber|int|string $that): int
+    public function compare_to(Big_Number|int|string $that): int
     {
-        $that = BigRational::of($that);
-
-        if ($this->denominator->isEqualTo($that->denominator)) {
-            return $this->numerator->compareTo($that->numerator);
+        $that = Big_Rational::of($that);
+        if ($this->denominator->is_equal_to($that->denominator)) {
+            return $this->numerator->compare_to($that->numerator);
         }
-
-        return $this->numerator
-            ->multipliedBy($that->denominator)
-            ->compareTo($that->numerator->multipliedBy($this->denominator));
+        return $this->numerator->multiplied_by($that->denominator)->compare_to($that->numerator->multiplied_by($this->denominator));
     }
-
     #[Override]
-    public function getSign(): int
+    public function get_sign(): int
     {
-        return $this->numerator->getSign();
+        return $this->numerator->get_sign();
     }
-
     #[Override]
-    public function toBigInteger(): BigInteger
+    public function to_big_integer(): Big_Integer
     {
-        if ($this->denominator->isEqualTo(1)) {
+        if ($this->denominator->is_equal_to(1)) {
             return $this->numerator;
         }
-
-        throw RoundingNecessaryException::rationalNotConvertibleToInteger();
+        throw Rounding_Necessary_Exception::rational_not_convertible_to_integer();
     }
-
     #[Override]
-    public function toBigDecimal(): BigDecimal
+    public function to_big_decimal(): Big_Decimal
     {
-        $scale = DecimalHelper::computeScaleFromReducedFractionDenominator($this->denominator->toString());
-
+        $scale = Decimal_Helper::compute_scale_from_reduced_fraction_denominator($this->denominator->to_string());
         if ($scale === null) {
-            throw RoundingNecessaryException::rationalNotConvertibleToDecimal();
+            throw Rounding_Necessary_Exception::rational_not_convertible_to_decimal();
         }
-
-        return $this->numerator->toBigDecimal()->dividedBy($this->denominator, $scale)->strippedOfTrailingZeros();
+        return $this->numerator->to_big_decimal()->divided_by($this->denominator, $scale)->stripped_of_trailing_zeros();
     }
-
     #[Override]
-    public function toBigRational(): BigRational
+    public function to_big_rational(): Big_Rational
     {
         return $this;
     }
-
     #[Override]
-    public function toScale(int $scale, RoundingMode $roundingMode = RoundingMode::Unnecessary): BigDecimal
+    public function to_scale(int $scale, Rounding_Mode $rounding_mode = Rounding_Mode::Unnecessary): Big_Decimal
     {
-        if ($scale < 0) { // @phpstan-ignore smaller.alwaysFalse
-            throw InvalidArgumentException::negativeScale();
+        if ($scale < 0) {
+            // @phpstan-ignore smaller.alwaysFalse
+            throw InvalidArgumentException::negative_scale();
         }
-
-        if ($roundingMode === RoundingMode::Unnecessary) {
-            $requiredScale = DecimalHelper::computeScaleFromReducedFractionDenominator($this->denominator->toString());
-
-            if ($requiredScale === null) {
-                throw RoundingNecessaryException::rationalNotConvertibleToDecimal();
+        if ($rounding_mode === Rounding_Mode::Unnecessary) {
+            $required_scale = Decimal_Helper::compute_scale_from_reduced_fraction_denominator($this->denominator->to_string());
+            if ($required_scale === null) {
+                throw Rounding_Necessary_Exception::rational_not_convertible_to_decimal();
             }
-
-            if ($requiredScale > $scale) {
-                throw RoundingNecessaryException::rationalScaleTooSmall();
+            if ($required_scale > $scale) {
+                throw Rounding_Necessary_Exception::rational_scale_too_small();
             }
         }
-
-        return $this->numerator->toBigDecimal()->dividedBy($this->denominator, $scale, $roundingMode);
+        return $this->numerator->to_big_decimal()->divided_by($this->denominator, $scale, $rounding_mode);
     }
-
     #[Override]
-    public function toInt(): int
+    public function to_int(): int
     {
-        return $this->toBigInteger()->toInt();
+        return $this->to_big_integer()->to_int();
     }
-
     #[Override]
-    public function toFloat(): float
+    public function to_float(): float
     {
-        $numeratorFloat = $this->numerator->toFloat();
-        $denominatorFloat = $this->denominator->toFloat();
-
-        if (is_finite($numeratorFloat) && is_finite($denominatorFloat)) {
-            return $numeratorFloat / $denominatorFloat;
+        $numerator_float = $this->numerator->to_float();
+        $denominator_float = $this->denominator->to_float();
+        if (is_finite($numerator_float) && is_finite($denominator_float)) {
+            return $numerator_float / $denominator_float;
         }
-
         // At least one side overflows to INF; use a decimal approximation instead.
         // We need ~17 significant digits for double precision (we use 20 for some margin). Since $scale controls
         // decimal places (not significant digits), we subtract the estimated order of magnitude so that large results
         // use fewer decimal places and small results use more (to look past leading zeros). Clamped to [0, 350] as
         // doubles range from e-324 to e308 (350 ≈ 324 + 20 significant digits + margin).
-        $magnitude = strlen($this->numerator->abs()->toString()) - strlen($this->denominator->toString());
+        $magnitude = strlen($this->numerator->abs()->to_string()) - strlen($this->denominator->to_string());
         $scale = min(350, max(0, 20 - $magnitude));
-
-        return $this->numerator
-            ->toBigDecimal()
-            ->dividedBy($this->denominator, $scale, RoundingMode::HalfEven)
-            ->toFloat();
+        return $this->numerator->to_big_decimal()->divided_by($this->denominator, $scale, Rounding_Mode::HalfEven)->to_float();
     }
-
     #[Override]
-    public function toString(): string
+    public function to_string(): string
     {
-        $numerator = $this->numerator->toString();
-        $denominator = $this->denominator->toString();
-
+        $numerator = $this->numerator->to_string();
+        $denominator = $this->denominator->to_string();
         if ($denominator === '1') {
             return $numerator;
         }
-
         return $numerator . '/' . $denominator;
     }
-
     /**
      * Returns the decimal representation of this rational number, with repeating decimals in parentheses.
      *
@@ -503,51 +414,39 @@ final readonly class BigRational extends BigNumber
      *
      * @pure
      */
-    public function toRepeatingDecimalString(): string
+    public function to_repeating_decimal_string(): string
     {
-        if ($this->isZero()) {
+        if ($this->is_zero()) {
             return '0';
         }
-
-        $sign = $this->numerator->isNegative() ? '-' : '';
+        $sign = $this->numerator->is_negative() ? '-' : '';
         $numerator = $this->numerator->abs();
         $denominator = $this->denominator;
-
         $integral = $numerator->quotient($denominator);
         $remainder = $numerator->remainder($denominator);
-
-        $integralString = $integral->toString();
-
-        if ($remainder->isZero()) {
-            return $sign . $integralString;
+        $integral_string = $integral->to_string();
+        if ($remainder->is_zero()) {
+            return $sign . $integral_string;
         }
-
         $digits = '';
-        $remainderPositions = [];
+        $remainder_positions = [];
         $index = 0;
-
-        while (! $remainder->isZero()) {
-            $remainderString = $remainder->toString();
-
-            if (isset($remainderPositions[$remainderString])) {
-                $repeatIndex = $remainderPositions[$remainderString];
-                $nonRepeating = substr($digits, 0, $repeatIndex);
-                $repeating = substr($digits, $repeatIndex);
-
-                return $sign . $integralString . '.' . $nonRepeating . '(' . $repeating . ')';
+        while (!$remainder->is_zero()) {
+            $remainder_string = $remainder->to_string();
+            if (isset($remainder_positions[$remainder_string])) {
+                $repeat_index = $remainder_positions[$remainder_string];
+                $non_repeating = substr($digits, 0, $repeat_index);
+                $repeating = substr($digits, $repeat_index);
+                return $sign . $integral_string . '.' . $non_repeating . '(' . $repeating . ')';
             }
-
-            $remainderPositions[$remainderString] = $index;
-            $remainder = $remainder->multipliedBy(10);
-
-            $digits .= $remainder->quotient($denominator)->toString();
+            $remainder_positions[$remainder_string] = $index;
+            $remainder = $remainder->multiplied_by(10);
+            $digits .= $remainder->quotient($denominator)->to_string();
             $remainder = $remainder->remainder($denominator);
             $index++;
         }
-
-        return $sign . $integralString . '.' . $digits;
+        return $sign . $integral_string . '.' . $digits;
     }
-
     /**
      * This method is required for serializing the object and SHOULD NOT be accessed directly.
      *
@@ -559,7 +458,6 @@ final readonly class BigRational extends BigNumber
     {
         return ['numerator' => $this->numerator, 'denominator' => $this->denominator];
     }
-
     /**
      * This method is only here to allow unserializing the object and cannot be accessed directly.
      *
@@ -575,15 +473,13 @@ final readonly class BigRational extends BigNumber
         if (isset($this->numerator)) {
             throw new LogicException('__unserialize() is an internal function, it must not be called directly.');
         }
-
         /** @phpstan-ignore deadCode.unreachable */
         $this->numerator = $data['numerator'];
         $this->denominator = $data['denominator'];
     }
-
     #[Override]
-    protected static function from(BigNumber $number): static
+    protected static function from(Big_Number $number): static
     {
-        return $number->toBigRational();
+        return $number->to_big_rational();
     }
 }

@@ -1,23 +1,20 @@
 <?php
 
-declare(strict_types=1);
-
+declare (strict_types=1);
 namespace Brick\Math\Internal;
 
 use function extension_loaded;
-
 /**
  * Stores the current Calculator instance used by BigNumber classes.
  *
  * @internal
  */
-final class CalculatorRegistry
+final class Calculator_Registry
 {
     /**
      * The Calculator instance in use.
      */
     private static ?Calculator $instance = null;
-
     /**
      * Sets the Calculator instance to use.
      *
@@ -29,7 +26,6 @@ final class CalculatorRegistry
     {
         self::$instance = $calculator;
     }
-
     /**
      * Returns the Calculator instance to use.
      *
@@ -47,11 +43,9 @@ final class CalculatorRegistry
             /** @phpstan-ignore impure.propertyAssign */
             self::$instance = self::detect();
         }
-
         /** @phpstan-ignore impure.staticPropertyAccess */
         return self::$instance;
     }
-
     /**
      * Returns the fastest available Calculator implementation.
      *
@@ -62,13 +56,11 @@ final class CalculatorRegistry
     private static function detect(): Calculator
     {
         if (extension_loaded('gmp')) {
-            return new Calculator\GmpCalculator();
+            return new Calculator\Gmp_Calculator();
         }
-
         if (extension_loaded('bcmath')) {
-            return new Calculator\BcMathCalculator();
+            return new Calculator\Bc_Math_Calculator();
         }
-
-        return new Calculator\NativeCalculator();
+        return new Calculator\Native_Calculator();
     }
 }
