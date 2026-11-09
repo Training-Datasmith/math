@@ -2,7 +2,7 @@
 
 ## Purpose
 
-An arbitrary-precision arithmetic library for PHP. Provides `BigInteger`, `BigDecimal`, and `BigRational` value objects with exact arithmetic — no floating-point rounding errors.
+An arbitrary-precision arithmetic library for PHP. Provides `Big_Integer`, `Big_Decimal`, and `Big_Rational` value objects with exact arithmetic — no floating-point rounding errors.
 
 ## Directory Structure
 
@@ -39,21 +39,21 @@ src/
 - **Value objects**: All three number types are immutable; every operation returns a new instance
 - **Readonly abstract class**: `Big_Number` is `abstract readonly`, enforcing immutability at the language level
 - **Backend detection**: `Calculator_Registry` auto-selects GMP > bcmath > native at runtime; all three produce identical results
-- **Sealed hierarchy**: `@phpstan-sealed` prevents subclassing outside `BigInteger|BigDecimal|BigRational` while keeping the base class in the public API
+- **Sealed hierarchy**: `@phpstan-sealed` prevents subclassing outside `Big_Integer|Big_Decimal|Big_Rational` while keeping the base class in the public API
 - **Strict exception hierarchy**: Each error condition has its own typed exception, all extending `Math_Exception`
 
 ## Extension Points
 
-- Use `BigNumber::of($value)` as the entry point; it accepts int, string, float, or another `BigNumber`
-- Call `BigInteger::random(int $numBits)` for cryptographically random large integers
+- Use `Big_Number::of($value)` as the entry point; it accepts int, string, float, or another `Big_Number`
+- Call `Big_Integer::random(int $numBits)` for cryptographically random large integers
 - Override the calculator backend via `Calculator_Registry::register()` for testing or custom environments
 
 ## Dependency Flow
 
 ```
-BigNumber::of(mixed $value): BigInteger|BigDecimal|BigRational
+Big_Number::of(mixed $value): Big_Integer|Big_Decimal|Big_Rational
   └── Internal\Calculator (abstract)
-        ├── GmpCalculator       (prefers GMP extension)
-        ├── BcMathCalculator    (prefers bcmath extension)
-        └── NativeCalculator    (pure PHP, always available)
+        ├── Gmp_Calculator       (prefers GMP extension)
+        ├── Bc_Math_Calculator    (prefers bcmath extension)
+        └── Native_Calculator    (pure PHP, always available)
 ```

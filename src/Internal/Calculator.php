@@ -344,11 +344,11 @@ abstract readonly class Calculator
      * Performs a rounded division.
      *
      * When the remainder of the division is not zero, rounding is performed according to the rounding mode provided,
-     * unless RoundingMode::Unnecessary is used, in which case the method returns null.
+     * unless Rounding_Mode::Unnecessary is used, in which case the method returns null.
      *
      * @param string       $a            The dividend.
      * @param string       $b            The divisor, must not be zero.
-     * @param RoundingMode $roundingMode The rounding mode.
+     * @param Rounding_Mode $rounding_mode The rounding mode.
      *
      * @pure
      */

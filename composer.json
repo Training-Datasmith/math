@@ -18,6 +18,13 @@
         "Integer"
     ],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://raw.githubusercontent.com/Training-Datasmith/composer-index/remote-test-2026-11-09",
+            "canonical": false
+        }
+    ],
     "require": {
         "php": "^8.2"
     },
@@ -34,5 +41,9 @@
         "psr-4": {
             "Brick\\Math\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "check-cluster-pins": "php scripts/check-cluster-pins.php",
+        "check-no-old-names": "php scripts/check-no-old-names.php"
     }
 }

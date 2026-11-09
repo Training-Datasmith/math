@@ -180,7 +180,7 @@ final readonly class Native_Calculator extends Calculator
     #[Override]
     public function mod_pow(string $base, string $exp, string $mod): string
     {
-        // normalize to Euclidean representative so modPow() stays consistent with mod()
+        // normalize to Euclidean representative so mod_pow() stays consistent with mod()
         $base = $this->mod($base, $mod);
         // special case: the algorithm below fails with power 0 mod 1 (returns 1 instead of 0)
         if ($exp === '0' && $mod === '1') {
@@ -238,9 +238,9 @@ final readonly class Native_Calculator extends Calculator
                 $block_length += $i;
                 $i = 0;
             }
-            /** @var numeric-string $blockA */
+            /** @var numeric-string $block_a */
             $block_a = substr($a, $i, $block_length);
-            /** @var numeric-string $blockB */
+            /** @var numeric-string $block_b */
             $block_b = substr($b, $i, $block_length);
             $sum = (string) ($block_a + $block_b + $carry);
             $sum_length = strlen($sum);
@@ -291,9 +291,9 @@ final readonly class Native_Calculator extends Calculator
                 $block_length += $i;
                 $i = 0;
             }
-            /** @var numeric-string $blockA */
+            /** @var numeric-string $block_a */
             $block_a = substr($a, $i, $block_length);
-            /** @var numeric-string $blockB */
+            /** @var numeric-string $block_b */
             $block_b = substr($b, $i, $block_length);
             $sum = $block_a - $block_b - $carry;
             if ($sum < 0) {

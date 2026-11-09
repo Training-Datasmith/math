@@ -13,7 +13,7 @@ enum Rounding_Mode
      * Asserts that the requested operation has an exact result, hence no rounding is necessary.
      *
      * If this rounding mode is specified on an operation that yields a result that
-     * cannot be represented at the requested scale, a RoundingNecessaryException is thrown.
+     * cannot be represented at the requested scale, a Rounding_Necessary_Exception is thrown.
      */
     case Unnecessary;
     /**

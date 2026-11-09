@@ -5,7 +5,7 @@ namespace Brick\Math\Internal;
 
 use function extension_loaded;
 /**
- * Stores the current Calculator instance used by BigNumber classes.
+ * Stores the current Calculator instance used by Big_Number classes.
  *
  * @internal
  */

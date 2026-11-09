@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Brick\Math\Tests\Internal;
 
-use Brick\Math\Exception\IntegerOverflowException;
+use Brick\Math\Exception\Integer_Overflow_Exception;
 use Brick\Math\Internal\Safe;
-use Brick\Math\Tests\AbstractTestCase;
+use Brick\Math\Tests\Abstract_Test_Case;
 
 use const PHP_INT_MAX;
 
@@ -14,11 +14,11 @@ use const PHP_INT_MIN;
 
 use function sprintf;
 
-final class SafeTest extends AbstractTestCase
+final class Safe_Test extends Abstract_Test_Case
 {
     public function testAddThrowsIntegerOverflowException(): void
     {
-        $this->expectException(IntegerOverflowException::class);
+        $this->expectException(Integer_Overflow_Exception::class);
         $this->expectExceptionMessageExact(sprintf(
             'Cannot compute %d + %d because the result is outside the native integer range [%d, %d].',
             PHP_INT_MAX,
@@ -32,7 +32,7 @@ final class SafeTest extends AbstractTestCase
 
     public function testSubThrowsIntegerOverflowException(): void
     {
-        $this->expectException(IntegerOverflowException::class);
+        $this->expectException(Integer_Overflow_Exception::class);
         $this->expectExceptionMessageExact(sprintf(
             'Cannot compute %d - %d because the result is outside the native integer range [%d, %d].',
             PHP_INT_MIN,
@@ -46,7 +46,7 @@ final class SafeTest extends AbstractTestCase
 
     public function testMulThrowsIntegerOverflowException(): void
     {
-        $this->expectException(IntegerOverflowException::class);
+        $this->expectException(Integer_Overflow_Exception::class);
         $this->expectExceptionMessageExact(sprintf(
             'Cannot compute %d * %d because the result is outside the native integer range [%d, %d].',
             PHP_INT_MAX,
@@ -60,7 +60,7 @@ final class SafeTest extends AbstractTestCase
 
     public function testNegThrowsIntegerOverflowException(): void
     {
-        $this->expectException(IntegerOverflowException::class);
+        $this->expectException(Integer_Overflow_Exception::class);
         $this->expectExceptionMessageExact(sprintf(
             'Cannot compute -(%d) because the result is outside the native integer range [%d, %d].',
             PHP_INT_MIN,

@@ -1,0 +1,4 @@
+GMP OK (12915 tests, 51429 assertions)
+BCMath OK (12915 tests, 51429 assertions)
+Native OK (12915 tests, 51429 assertions)
+BCMath-scale-8 OK (12915 tests, 51429 assertions)

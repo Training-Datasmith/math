@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Brick\Math\Tests;
 
-use Brick\Math\BigDecimal;
-use Brick\Math\BigInteger;
-use Brick\Math\BigRational;
+use Brick\Math\Big_Decimal;
+use Brick\Math\Big_Integer;
+use Brick\Math\Big_Rational;
 
 use function count;
 
@@ -24,7 +24,7 @@ use function substr;
 /**
  * Base class for math tests.
  */
-abstract class AbstractTestCase extends TestCase
+abstract class Abstract_Test_Case extends TestCase
 {
     final protected function expectExceptionMessageExact(string $message): void
     {
@@ -33,39 +33,39 @@ abstract class AbstractTestCase extends TestCase
 
     /**
      * @param string     $expected The expected value, as a string.
-     * @param BigInteger $actual   The BigInteger instance to test.
+     * @param Big_Integer $actual   The Big_Integer instance to test.
      */
-    final protected static function assertBigIntegerEquals(string $expected, BigInteger $actual): void
+    final protected static function assertBigIntegerEquals(string $expected, Big_Integer $actual): void
     {
-        self::assertSame($expected, $actual->toString());
+        self::assertSame($expected, $actual->to_string());
     }
 
     /**
      * @param string     $expected The expected string representation.
-     * @param BigDecimal $actual   The BigDecimal instance to test.
+     * @param Big_Decimal $actual   The Big_Decimal instance to test.
      */
-    final protected static function assertBigDecimalEquals(string $expected, BigDecimal $actual): void
+    final protected static function assertBigDecimalEquals(string $expected, Big_Decimal $actual): void
     {
-        self::assertSame($expected, $actual->toString());
+        self::assertSame($expected, $actual->to_string());
 
         [$unscaledValue, $scale] = self::getUnscaledValueAndScale($expected);
 
-        self::assertSame($unscaledValue, $actual->getUnscaledValue()->toString());
-        self::assertSame($scale, $actual->getScale());
+        self::assertSame($unscaledValue, $actual->get_unscaled_value()->to_string());
+        self::assertSame($scale, $actual->get_scale());
     }
 
     /**
      * @param string      $expected The expected string representation.
-     * @param BigRational $actual   The BigRational instance to test.
+     * @param Big_Rational $actual   The Big_Rational instance to test.
      */
-    final protected static function assertBigRationalEquals(string $expected, BigRational $actual): void
+    final protected static function assertBigRationalEquals(string $expected, Big_Rational $actual): void
     {
-        self::assertSame($expected, $actual->toString());
+        self::assertSame($expected, $actual->to_string());
 
         [$numerator, $denominator] = self::getNumeratorAndDenominator($expected);
 
-        self::assertSame($numerator, $actual->getNumerator()->toString());
-        self::assertSame($denominator, $actual->getDenominator()->toString());
+        self::assertSame($numerator, $actual->get_numerator()->to_string());
+        self::assertSame($denominator, $actual->get_denominator()->to_string());
     }
 
     final protected static function isException(string $name): bool
@@ -76,7 +76,7 @@ abstract class AbstractTestCase extends TestCase
     /**
      * Computes the unscaled value and scale from a properly formatted decimal string.
      *
-     * This intentionally uses a different algorithm than `BigDecimal::of()`, to increase the chances of catching bugs.
+     * This intentionally uses a different algorithm than `Big_Decimal::of()`, to increase the chances of catching bugs.
      *
      * @return array{string, int}
      */
@@ -123,7 +123,7 @@ abstract class AbstractTestCase extends TestCase
     /**
      * Extracts the numerator and denominator from a properly formatted rational string.
      *
-     * This intentionally uses a different algorithm than `BigRational::of()`, to increase the chances of catching bugs.
+     * This intentionally uses a different algorithm than `Big_Rational::of()`, to increase the chances of catching bugs.
      *
      * @return array{string, string}
      */

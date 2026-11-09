@@ -56,11 +56,11 @@ final class Decimal_Helper
      * Returns null when rounding is necessary and the rounding mode is Unnecessary.
      *
      * @param string       $value        The unscaled value.
-     * @param int          $currentScale The current scale.
-     * @param int          $targetScale  The target scale.
-     * @param RoundingMode $roundingMode The rounding mode.
+     * @param int          $current_scale The current scale.
+     * @param int          $target_scale  The target scale.
+     * @param Rounding_Mode $rounding_mode The rounding mode.
      *
-     * @return string|null The unscaled value at the target scale, or null if RoundingMode::Unnecessary is used and rounding is necessary.
+     * @return string|null The unscaled value at the target scale, or null if Rounding_Mode::Unnecessary is used and rounding is necessary.
      *
      * @pure
      */
@@ -108,8 +108,8 @@ final class Decimal_Helper
      * Tries to scale exactly without rounding, returning null when rounding would be required.
      *
      * @param string $value        The unscaled value.
-     * @param int    $currentScale The current scale.
-     * @param int    $targetScale  The target scale.
+     * @param int    $current_scale The current scale.
+     * @param int    $target_scale  The target scale.
      *
      * @return string|null The unscaled value at the target scale, or null if rounding would be required.
      *

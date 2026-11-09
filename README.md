@@ -47,11 +47,11 @@ for a list of changes introduced by each further `0.x.0` version.
 
 This library provides the following public classes in the `Brick\Math` namespace:
 
-- [BigNumber](https://github.com/brick/math/blob/0.17.0/src/BigNumber.php): base class for `BigInteger`, `BigDecimal` and `BigRational`
-- [BigInteger](https://github.com/brick/math/blob/0.17.0/src/BigInteger.php): represents an arbitrary-precision integer number.
-- [BigDecimal](https://github.com/brick/math/blob/0.17.0/src/BigDecimal.php): represents an arbitrary-precision decimal number.
-- [BigRational](https://github.com/brick/math/blob/0.17.0/src/BigRational.php): represents an arbitrary-precision rational number (fraction), always reduced to lowest terms.
-- [RoundingMode](https://github.com/brick/math/blob/0.17.0/src/RoundingMode.php): enum representing all available rounding modes.
+- [Big_Number](https://github.com/brick/math/blob/0.17.0/src/Big_Number.php): base class for `Big_Integer`, `Big_Decimal` and `Big_Rational`
+- [Big_Integer](https://github.com/brick/math/blob/0.17.0/src/Big_Integer.php): represents an arbitrary-precision integer number.
+- [Big_Decimal](https://github.com/brick/math/blob/0.17.0/src/Big_Decimal.php): represents an arbitrary-precision decimal number.
+- [Big_Rational](https://github.com/brick/math/blob/0.17.0/src/Big_Rational.php): represents an arbitrary-precision rational number (fraction), always reduced to lowest terms.
+- [Rounding_Mode](https://github.com/brick/math/blob/0.17.0/src/Rounding_Mode.php): enum representing all available rounding modes.
 
 And [exceptions](#exceptions) in the `Brick\Math\Exception` namespace.
 
@@ -63,156 +63,156 @@ The constructors of the classes are not public, you must use a factory method to
 
 All classes provide an `of()` factory method that accepts any of the following types:
 
-- `BigNumber` instances
+- `Big_Number` instances
 - `int` numbers
 - `string` representations of integer, decimal and rational numbers
 
 Example:
 
 ```php
-BigInteger::of(123546);
-BigInteger::of('9999999999999999999999999999999999999999999');
+Big_Integer::of(123546);
+Big_Integer::of('9999999999999999999999999999999999999999999');
 
-BigDecimal::of('9.99999999999999999999999999999999999999999999');
+Big_Decimal::of('9.99999999999999999999999999999999999999999999');
 
-BigRational::of('2/3');
+Big_Rational::of('2/3');
 ```
 
 Note that all `of()` methods accept all the representations above, *as long as it can be safely converted to
 the current type*:
 
 ```php
-BigInteger::of('1.00'); // 1
-BigInteger::of('1.01'); // RoundingNecessaryException
+Big_Integer::of('1.00'); // 1
+Big_Integer::of('1.01'); // Rounding_Necessary_Exception
 
-BigDecimal::of('1/8'); // 0.125
-BigDecimal::of('1/3'); // RoundingNecessaryException
+Big_Decimal::of('1/8'); // 0.125
+Big_Decimal::of('1/3'); // Rounding_Necessary_Exception
 
-BigRational::of('1.1'); // 11/10
-BigRational::of('1.15'); // 23/20 (reduced to lowest terms)
+Big_Rational::of('1.1'); // 11/10
+Big_Rational::of('1.15'); // 23/20 (reduced to lowest terms)
 ```
 
 > [!NOTE]
 > The `of()` factory method does not accept `float` values, because casting a float to string can be lossy.
-> To convert a float to a `BigDecimal`, use one of the dedicated methods:
+> To convert a float to a `Big_Decimal`, use one of the dedicated methods:
 >
 > ```php
 > // Exact IEEE-754 representation — the value the float actually holds:
-> BigDecimal::fromFloatExact(0.1); // 0.1000000000000000055511151231257827021181583404541015625
+> Big_Decimal::from_float_exact(0.1); // 0.1000000000000000055511151231257827021181583404541015625
 >
 > // Shortest decimal that round-trips back to the same float:
-> BigDecimal::fromFloatShortest(0.1); // 0.1
+> Big_Decimal::from_float_shortest(0.1); // 0.1
 > ```
 
 #### Immutability & chaining
 
-The `BigInteger`, `BigDecimal` and `BigRational` classes are immutable: their value never changes,
-so that they can be safely passed around. All methods that return a `BigInteger`, `BigDecimal` or `BigRational`
+The `Big_Integer`, `Big_Decimal` and `Big_Rational` classes are immutable: their value never changes,
+so that they can be safely passed around. All methods that return a `Big_Integer`, `Big_Decimal` or `Big_Rational`
 return a new object, leaving the original object unaffected:
 
 ```php
-$ten = BigInteger::of(10);
+$ten = Big_Integer::of(10);
 
 echo $ten->plus(5); // 15
-echo $ten->multipliedBy(3); // 30
+echo $ten->multiplied_by(3); // 30
 ```
 
 The methods can be chained for better readability:
 
 ```php
-echo BigInteger::of(10)->plus(5)->multipliedBy(3); // 45
+echo Big_Integer::of(10)->plus(5)->multiplied_by(3); // 45
 ```
 
 #### Parameter types
 
-All methods that accept a number: `plus()`, `minus()`, `multipliedBy()`, etc. accept the same types as `of()`.
+All methods that accept a number: `plus()`, `minus()`, `multiplied_by()`, etc. accept the same types as `of()`.
 For example, given the following number:
 
 ```php
-$integer = BigInteger::of(123);
+$integer = Big_Integer::of(123);
 ```
 
 The following lines are equivalent:
 
 ```php
-$integer->multipliedBy(123);
-$integer->multipliedBy('123');
-$integer->multipliedBy($integer);
+$integer->multiplied_by(123);
+$integer->multiplied_by('123');
+$integer->multiplied_by($integer);
 ```
 
-Just like `of()`, other types of `BigNumber` are acceptable, as long as they can be safely converted to the current type:
+Just like `of()`, other types of `Big_Number` are acceptable, as long as they can be safely converted to the current type:
 
 ```php
-echo BigInteger::of(2)->multipliedBy(BigDecimal::of('2.0')); // 4
-echo BigInteger::of(2)->multipliedBy(BigDecimal::of('2.5')); // RoundingNecessaryException
-echo BigDecimal::of(2.5)->multipliedBy(BigInteger::of(2)); // 5.0
+echo Big_Integer::of(2)->multiplied_by(Big_Decimal::of('2.0')); // 4
+echo Big_Integer::of(2)->multiplied_by(Big_Decimal::of('2.5')); // Rounding_Necessary_Exception
+echo Big_Decimal::of(2.5)->multiplied_by(Big_Integer::of(2)); // 5.0
 ```
 
 #### Division & rounding
 
-##### BigInteger
+##### Big_Integer
 
-By default, dividing a `BigInteger` returns the exact result of the division, or throws an exception if the remainder
+By default, dividing a `Big_Integer` returns the exact result of the division, or throws an exception if the remainder
 of the division is not zero:
 
 ```php
-echo BigInteger::of(999)->dividedBy(3); // 333
-echo BigInteger::of(1000)->dividedBy(3); // RoundingNecessaryException
+echo Big_Integer::of(999)->divided_by(3); // 333
+echo Big_Integer::of(1000)->divided_by(3); // Rounding_Necessary_Exception
 ```
 
-You can pass an optional [rounding mode](https://github.com/brick/math/blob/0.17.0/src/RoundingMode.php) to round the result, if necessary:
+You can pass an optional [rounding mode](https://github.com/brick/math/blob/0.17.0/src/Rounding_Mode.php) to round the result, if necessary:
 
 ```php
-echo BigInteger::of(1000)->dividedBy(3, RoundingMode::Down); // 333
-echo BigInteger::of(1000)->dividedBy(3, RoundingMode::Up); // 334
+echo Big_Integer::of(1000)->divided_by(3, Rounding_Mode::Down); // 333
+echo Big_Integer::of(1000)->divided_by(3, Rounding_Mode::Up); // 334
 ```
 
 If you're into quotients and remainders, there are methods for this, too:
 
 ```php
-echo BigInteger::of(1000)->quotient(3); // 333
-echo BigInteger::of(1000)->remainder(3); // 1
+echo Big_Integer::of(1000)->quotient(3); // 333
+echo Big_Integer::of(1000)->remainder(3); // 1
 ```
 
 You can even get both at the same time:
 
 ```php
-[$quotient, $remainder] = BigInteger::of(1000)->quotientAndRemainder(3);
+[$quotient, $remainder] = Big_Integer::of(1000)->quotient_and_remainder(3);
 ```
 
-##### BigDecimal
+##### Big_Decimal
 
-Dividing a `BigDecimal` always requires a scale to be specified. If the exact result of the division does not fit in
-the given scale, a [rounding mode](https://github.com/brick/math/blob/0.17.0/src/RoundingMode.php) must be provided.
+Dividing a `Big_Decimal` always requires a scale to be specified. If the exact result of the division does not fit in
+the given scale, a [rounding mode](https://github.com/brick/math/blob/0.17.0/src/Rounding_Mode.php) must be provided.
 
 ```php
-echo BigDecimal::of(1)->dividedBy('8', 3); // 0.125
-echo BigDecimal::of(1)->dividedBy('8', 2); // RoundingNecessaryException
-echo BigDecimal::of(1)->dividedBy('8', 2, RoundingMode::HalfDown); // 0.12
-echo BigDecimal::of(1)->dividedBy('8', 2, RoundingMode::HalfUp); // 0.13
+echo Big_Decimal::of(1)->divided_by('8', 3); // 0.125
+echo Big_Decimal::of(1)->divided_by('8', 2); // Rounding_Necessary_Exception
+echo Big_Decimal::of(1)->divided_by('8', 2, Rounding_Mode::HalfDown); // 0.12
+echo Big_Decimal::of(1)->divided_by('8', 2, Rounding_Mode::HalfUp); // 0.13
 ```
 
-If you know that the division yields a finite number of decimals places, you can use `dividedByExact()`, which will
+If you know that the division yields a finite number of decimals places, you can use `divided_by_exact()`, which will
 automatically compute the required scale to fit the result, or throw an exception if the division yields an infinite
 repeating decimal:
 
 ```php
-echo BigDecimal::of(1)->dividedByExact(256); // 0.00390625
-echo BigDecimal::of(1)->dividedByExact(11); // RoundingNecessaryException
+echo Big_Decimal::of(1)->divided_by_exact(256); // 0.00390625
+echo Big_Decimal::of(1)->divided_by_exact(11); // Rounding_Necessary_Exception
 ```
 
-##### BigRational
+##### Big_Rational
 
-The result of the division of a `BigRational` can always be represented exactly:
+The result of the division of a `Big_Rational` can always be represented exactly:
 
 ```php
-echo BigRational::of('13/99')->dividedBy('7'); // 13/693
-echo BigRational::of('13/99')->dividedBy('9/8'); // 104/891
+echo Big_Rational::of('13/99')->divided_by('7'); // 13/693
+echo Big_Rational::of('13/99')->divided_by('9/8'); // 104/891
 ```
 
 #### Bitwise operations
 
-`BigInteger` supports bitwise operations:
+`Big_Integer` supports bitwise operations:
 
 - `and()`
 - `or()`
@@ -221,38 +221,38 @@ echo BigRational::of('13/99')->dividedBy('9/8'); // 104/891
 
 and bit shifting:
 
-- `shiftedLeft()`
-- `shiftedRight()`
+- `shifted_left()`
+- `shifted_right()`
 
 #### Exceptions
 
-All exceptions thrown by this library implement the `MathException` interface.
+All exceptions thrown by this library implement the `Math_Exception` interface.
 This means that you can safely catch all exceptions thrown by this library using a single catch clause:
 
 ```php
-use Brick\Math\BigDecimal;
-use Brick\Math\Exception\MathException;
+use Brick\Math\Big_Decimal;
+use Brick\Math\Exception\Math_Exception;
 
 try {
-    $number = BigInteger::of(1)->dividedBy(3);
-} catch (MathException $e) {
+    $number = Big_Integer::of(1)->divided_by(3);
+} catch (Math_Exception $e) {
     // ...
 }
 ```
 
 If you need more granular control over the exceptions thrown, you can catch the specific exception classes:
 
-- `DivisionByZeroException`
-- `IntegerOverflowException`
-- `InvalidArgumentException`
-- `NegativeNumberException`
-- `NoInverseException`
-- `NumberFormatException`
-- `RoundingNecessaryException`
+- `Division_By_Zero_Exception`
+- `Integer_Overflow_Exception`
+- `Invalid_Argument_Exception`
+- `Negative_Number_Exception`
+- `No_Inverse_Exception`
+- `Number_Format_Exception`
+- `Rounding_Necessary_Exception`
 
 #### Serialization
 
-`BigInteger`, `BigDecimal` and `BigRational` can be safely serialized on a machine and unserialized on another,
+`Big_Integer`, `Big_Decimal` and `Big_Rational` can be safely serialized on a machine and unserialized on another,
 even if these machines do not share the same set of PHP extensions.
 
 For example, serializing on a machine with GMP support and unserializing on a machine that does not have this extension

@@ -7,20 +7,20 @@ namespace Brick\Math\Tests;
 use function abs;
 use function bin2hex;
 
-use Brick\Math\BigDecimal;
-use Brick\Math\BigInteger;
-use Brick\Math\BigNumber;
-use Brick\Math\Exception\DivisionByZeroException;
-use Brick\Math\Exception\IntegerOverflowException;
-use Brick\Math\Exception\InvalidArgumentException;
-use Brick\Math\Exception\NegativeNumberException;
-use Brick\Math\Exception\NoInverseException;
-use Brick\Math\Exception\NumberFormatException;
-use Brick\Math\Exception\RandomSourceException;
-use Brick\Math\Exception\RoundingNecessaryException;
+use Brick\Math\Big_Decimal;
+use Brick\Math\Big_Integer;
+use Brick\Math\Big_Number;
+use Brick\Math\Exception\Division_By_Zero_Exception;
+use Brick\Math\Exception\Integer_Overflow_Exception;
+use Brick\Math\Exception\Invalid_Argument_Exception;
+use Brick\Math\Exception\Negative_Number_Exception;
+use Brick\Math\Exception\No_Inverse_Exception;
+use Brick\Math\Exception\Number_Format_Exception;
+use Brick\Math\Exception\Random_Source_Exception;
+use Brick\Math\Exception\Rounding_Necessary_Exception;
 use Brick\Math\Internal\Calculator;
-use Brick\Math\Internal\CalculatorRegistry;
-use Brick\Math\RoundingMode;
+use Brick\Math\Internal\Calculator_Registry;
+use Brick\Math\Rounding_Mode;
 
 use function count;
 
@@ -47,28 +47,28 @@ use function strtoupper;
 use function unserialize;
 
 /**
- * Unit tests for class BigInteger.
+ * Unit tests for class Big_Integer.
  */
-class BigIntegerTest extends AbstractTestCase
+class Big_Integer_Test extends Abstract_Test_Case
 {
     /**
-     * @param int|string $value    The value to convert to a BigInteger.
+     * @param int|string $value    The value to convert to a Big_Integer.
      * @param string     $expected The expected string value of the result.
      */
     #[DataProvider('providerOf')]
     public function testOf(int|string $value, string $expected): void
     {
-        self::assertBigIntegerEquals($expected, BigInteger::of($value));
+        self::assertBigIntegerEquals($expected, Big_Integer::of($value));
     }
 
     /**
-     * @param int|string $value    The value to convert to a BigInteger.
+     * @param int|string $value    The value to convert to a Big_Integer.
      * @param string     $expected The expected string value of the result.
      */
     #[DataProvider('providerOf')]
     public function testOfNullableWithValidInputBehavesLikeOf(mixed $value, string $expected): void
     {
-        $result = BigInteger::ofNullable($value);
+        $result = Big_Integer::of_nullable($value);
 
         self::assertNotNull($result);
         self::assertBigIntegerEquals($expected, $result);
@@ -76,7 +76,7 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testOfNullableWithNullInput(): void
     {
-        self::assertNull(BigInteger::ofNullable(null));
+        self::assertNull(Big_Integer::of_nullable(null));
     }
 
     public static function providerOf(): array
@@ -148,26 +148,26 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testOfBigIntegerReturnsThis(): void
     {
-        $decimal = BigInteger::of(123);
+        $decimal = Big_Integer::of(123);
 
-        self::assertSame($decimal, BigInteger::of($decimal));
+        self::assertSame($decimal, Big_Integer::of($decimal));
     }
 
     public function testOfEmptyStringThrowsException(): void
     {
-        $this->expectException(NumberFormatException::class);
+        $this->expectException(Number_Format_Exception::class);
         $this->expectExceptionMessageExact('The number must not be empty.');
 
-        BigInteger::of('');
+        Big_Integer::of('');
     }
 
     #[DataProvider('providerOfInvalidFormatThrowsException')]
     public function testOfInvalidFormatThrowsException(string $value): void
     {
-        $this->expectException(NumberFormatException::class);
+        $this->expectException(Number_Format_Exception::class);
         $this->expectExceptionMessageExact(sprintf('Value "%s" does not represent a valid number.', $value));
 
-        BigInteger::of($value);
+        Big_Integer::of($value);
     }
 
     public static function providerOfInvalidFormatThrowsException(): array
@@ -190,10 +190,10 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerOfNonConvertibleValueThrowsException')]
     public function testOfNonConvertibleValueThrowsException(string $value, string $expectedExceptionMessage): void
     {
-        $this->expectException(RoundingNecessaryException::class);
+        $this->expectException(Rounding_Necessary_Exception::class);
         $this->expectExceptionMessageExact($expectedExceptionMessage);
 
-        BigInteger::of($value);
+        Big_Integer::of($value);
     }
 
     public static function providerOfNonConvertibleValueThrowsException(): array
@@ -213,7 +213,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerFromBase')]
     public function testFromBase(string $number, int $base, string $expected): void
     {
-        self::assertBigIntegerEquals($expected, BigInteger::fromBase($number, $base));
+        self::assertBigIntegerEquals($expected, Big_Integer::from_base($number, $base));
     }
 
     public static function providerFromBase(): array
@@ -324,10 +324,10 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerFromBaseWithInvalidValue')]
     public function testFromBaseWithInvalidValue(string $value, int $base, string $expectedExceptionMessage): void
     {
-        $this->expectException(NumberFormatException::class);
+        $this->expectException(Number_Format_Exception::class);
         $this->expectExceptionMessageExact($expectedExceptionMessage);
 
-        BigInteger::fromBase($value, $base);
+        Big_Integer::from_base($value, $base);
     }
 
     public static function providerFromBaseWithInvalidValue(): array
@@ -380,10 +380,10 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerFromBaseWithInvalidBase')]
     public function testFromBaseWithInvalidBase(int $base): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact(sprintf('Base %d is out of range [2, 36].', $base));
 
-        BigInteger::fromBase('0', $base);
+        Big_Integer::from_base('0', $base);
     }
 
     public static function providerFromBaseWithInvalidBase(): array
@@ -399,26 +399,26 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testZero(): void
     {
-        self::assertBigIntegerEquals('0', BigInteger::zero());
-        self::assertSame(BigInteger::zero(), BigInteger::zero());
+        self::assertBigIntegerEquals('0', Big_Integer::zero());
+        self::assertSame(Big_Integer::zero(), Big_Integer::zero());
     }
 
     public function testOne(): void
     {
-        self::assertBigIntegerEquals('1', BigInteger::one());
-        self::assertSame(BigInteger::one(), BigInteger::one());
+        self::assertBigIntegerEquals('1', Big_Integer::one());
+        self::assertSame(Big_Integer::one(), Big_Integer::one());
     }
 
     public function testTen(): void
     {
-        self::assertBigIntegerEquals('10', BigInteger::ten());
-        self::assertSame(BigInteger::ten(), BigInteger::ten());
+        self::assertBigIntegerEquals('10', Big_Integer::ten());
+        self::assertSame(Big_Integer::ten(), Big_Integer::ten());
     }
 
     #[DataProvider('providerGcdAll')]
     public function testGcdAll(array $values, string|int $expectedGCD): void
     {
-        self::assertBigIntegerEquals((string) $expectedGCD, BigInteger::gcdAll(...$values));
+        self::assertBigIntegerEquals((string) $expectedGCD, Big_Integer::gcd_all(...$values));
     }
 
     public static function providerGcdAll(): Generator
@@ -451,13 +451,13 @@ class BigIntegerTest extends AbstractTestCase
         yield [['28', '56', '77784', '14', '4'], '2'];
 
         // mixed types
-        yield [[12, 14, '18', BigInteger::of(20)], '2'];
+        yield [[12, 14, '18', Big_Integer::of(20)], '2'];
     }
 
     #[DataProvider('providerLcmAll')]
     public function testLcmAll(array $values, string|int $expectedLCM): void
     {
-        self::assertBigIntegerEquals((string) $expectedLCM, BigInteger::lcmAll(...$values));
+        self::assertBigIntegerEquals((string) $expectedLCM, Big_Integer::lcm_all(...$values));
     }
 
     public static function providerLcmAll(): Generator
@@ -485,7 +485,7 @@ class BigIntegerTest extends AbstractTestCase
         yield [['0', '4', '7'], '0'];
 
         // mixed types
-        yield [[12, '18', BigInteger::of(20), BigDecimal::of('14.0')], '1260'];
+        yield [[12, '18', Big_Integer::of(20), Big_Decimal::of('14.0')], '1260'];
     }
 
     /**
@@ -495,7 +495,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerMin')]
     public function testMin(array $values, string $min): void
     {
-        self::assertBigIntegerEquals($min, BigInteger::min(...$values));
+        self::assertBigIntegerEquals($min, Big_Integer::min(...$values));
     }
 
     public static function providerMin(): array
@@ -514,10 +514,10 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerMinOfNonIntegerValuesThrowsException')]
     public function testMinOfNonIntegerValuesThrowsException(string $number, string $expectedExceptionMessage): void
     {
-        $this->expectException(RoundingNecessaryException::class);
+        $this->expectException(Rounding_Necessary_Exception::class);
         $this->expectExceptionMessageExact($expectedExceptionMessage);
 
-        BigInteger::min(1, $number);
+        Big_Integer::min(1, $number);
     }
 
     public static function providerMinOfNonIntegerValuesThrowsException(): array
@@ -535,7 +535,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerMax')]
     public function testMax(array $values, string $max): void
     {
-        self::assertBigIntegerEquals($max, BigInteger::max(...$values));
+        self::assertBigIntegerEquals($max, Big_Integer::max(...$values));
     }
 
     public static function providerMax(): array
@@ -555,10 +555,10 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerMaxOfNonIntegerValuesThrowsException')]
     public function testMaxOfNonIntegerValuesThrowsException(string $number, string $expectedExceptionMessage): void
     {
-        $this->expectException(RoundingNecessaryException::class);
+        $this->expectException(Rounding_Necessary_Exception::class);
         $this->expectExceptionMessageExact($expectedExceptionMessage);
 
-        BigInteger::max(1, $number);
+        Big_Integer::max(1, $number);
     }
 
     public static function providerMaxOfNonIntegerValuesThrowsException(): array
@@ -576,7 +576,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerSum')]
     public function testSum(array $values, string $sum): void
     {
-        self::assertBigIntegerEquals($sum, BigInteger::sum(...$values));
+        self::assertBigIntegerEquals($sum, Big_Integer::sum(...$values));
     }
 
     public static function providerSum(): array
@@ -597,10 +597,10 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerSumOfNonIntegerValuesThrowsException')]
     public function testSumOfNonIntegerValuesThrowsException(string $number, string $expectedExceptionMessage): void
     {
-        $this->expectException(RoundingNecessaryException::class);
+        $this->expectException(Rounding_Necessary_Exception::class);
         $this->expectExceptionMessageExact($expectedExceptionMessage);
 
-        BigInteger::sum(1, $number);
+        Big_Integer::sum(1, $number);
     }
 
     public static function providerSumOfNonIntegerValuesThrowsException(): array
@@ -619,7 +619,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerPlus')]
     public function testPlus(string $a, string $b, string $r): void
     {
-        self::assertBigIntegerEquals($r, BigInteger::of($a)->plus($b));
+        self::assertBigIntegerEquals($r, Big_Integer::of($a)->plus($b));
     }
 
     public static function providerPlus(): array
@@ -648,7 +648,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerMinus')]
     public function testMinus(string $a, string $b, string $r): void
     {
-        self::assertBigIntegerEquals($r, BigInteger::of($a)->minus($b));
+        self::assertBigIntegerEquals($r, Big_Integer::of($a)->minus($b));
     }
 
     public static function providerMinus(): array
@@ -674,7 +674,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerMultipliedBy')]
     public function testMultipliedBy(string $a, int|string $b, string $r): void
     {
-        self::assertBigIntegerEquals($r, BigInteger::of($a)->multipliedBy($b));
+        self::assertBigIntegerEquals($r, Big_Integer::of($a)->multiplied_by($b));
     }
 
     public static function providerMultipliedBy(): array
@@ -713,17 +713,17 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerDividedBy')]
     public function testDividedBy(string $number, int|string $divisor, string $expected): void
     {
-        $number = BigInteger::of($number);
+        $number = Big_Integer::of($number);
 
         if (self::isException($expected)) {
             $this->expectException($expected);
 
-            if ($expected === DivisionByZeroException::class) {
+            if ($expected === Division_By_Zero_Exception::class) {
                 $this->expectExceptionMessageExact('Division by zero.');
             }
         }
 
-        $actual = $number->dividedBy($divisor);
+        $actual = $number->divided_by($divisor);
 
         if (! self::isException($expected)) {
             self::assertBigIntegerEquals($expected, $actual);
@@ -734,16 +734,16 @@ class BigIntegerTest extends AbstractTestCase
     {
         return [
             ['123456789098765432101234567890987654321', 1, '123456789098765432101234567890987654321'],
-            ['123456789098765432101234567890987654321', 2, RoundingNecessaryException::class],
-            ['123456789098765432101234567890987654321', 0, DivisionByZeroException::class],
-            ['123456789098765432101234567890987654321', '0.0', DivisionByZeroException::class],
-            ['123456789098765432101234567890987654321', '0.1', RoundingNecessaryException::class],
+            ['123456789098765432101234567890987654321', 2, Rounding_Necessary_Exception::class],
+            ['123456789098765432101234567890987654321', 0, Division_By_Zero_Exception::class],
+            ['123456789098765432101234567890987654321', '0.0', Division_By_Zero_Exception::class],
+            ['123456789098765432101234567890987654321', '0.1', Rounding_Necessary_Exception::class],
             ['123456789098765432101234567890987654322', 2, '61728394549382716050617283945493827161'],
             ['123456789098765432101234567890987654322', '2', '61728394549382716050617283945493827161'],
             ['123456789098765432101234567890987654322', '2.0', '61728394549382716050617283945493827161'],
             ['123456789098765432101234567890987654322', '14/7', '61728394549382716050617283945493827161'],
-            ['61728394549382716050617283945493827161', '0.5', RoundingNecessaryException::class],
-            ['61728394549382716050617283945493827161', '1/2', RoundingNecessaryException::class],
+            ['61728394549382716050617283945493827161', '0.5', Rounding_Necessary_Exception::class],
+            ['61728394549382716050617283945493827161', '1/2', Rounding_Necessary_Exception::class],
             ['0', '61728394549382716050617283945493827161', '0'],
 
             // overflowing native integer division
@@ -753,16 +753,16 @@ class BigIntegerTest extends AbstractTestCase
     }
 
     /**
-     * @param RoundingMode $roundingMode The rounding mode.
+     * @param Rounding_Mode $roundingMode The rounding mode.
      * @param string       $number       The number to round.
      * @param string|null  $ten          The expected rounding divided by 10, or null if an exception is expected.
      * @param string|null  $hundred      The expected rounding divided by 100 or null if an exception is expected.
      * @param string|null  $thousand     The expected rounding divided by 1000, or null if an exception is expected.
      */
     #[DataProvider('providerDividedByWithRoundingMode')]
-    public function testDividedByWithRoundingMode(RoundingMode $roundingMode, string $number, ?string $ten, ?string $hundred, ?string $thousand): void
+    public function testDividedByWithRoundingMode(Rounding_Mode $roundingMode, string $number, ?string $ten, ?string $hundred, ?string $thousand): void
     {
-        $number = BigInteger::of($number);
+        $number = Big_Integer::of($number);
 
         $this->doTestDividedByWithRoundingMode($roundingMode, $number, '1', $ten, $hundred, $thousand);
         $this->doTestDividedByWithRoundingMode($roundingMode, $number->negated(), '-1', $ten, $hundred, $thousand);
@@ -771,465 +771,465 @@ class BigIntegerTest extends AbstractTestCase
     public static function providerDividedByWithRoundingMode(): array
     {
         return [
-            [RoundingMode::Up,  '3501',  '351',  '36',  '4'],
-            [RoundingMode::Up,  '3500',  '350',  '35',  '4'],
-            [RoundingMode::Up,  '3499',  '350',  '35',  '4'],
-            [RoundingMode::Up,  '3001',  '301',  '31',  '4'],
-            [RoundingMode::Up,  '3000',  '300',  '30',  '3'],
-            [RoundingMode::Up,  '2999',  '300',  '30',  '3'],
-            [RoundingMode::Up,  '2501',  '251',  '26',  '3'],
-            [RoundingMode::Up,  '2500',  '250',  '25',  '3'],
-            [RoundingMode::Up,  '2499',  '250',  '25',  '3'],
-            [RoundingMode::Up,  '2001',  '201',  '21',  '3'],
-            [RoundingMode::Up,  '2000',  '200',  '20',  '2'],
-            [RoundingMode::Up,  '1999',  '200',  '20',  '2'],
-            [RoundingMode::Up,  '1501',  '151',  '16',  '2'],
-            [RoundingMode::Up,  '1500',  '150',  '15',  '2'],
-            [RoundingMode::Up,  '1499',  '150',  '15',  '2'],
-            [RoundingMode::Up,  '1001',  '101',  '11',  '2'],
-            [RoundingMode::Up,  '1000',  '100',  '10',  '1'],
-            [RoundingMode::Up,   '999',  '100',  '10',  '1'],
-            [RoundingMode::Up,   '501',   '51',   '6',  '1'],
-            [RoundingMode::Up,   '500',   '50',   '5',  '1'],
-            [RoundingMode::Up,   '499',   '50',   '5',  '1'],
-            [RoundingMode::Up,     '1',    '1',   '1',  '1'],
-            [RoundingMode::Up,     '0',    '0',   '0',  '0'],
-            [RoundingMode::Up,    '-1',   '-1',  '-1', '-1'],
-            [RoundingMode::Up,  '-499',  '-50',  '-5', '-1'],
-            [RoundingMode::Up,  '-500',  '-50',  '-5', '-1'],
-            [RoundingMode::Up,  '-501',  '-51',  '-6', '-1'],
-            [RoundingMode::Up,  '-999', '-100', '-10', '-1'],
-            [RoundingMode::Up, '-1000', '-100', '-10', '-1'],
-            [RoundingMode::Up, '-1001', '-101', '-11', '-2'],
-            [RoundingMode::Up, '-1499', '-150', '-15', '-2'],
-            [RoundingMode::Up, '-1500', '-150', '-15', '-2'],
-            [RoundingMode::Up, '-1501', '-151', '-16', '-2'],
-            [RoundingMode::Up, '-1999', '-200', '-20', '-2'],
-            [RoundingMode::Up, '-2000', '-200', '-20', '-2'],
-            [RoundingMode::Up, '-2001', '-201', '-21', '-3'],
-            [RoundingMode::Up, '-2499', '-250', '-25', '-3'],
-            [RoundingMode::Up, '-2500', '-250', '-25', '-3'],
-            [RoundingMode::Up, '-2501', '-251', '-26', '-3'],
-            [RoundingMode::Up, '-2999', '-300', '-30', '-3'],
-            [RoundingMode::Up, '-3000', '-300', '-30', '-3'],
-            [RoundingMode::Up, '-3001', '-301', '-31', '-4'],
-            [RoundingMode::Up, '-3499', '-350', '-35', '-4'],
-            [RoundingMode::Up, '-3500', '-350', '-35', '-4'],
-            [RoundingMode::Up, '-3501', '-351', '-36', '-4'],
+            [Rounding_Mode::Up,  '3501',  '351',  '36',  '4'],
+            [Rounding_Mode::Up,  '3500',  '350',  '35',  '4'],
+            [Rounding_Mode::Up,  '3499',  '350',  '35',  '4'],
+            [Rounding_Mode::Up,  '3001',  '301',  '31',  '4'],
+            [Rounding_Mode::Up,  '3000',  '300',  '30',  '3'],
+            [Rounding_Mode::Up,  '2999',  '300',  '30',  '3'],
+            [Rounding_Mode::Up,  '2501',  '251',  '26',  '3'],
+            [Rounding_Mode::Up,  '2500',  '250',  '25',  '3'],
+            [Rounding_Mode::Up,  '2499',  '250',  '25',  '3'],
+            [Rounding_Mode::Up,  '2001',  '201',  '21',  '3'],
+            [Rounding_Mode::Up,  '2000',  '200',  '20',  '2'],
+            [Rounding_Mode::Up,  '1999',  '200',  '20',  '2'],
+            [Rounding_Mode::Up,  '1501',  '151',  '16',  '2'],
+            [Rounding_Mode::Up,  '1500',  '150',  '15',  '2'],
+            [Rounding_Mode::Up,  '1499',  '150',  '15',  '2'],
+            [Rounding_Mode::Up,  '1001',  '101',  '11',  '2'],
+            [Rounding_Mode::Up,  '1000',  '100',  '10',  '1'],
+            [Rounding_Mode::Up,   '999',  '100',  '10',  '1'],
+            [Rounding_Mode::Up,   '501',   '51',   '6',  '1'],
+            [Rounding_Mode::Up,   '500',   '50',   '5',  '1'],
+            [Rounding_Mode::Up,   '499',   '50',   '5',  '1'],
+            [Rounding_Mode::Up,     '1',    '1',   '1',  '1'],
+            [Rounding_Mode::Up,     '0',    '0',   '0',  '0'],
+            [Rounding_Mode::Up,    '-1',   '-1',  '-1', '-1'],
+            [Rounding_Mode::Up,  '-499',  '-50',  '-5', '-1'],
+            [Rounding_Mode::Up,  '-500',  '-50',  '-5', '-1'],
+            [Rounding_Mode::Up,  '-501',  '-51',  '-6', '-1'],
+            [Rounding_Mode::Up,  '-999', '-100', '-10', '-1'],
+            [Rounding_Mode::Up, '-1000', '-100', '-10', '-1'],
+            [Rounding_Mode::Up, '-1001', '-101', '-11', '-2'],
+            [Rounding_Mode::Up, '-1499', '-150', '-15', '-2'],
+            [Rounding_Mode::Up, '-1500', '-150', '-15', '-2'],
+            [Rounding_Mode::Up, '-1501', '-151', '-16', '-2'],
+            [Rounding_Mode::Up, '-1999', '-200', '-20', '-2'],
+            [Rounding_Mode::Up, '-2000', '-200', '-20', '-2'],
+            [Rounding_Mode::Up, '-2001', '-201', '-21', '-3'],
+            [Rounding_Mode::Up, '-2499', '-250', '-25', '-3'],
+            [Rounding_Mode::Up, '-2500', '-250', '-25', '-3'],
+            [Rounding_Mode::Up, '-2501', '-251', '-26', '-3'],
+            [Rounding_Mode::Up, '-2999', '-300', '-30', '-3'],
+            [Rounding_Mode::Up, '-3000', '-300', '-30', '-3'],
+            [Rounding_Mode::Up, '-3001', '-301', '-31', '-4'],
+            [Rounding_Mode::Up, '-3499', '-350', '-35', '-4'],
+            [Rounding_Mode::Up, '-3500', '-350', '-35', '-4'],
+            [Rounding_Mode::Up, '-3501', '-351', '-36', '-4'],
 
-            [RoundingMode::Down,  '3501',  '350',  '35',  '3'],
-            [RoundingMode::Down,  '3500',  '350',  '35',  '3'],
-            [RoundingMode::Down,  '3499',  '349',  '34',  '3'],
-            [RoundingMode::Down,  '3001',  '300',  '30',  '3'],
-            [RoundingMode::Down,  '3000',  '300',  '30',  '3'],
-            [RoundingMode::Down,  '2999',  '299',  '29',  '2'],
-            [RoundingMode::Down,  '2501',  '250',  '25',  '2'],
-            [RoundingMode::Down,  '2500',  '250',  '25',  '2'],
-            [RoundingMode::Down,  '2499',  '249',  '24',  '2'],
-            [RoundingMode::Down,  '2001',  '200',  '20',  '2'],
-            [RoundingMode::Down,  '2000',  '200',  '20',  '2'],
-            [RoundingMode::Down,  '1999',  '199',  '19',  '1'],
-            [RoundingMode::Down,  '1501',  '150',  '15',  '1'],
-            [RoundingMode::Down,  '1500',  '150',  '15',  '1'],
-            [RoundingMode::Down,  '1499',  '149',  '14',  '1'],
-            [RoundingMode::Down,  '1001',  '100',  '10',  '1'],
-            [RoundingMode::Down,  '1000',  '100',  '10',  '1'],
-            [RoundingMode::Down,   '999',   '99',   '9',  '0'],
-            [RoundingMode::Down,   '501',   '50',   '5',  '0'],
-            [RoundingMode::Down,   '500',   '50',   '5',  '0'],
-            [RoundingMode::Down,   '499',   '49',   '4',  '0'],
-            [RoundingMode::Down,     '1',    '0',   '0',  '0'],
-            [RoundingMode::Down,     '0',    '0',   '0',  '0'],
-            [RoundingMode::Down,    '-1',    '0',   '0',  '0'],
-            [RoundingMode::Down,  '-499',  '-49',  '-4',  '0'],
-            [RoundingMode::Down,  '-500',  '-50',  '-5',  '0'],
-            [RoundingMode::Down,  '-501',  '-50',  '-5',  '0'],
-            [RoundingMode::Down,  '-999',  '-99',  '-9',  '0'],
-            [RoundingMode::Down, '-1000', '-100', '-10', '-1'],
-            [RoundingMode::Down, '-1001', '-100', '-10', '-1'],
-            [RoundingMode::Down, '-1499', '-149', '-14', '-1'],
-            [RoundingMode::Down, '-1500', '-150', '-15', '-1'],
-            [RoundingMode::Down, '-1501', '-150', '-15', '-1'],
-            [RoundingMode::Down, '-1999', '-199', '-19', '-1'],
-            [RoundingMode::Down, '-2000', '-200', '-20', '-2'],
-            [RoundingMode::Down, '-2001', '-200', '-20', '-2'],
-            [RoundingMode::Down, '-2499', '-249', '-24', '-2'],
-            [RoundingMode::Down, '-2500', '-250', '-25', '-2'],
-            [RoundingMode::Down, '-2501', '-250', '-25', '-2'],
-            [RoundingMode::Down, '-2999', '-299', '-29', '-2'],
-            [RoundingMode::Down, '-3000', '-300', '-30', '-3'],
-            [RoundingMode::Down, '-3001', '-300', '-30', '-3'],
-            [RoundingMode::Down, '-3499', '-349', '-34', '-3'],
-            [RoundingMode::Down, '-3500', '-350', '-35', '-3'],
-            [RoundingMode::Down, '-3501', '-350', '-35', '-3'],
+            [Rounding_Mode::Down,  '3501',  '350',  '35',  '3'],
+            [Rounding_Mode::Down,  '3500',  '350',  '35',  '3'],
+            [Rounding_Mode::Down,  '3499',  '349',  '34',  '3'],
+            [Rounding_Mode::Down,  '3001',  '300',  '30',  '3'],
+            [Rounding_Mode::Down,  '3000',  '300',  '30',  '3'],
+            [Rounding_Mode::Down,  '2999',  '299',  '29',  '2'],
+            [Rounding_Mode::Down,  '2501',  '250',  '25',  '2'],
+            [Rounding_Mode::Down,  '2500',  '250',  '25',  '2'],
+            [Rounding_Mode::Down,  '2499',  '249',  '24',  '2'],
+            [Rounding_Mode::Down,  '2001',  '200',  '20',  '2'],
+            [Rounding_Mode::Down,  '2000',  '200',  '20',  '2'],
+            [Rounding_Mode::Down,  '1999',  '199',  '19',  '1'],
+            [Rounding_Mode::Down,  '1501',  '150',  '15',  '1'],
+            [Rounding_Mode::Down,  '1500',  '150',  '15',  '1'],
+            [Rounding_Mode::Down,  '1499',  '149',  '14',  '1'],
+            [Rounding_Mode::Down,  '1001',  '100',  '10',  '1'],
+            [Rounding_Mode::Down,  '1000',  '100',  '10',  '1'],
+            [Rounding_Mode::Down,   '999',   '99',   '9',  '0'],
+            [Rounding_Mode::Down,   '501',   '50',   '5',  '0'],
+            [Rounding_Mode::Down,   '500',   '50',   '5',  '0'],
+            [Rounding_Mode::Down,   '499',   '49',   '4',  '0'],
+            [Rounding_Mode::Down,     '1',    '0',   '0',  '0'],
+            [Rounding_Mode::Down,     '0',    '0',   '0',  '0'],
+            [Rounding_Mode::Down,    '-1',    '0',   '0',  '0'],
+            [Rounding_Mode::Down,  '-499',  '-49',  '-4',  '0'],
+            [Rounding_Mode::Down,  '-500',  '-50',  '-5',  '0'],
+            [Rounding_Mode::Down,  '-501',  '-50',  '-5',  '0'],
+            [Rounding_Mode::Down,  '-999',  '-99',  '-9',  '0'],
+            [Rounding_Mode::Down, '-1000', '-100', '-10', '-1'],
+            [Rounding_Mode::Down, '-1001', '-100', '-10', '-1'],
+            [Rounding_Mode::Down, '-1499', '-149', '-14', '-1'],
+            [Rounding_Mode::Down, '-1500', '-150', '-15', '-1'],
+            [Rounding_Mode::Down, '-1501', '-150', '-15', '-1'],
+            [Rounding_Mode::Down, '-1999', '-199', '-19', '-1'],
+            [Rounding_Mode::Down, '-2000', '-200', '-20', '-2'],
+            [Rounding_Mode::Down, '-2001', '-200', '-20', '-2'],
+            [Rounding_Mode::Down, '-2499', '-249', '-24', '-2'],
+            [Rounding_Mode::Down, '-2500', '-250', '-25', '-2'],
+            [Rounding_Mode::Down, '-2501', '-250', '-25', '-2'],
+            [Rounding_Mode::Down, '-2999', '-299', '-29', '-2'],
+            [Rounding_Mode::Down, '-3000', '-300', '-30', '-3'],
+            [Rounding_Mode::Down, '-3001', '-300', '-30', '-3'],
+            [Rounding_Mode::Down, '-3499', '-349', '-34', '-3'],
+            [Rounding_Mode::Down, '-3500', '-350', '-35', '-3'],
+            [Rounding_Mode::Down, '-3501', '-350', '-35', '-3'],
 
-            [RoundingMode::Ceiling,  '3501',  '351',  '36',  '4'],
-            [RoundingMode::Ceiling,  '3500',  '350',  '35',  '4'],
-            [RoundingMode::Ceiling,  '3499',  '350',  '35',  '4'],
-            [RoundingMode::Ceiling,  '3001',  '301',  '31',  '4'],
-            [RoundingMode::Ceiling,  '3000',  '300',  '30',  '3'],
-            [RoundingMode::Ceiling,  '2999',  '300',  '30',  '3'],
-            [RoundingMode::Ceiling,  '2501',  '251',  '26',  '3'],
-            [RoundingMode::Ceiling,  '2500',  '250',  '25',  '3'],
-            [RoundingMode::Ceiling,  '2499',  '250',  '25',  '3'],
-            [RoundingMode::Ceiling,  '2001',  '201',  '21',  '3'],
-            [RoundingMode::Ceiling,  '2000',  '200',  '20',  '2'],
-            [RoundingMode::Ceiling,  '1999',  '200',  '20',  '2'],
-            [RoundingMode::Ceiling,  '1501',  '151',  '16',  '2'],
-            [RoundingMode::Ceiling,  '1500',  '150',  '15',  '2'],
-            [RoundingMode::Ceiling,  '1499',  '150',  '15',  '2'],
-            [RoundingMode::Ceiling,  '1001',  '101',  '11',  '2'],
-            [RoundingMode::Ceiling,  '1000',  '100',  '10',  '1'],
-            [RoundingMode::Ceiling,   '999',  '100',  '10',  '1'],
-            [RoundingMode::Ceiling,   '501',   '51',   '6',  '1'],
-            [RoundingMode::Ceiling,   '500',   '50',   '5',  '1'],
-            [RoundingMode::Ceiling,   '499',   '50',   '5',  '1'],
-            [RoundingMode::Ceiling,     '1',    '1',   '1',  '1'],
-            [RoundingMode::Ceiling,     '0',    '0',   '0',  '0'],
-            [RoundingMode::Ceiling,    '-1',    '0',   '0',  '0'],
-            [RoundingMode::Ceiling,  '-499',  '-49',  '-4',  '0'],
-            [RoundingMode::Ceiling,  '-500',  '-50',  '-5',  '0'],
-            [RoundingMode::Ceiling,  '-501',  '-50',  '-5',  '0'],
-            [RoundingMode::Ceiling,  '-999',  '-99',  '-9',  '0'],
-            [RoundingMode::Ceiling, '-1000', '-100', '-10', '-1'],
-            [RoundingMode::Ceiling, '-1001', '-100', '-10', '-1'],
-            [RoundingMode::Ceiling, '-1499', '-149', '-14', '-1'],
-            [RoundingMode::Ceiling, '-1500', '-150', '-15', '-1'],
-            [RoundingMode::Ceiling, '-1501', '-150', '-15', '-1'],
-            [RoundingMode::Ceiling, '-1999', '-199', '-19', '-1'],
-            [RoundingMode::Ceiling, '-2000', '-200', '-20', '-2'],
-            [RoundingMode::Ceiling, '-2001', '-200', '-20', '-2'],
-            [RoundingMode::Ceiling, '-2499', '-249', '-24', '-2'],
-            [RoundingMode::Ceiling, '-2500', '-250', '-25', '-2'],
-            [RoundingMode::Ceiling, '-2501', '-250', '-25', '-2'],
-            [RoundingMode::Ceiling, '-2999', '-299', '-29', '-2'],
-            [RoundingMode::Ceiling, '-3000', '-300', '-30', '-3'],
-            [RoundingMode::Ceiling, '-3001', '-300', '-30', '-3'],
-            [RoundingMode::Ceiling, '-3499', '-349', '-34', '-3'],
-            [RoundingMode::Ceiling, '-3500', '-350', '-35', '-3'],
-            [RoundingMode::Ceiling, '-3501', '-350', '-35', '-3'],
+            [Rounding_Mode::Ceiling,  '3501',  '351',  '36',  '4'],
+            [Rounding_Mode::Ceiling,  '3500',  '350',  '35',  '4'],
+            [Rounding_Mode::Ceiling,  '3499',  '350',  '35',  '4'],
+            [Rounding_Mode::Ceiling,  '3001',  '301',  '31',  '4'],
+            [Rounding_Mode::Ceiling,  '3000',  '300',  '30',  '3'],
+            [Rounding_Mode::Ceiling,  '2999',  '300',  '30',  '3'],
+            [Rounding_Mode::Ceiling,  '2501',  '251',  '26',  '3'],
+            [Rounding_Mode::Ceiling,  '2500',  '250',  '25',  '3'],
+            [Rounding_Mode::Ceiling,  '2499',  '250',  '25',  '3'],
+            [Rounding_Mode::Ceiling,  '2001',  '201',  '21',  '3'],
+            [Rounding_Mode::Ceiling,  '2000',  '200',  '20',  '2'],
+            [Rounding_Mode::Ceiling,  '1999',  '200',  '20',  '2'],
+            [Rounding_Mode::Ceiling,  '1501',  '151',  '16',  '2'],
+            [Rounding_Mode::Ceiling,  '1500',  '150',  '15',  '2'],
+            [Rounding_Mode::Ceiling,  '1499',  '150',  '15',  '2'],
+            [Rounding_Mode::Ceiling,  '1001',  '101',  '11',  '2'],
+            [Rounding_Mode::Ceiling,  '1000',  '100',  '10',  '1'],
+            [Rounding_Mode::Ceiling,   '999',  '100',  '10',  '1'],
+            [Rounding_Mode::Ceiling,   '501',   '51',   '6',  '1'],
+            [Rounding_Mode::Ceiling,   '500',   '50',   '5',  '1'],
+            [Rounding_Mode::Ceiling,   '499',   '50',   '5',  '1'],
+            [Rounding_Mode::Ceiling,     '1',    '1',   '1',  '1'],
+            [Rounding_Mode::Ceiling,     '0',    '0',   '0',  '0'],
+            [Rounding_Mode::Ceiling,    '-1',    '0',   '0',  '0'],
+            [Rounding_Mode::Ceiling,  '-499',  '-49',  '-4',  '0'],
+            [Rounding_Mode::Ceiling,  '-500',  '-50',  '-5',  '0'],
+            [Rounding_Mode::Ceiling,  '-501',  '-50',  '-5',  '0'],
+            [Rounding_Mode::Ceiling,  '-999',  '-99',  '-9',  '0'],
+            [Rounding_Mode::Ceiling, '-1000', '-100', '-10', '-1'],
+            [Rounding_Mode::Ceiling, '-1001', '-100', '-10', '-1'],
+            [Rounding_Mode::Ceiling, '-1499', '-149', '-14', '-1'],
+            [Rounding_Mode::Ceiling, '-1500', '-150', '-15', '-1'],
+            [Rounding_Mode::Ceiling, '-1501', '-150', '-15', '-1'],
+            [Rounding_Mode::Ceiling, '-1999', '-199', '-19', '-1'],
+            [Rounding_Mode::Ceiling, '-2000', '-200', '-20', '-2'],
+            [Rounding_Mode::Ceiling, '-2001', '-200', '-20', '-2'],
+            [Rounding_Mode::Ceiling, '-2499', '-249', '-24', '-2'],
+            [Rounding_Mode::Ceiling, '-2500', '-250', '-25', '-2'],
+            [Rounding_Mode::Ceiling, '-2501', '-250', '-25', '-2'],
+            [Rounding_Mode::Ceiling, '-2999', '-299', '-29', '-2'],
+            [Rounding_Mode::Ceiling, '-3000', '-300', '-30', '-3'],
+            [Rounding_Mode::Ceiling, '-3001', '-300', '-30', '-3'],
+            [Rounding_Mode::Ceiling, '-3499', '-349', '-34', '-3'],
+            [Rounding_Mode::Ceiling, '-3500', '-350', '-35', '-3'],
+            [Rounding_Mode::Ceiling, '-3501', '-350', '-35', '-3'],
 
-            [RoundingMode::Floor,  '3501',  '350',  '35',  '3'],
-            [RoundingMode::Floor,  '3500',  '350',  '35',  '3'],
-            [RoundingMode::Floor,  '3499',  '349',  '34',  '3'],
-            [RoundingMode::Floor,  '3001',  '300',  '30',  '3'],
-            [RoundingMode::Floor,  '3000',  '300',  '30',  '3'],
-            [RoundingMode::Floor,  '2999',  '299',  '29',  '2'],
-            [RoundingMode::Floor,  '2501',  '250',  '25',  '2'],
-            [RoundingMode::Floor,  '2500',  '250',  '25',  '2'],
-            [RoundingMode::Floor,  '2499',  '249',  '24',  '2'],
-            [RoundingMode::Floor,  '2001',  '200',  '20',  '2'],
-            [RoundingMode::Floor,  '2000',  '200',  '20',  '2'],
-            [RoundingMode::Floor,  '1999',  '199',  '19',  '1'],
-            [RoundingMode::Floor,  '1501',  '150',  '15',  '1'],
-            [RoundingMode::Floor,  '1500',  '150',  '15',  '1'],
-            [RoundingMode::Floor,  '1499',  '149',  '14',  '1'],
-            [RoundingMode::Floor,  '1001',  '100',  '10',  '1'],
-            [RoundingMode::Floor,  '1000',  '100',  '10',  '1'],
-            [RoundingMode::Floor,   '999',   '99',   '9',  '0'],
-            [RoundingMode::Floor,   '501',   '50',   '5',  '0'],
-            [RoundingMode::Floor,   '500',   '50',   '5',  '0'],
-            [RoundingMode::Floor,   '499',   '49',   '4',  '0'],
-            [RoundingMode::Floor,     '1',    '0',   '0',  '0'],
-            [RoundingMode::Floor,     '0',    '0',   '0',  '0'],
-            [RoundingMode::Floor,    '-1',   '-1',  '-1', '-1'],
-            [RoundingMode::Floor,  '-499',  '-50',  '-5', '-1'],
-            [RoundingMode::Floor,  '-500',  '-50',  '-5', '-1'],
-            [RoundingMode::Floor,  '-501',  '-51',  '-6', '-1'],
-            [RoundingMode::Floor,  '-999', '-100', '-10', '-1'],
-            [RoundingMode::Floor, '-1000', '-100', '-10', '-1'],
-            [RoundingMode::Floor, '-1001', '-101', '-11', '-2'],
-            [RoundingMode::Floor, '-1499', '-150', '-15', '-2'],
-            [RoundingMode::Floor, '-1500', '-150', '-15', '-2'],
-            [RoundingMode::Floor, '-1501', '-151', '-16', '-2'],
-            [RoundingMode::Floor, '-1999', '-200', '-20', '-2'],
-            [RoundingMode::Floor, '-2000', '-200', '-20', '-2'],
-            [RoundingMode::Floor, '-2001', '-201', '-21', '-3'],
-            [RoundingMode::Floor, '-2499', '-250', '-25', '-3'],
-            [RoundingMode::Floor, '-2500', '-250', '-25', '-3'],
-            [RoundingMode::Floor, '-2501', '-251', '-26', '-3'],
-            [RoundingMode::Floor, '-2999', '-300', '-30', '-3'],
-            [RoundingMode::Floor, '-3000', '-300', '-30', '-3'],
-            [RoundingMode::Floor, '-3001', '-301', '-31', '-4'],
-            [RoundingMode::Floor, '-3499', '-350', '-35', '-4'],
-            [RoundingMode::Floor, '-3500', '-350', '-35', '-4'],
-            [RoundingMode::Floor, '-3501', '-351', '-36', '-4'],
+            [Rounding_Mode::Floor,  '3501',  '350',  '35',  '3'],
+            [Rounding_Mode::Floor,  '3500',  '350',  '35',  '3'],
+            [Rounding_Mode::Floor,  '3499',  '349',  '34',  '3'],
+            [Rounding_Mode::Floor,  '3001',  '300',  '30',  '3'],
+            [Rounding_Mode::Floor,  '3000',  '300',  '30',  '3'],
+            [Rounding_Mode::Floor,  '2999',  '299',  '29',  '2'],
+            [Rounding_Mode::Floor,  '2501',  '250',  '25',  '2'],
+            [Rounding_Mode::Floor,  '2500',  '250',  '25',  '2'],
+            [Rounding_Mode::Floor,  '2499',  '249',  '24',  '2'],
+            [Rounding_Mode::Floor,  '2001',  '200',  '20',  '2'],
+            [Rounding_Mode::Floor,  '2000',  '200',  '20',  '2'],
+            [Rounding_Mode::Floor,  '1999',  '199',  '19',  '1'],
+            [Rounding_Mode::Floor,  '1501',  '150',  '15',  '1'],
+            [Rounding_Mode::Floor,  '1500',  '150',  '15',  '1'],
+            [Rounding_Mode::Floor,  '1499',  '149',  '14',  '1'],
+            [Rounding_Mode::Floor,  '1001',  '100',  '10',  '1'],
+            [Rounding_Mode::Floor,  '1000',  '100',  '10',  '1'],
+            [Rounding_Mode::Floor,   '999',   '99',   '9',  '0'],
+            [Rounding_Mode::Floor,   '501',   '50',   '5',  '0'],
+            [Rounding_Mode::Floor,   '500',   '50',   '5',  '0'],
+            [Rounding_Mode::Floor,   '499',   '49',   '4',  '0'],
+            [Rounding_Mode::Floor,     '1',    '0',   '0',  '0'],
+            [Rounding_Mode::Floor,     '0',    '0',   '0',  '0'],
+            [Rounding_Mode::Floor,    '-1',   '-1',  '-1', '-1'],
+            [Rounding_Mode::Floor,  '-499',  '-50',  '-5', '-1'],
+            [Rounding_Mode::Floor,  '-500',  '-50',  '-5', '-1'],
+            [Rounding_Mode::Floor,  '-501',  '-51',  '-6', '-1'],
+            [Rounding_Mode::Floor,  '-999', '-100', '-10', '-1'],
+            [Rounding_Mode::Floor, '-1000', '-100', '-10', '-1'],
+            [Rounding_Mode::Floor, '-1001', '-101', '-11', '-2'],
+            [Rounding_Mode::Floor, '-1499', '-150', '-15', '-2'],
+            [Rounding_Mode::Floor, '-1500', '-150', '-15', '-2'],
+            [Rounding_Mode::Floor, '-1501', '-151', '-16', '-2'],
+            [Rounding_Mode::Floor, '-1999', '-200', '-20', '-2'],
+            [Rounding_Mode::Floor, '-2000', '-200', '-20', '-2'],
+            [Rounding_Mode::Floor, '-2001', '-201', '-21', '-3'],
+            [Rounding_Mode::Floor, '-2499', '-250', '-25', '-3'],
+            [Rounding_Mode::Floor, '-2500', '-250', '-25', '-3'],
+            [Rounding_Mode::Floor, '-2501', '-251', '-26', '-3'],
+            [Rounding_Mode::Floor, '-2999', '-300', '-30', '-3'],
+            [Rounding_Mode::Floor, '-3000', '-300', '-30', '-3'],
+            [Rounding_Mode::Floor, '-3001', '-301', '-31', '-4'],
+            [Rounding_Mode::Floor, '-3499', '-350', '-35', '-4'],
+            [Rounding_Mode::Floor, '-3500', '-350', '-35', '-4'],
+            [Rounding_Mode::Floor, '-3501', '-351', '-36', '-4'],
 
-            [RoundingMode::HalfUp,  '3501',  '350',  '35',  '4'],
-            [RoundingMode::HalfUp,  '3500',  '350',  '35',  '4'],
-            [RoundingMode::HalfUp,  '3499',  '350',  '35',  '3'],
-            [RoundingMode::HalfUp,  '3001',  '300',  '30',  '3'],
-            [RoundingMode::HalfUp,  '3000',  '300',  '30',  '3'],
-            [RoundingMode::HalfUp,  '2999',  '300',  '30',  '3'],
-            [RoundingMode::HalfUp,  '2501',  '250',  '25',  '3'],
-            [RoundingMode::HalfUp,  '2500',  '250',  '25',  '3'],
-            [RoundingMode::HalfUp,  '2499',  '250',  '25',  '2'],
-            [RoundingMode::HalfUp,  '2001',  '200',  '20',  '2'],
-            [RoundingMode::HalfUp,  '2000',  '200',  '20',  '2'],
-            [RoundingMode::HalfUp,  '1999',  '200',  '20',  '2'],
-            [RoundingMode::HalfUp,  '1501',  '150',  '15',  '2'],
-            [RoundingMode::HalfUp,  '1500',  '150',  '15',  '2'],
-            [RoundingMode::HalfUp,  '1499',  '150',  '15',  '1'],
-            [RoundingMode::HalfUp,  '1001',  '100',  '10',  '1'],
-            [RoundingMode::HalfUp,  '1000',  '100',  '10',  '1'],
-            [RoundingMode::HalfUp,   '999',  '100',  '10',  '1'],
-            [RoundingMode::HalfUp,   '501',   '50',   '5',  '1'],
-            [RoundingMode::HalfUp,   '500',   '50',   '5',  '1'],
-            [RoundingMode::HalfUp,   '499',   '50',   '5',  '0'],
-            [RoundingMode::HalfUp,     '1',    '0',   '0',  '0'],
-            [RoundingMode::HalfUp,     '0',    '0',   '0',  '0'],
-            [RoundingMode::HalfUp,    '-1',    '0',   '0',  '0'],
-            [RoundingMode::HalfUp,  '-499',  '-50',  '-5',  '0'],
-            [RoundingMode::HalfUp,  '-500',  '-50',  '-5', '-1'],
-            [RoundingMode::HalfUp,  '-501',  '-50',  '-5', '-1'],
-            [RoundingMode::HalfUp,  '-999', '-100', '-10', '-1'],
-            [RoundingMode::HalfUp, '-1000', '-100', '-10', '-1'],
-            [RoundingMode::HalfUp, '-1001', '-100', '-10', '-1'],
-            [RoundingMode::HalfUp, '-1499', '-150', '-15', '-1'],
-            [RoundingMode::HalfUp, '-1500', '-150', '-15', '-2'],
-            [RoundingMode::HalfUp, '-1501', '-150', '-15', '-2'],
-            [RoundingMode::HalfUp, '-1999', '-200', '-20', '-2'],
-            [RoundingMode::HalfUp, '-2000', '-200', '-20', '-2'],
-            [RoundingMode::HalfUp, '-2001', '-200', '-20', '-2'],
-            [RoundingMode::HalfUp, '-2499', '-250', '-25', '-2'],
-            [RoundingMode::HalfUp, '-2500', '-250', '-25', '-3'],
-            [RoundingMode::HalfUp, '-2501', '-250', '-25', '-3'],
-            [RoundingMode::HalfUp, '-2999', '-300', '-30', '-3'],
-            [RoundingMode::HalfUp, '-3000', '-300', '-30', '-3'],
-            [RoundingMode::HalfUp, '-3001', '-300', '-30', '-3'],
-            [RoundingMode::HalfUp, '-3499', '-350', '-35', '-3'],
-            [RoundingMode::HalfUp, '-3500', '-350', '-35', '-4'],
-            [RoundingMode::HalfUp, '-3501', '-350', '-35', '-4'],
+            [Rounding_Mode::HalfUp,  '3501',  '350',  '35',  '4'],
+            [Rounding_Mode::HalfUp,  '3500',  '350',  '35',  '4'],
+            [Rounding_Mode::HalfUp,  '3499',  '350',  '35',  '3'],
+            [Rounding_Mode::HalfUp,  '3001',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfUp,  '3000',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfUp,  '2999',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfUp,  '2501',  '250',  '25',  '3'],
+            [Rounding_Mode::HalfUp,  '2500',  '250',  '25',  '3'],
+            [Rounding_Mode::HalfUp,  '2499',  '250',  '25',  '2'],
+            [Rounding_Mode::HalfUp,  '2001',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfUp,  '2000',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfUp,  '1999',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfUp,  '1501',  '150',  '15',  '2'],
+            [Rounding_Mode::HalfUp,  '1500',  '150',  '15',  '2'],
+            [Rounding_Mode::HalfUp,  '1499',  '150',  '15',  '1'],
+            [Rounding_Mode::HalfUp,  '1001',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfUp,  '1000',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfUp,   '999',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfUp,   '501',   '50',   '5',  '1'],
+            [Rounding_Mode::HalfUp,   '500',   '50',   '5',  '1'],
+            [Rounding_Mode::HalfUp,   '499',   '50',   '5',  '0'],
+            [Rounding_Mode::HalfUp,     '1',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfUp,     '0',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfUp,    '-1',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfUp,  '-499',  '-50',  '-5',  '0'],
+            [Rounding_Mode::HalfUp,  '-500',  '-50',  '-5', '-1'],
+            [Rounding_Mode::HalfUp,  '-501',  '-50',  '-5', '-1'],
+            [Rounding_Mode::HalfUp,  '-999', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfUp, '-1000', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfUp, '-1001', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfUp, '-1499', '-150', '-15', '-1'],
+            [Rounding_Mode::HalfUp, '-1500', '-150', '-15', '-2'],
+            [Rounding_Mode::HalfUp, '-1501', '-150', '-15', '-2'],
+            [Rounding_Mode::HalfUp, '-1999', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfUp, '-2000', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfUp, '-2001', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfUp, '-2499', '-250', '-25', '-2'],
+            [Rounding_Mode::HalfUp, '-2500', '-250', '-25', '-3'],
+            [Rounding_Mode::HalfUp, '-2501', '-250', '-25', '-3'],
+            [Rounding_Mode::HalfUp, '-2999', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfUp, '-3000', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfUp, '-3001', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfUp, '-3499', '-350', '-35', '-3'],
+            [Rounding_Mode::HalfUp, '-3500', '-350', '-35', '-4'],
+            [Rounding_Mode::HalfUp, '-3501', '-350', '-35', '-4'],
 
-            [RoundingMode::HalfDown,  '3501',  '350',  '35',  '4'],
-            [RoundingMode::HalfDown,  '3500',  '350',  '35',  '3'],
-            [RoundingMode::HalfDown,  '3499',  '350',  '35',  '3'],
-            [RoundingMode::HalfDown,  '3001',  '300',  '30',  '3'],
-            [RoundingMode::HalfDown,  '3000',  '300',  '30',  '3'],
-            [RoundingMode::HalfDown,  '2999',  '300',  '30',  '3'],
-            [RoundingMode::HalfDown,  '2501',  '250',  '25',  '3'],
-            [RoundingMode::HalfDown,  '2500',  '250',  '25',  '2'],
-            [RoundingMode::HalfDown,  '2499',  '250',  '25',  '2'],
-            [RoundingMode::HalfDown,  '2001',  '200',  '20',  '2'],
-            [RoundingMode::HalfDown,  '2000',  '200',  '20',  '2'],
-            [RoundingMode::HalfDown,  '1999',  '200',  '20',  '2'],
-            [RoundingMode::HalfDown,  '1501',  '150',  '15',  '2'],
-            [RoundingMode::HalfDown,  '1500',  '150',  '15',  '1'],
-            [RoundingMode::HalfDown,  '1499',  '150',  '15',  '1'],
-            [RoundingMode::HalfDown,  '1001',  '100',  '10',  '1'],
-            [RoundingMode::HalfDown,  '1000',  '100',  '10',  '1'],
-            [RoundingMode::HalfDown,   '999',  '100',  '10',  '1'],
-            [RoundingMode::HalfDown,   '501',   '50',   '5',  '1'],
-            [RoundingMode::HalfDown,   '500',   '50',   '5',  '0'],
-            [RoundingMode::HalfDown,   '499',   '50',   '5',  '0'],
-            [RoundingMode::HalfDown,     '1',    '0',   '0',  '0'],
-            [RoundingMode::HalfDown,     '0',    '0',   '0',  '0'],
-            [RoundingMode::HalfDown,    '-1',    '0',   '0',  '0'],
-            [RoundingMode::HalfDown,  '-499',  '-50',  '-5',  '0'],
-            [RoundingMode::HalfDown,  '-500',  '-50',  '-5',  '0'],
-            [RoundingMode::HalfDown,  '-501',  '-50',  '-5', '-1'],
-            [RoundingMode::HalfDown,  '-999', '-100', '-10', '-1'],
-            [RoundingMode::HalfDown, '-1000', '-100', '-10', '-1'],
-            [RoundingMode::HalfDown, '-1001', '-100', '-10', '-1'],
-            [RoundingMode::HalfDown, '-1499', '-150', '-15', '-1'],
-            [RoundingMode::HalfDown, '-1500', '-150', '-15', '-1'],
-            [RoundingMode::HalfDown, '-1501', '-150', '-15', '-2'],
-            [RoundingMode::HalfDown, '-1999', '-200', '-20', '-2'],
-            [RoundingMode::HalfDown, '-2000', '-200', '-20', '-2'],
-            [RoundingMode::HalfDown, '-2001', '-200', '-20', '-2'],
-            [RoundingMode::HalfDown, '-2499', '-250', '-25', '-2'],
-            [RoundingMode::HalfDown, '-2500', '-250', '-25', '-2'],
-            [RoundingMode::HalfDown, '-2501', '-250', '-25', '-3'],
-            [RoundingMode::HalfDown, '-2999', '-300', '-30', '-3'],
-            [RoundingMode::HalfDown, '-3000', '-300', '-30', '-3'],
-            [RoundingMode::HalfDown, '-3001', '-300', '-30', '-3'],
-            [RoundingMode::HalfDown, '-3499', '-350', '-35', '-3'],
-            [RoundingMode::HalfDown, '-3500', '-350', '-35', '-3'],
-            [RoundingMode::HalfDown, '-3501', '-350', '-35', '-4'],
+            [Rounding_Mode::HalfDown,  '3501',  '350',  '35',  '4'],
+            [Rounding_Mode::HalfDown,  '3500',  '350',  '35',  '3'],
+            [Rounding_Mode::HalfDown,  '3499',  '350',  '35',  '3'],
+            [Rounding_Mode::HalfDown,  '3001',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfDown,  '3000',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfDown,  '2999',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfDown,  '2501',  '250',  '25',  '3'],
+            [Rounding_Mode::HalfDown,  '2500',  '250',  '25',  '2'],
+            [Rounding_Mode::HalfDown,  '2499',  '250',  '25',  '2'],
+            [Rounding_Mode::HalfDown,  '2001',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfDown,  '2000',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfDown,  '1999',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfDown,  '1501',  '150',  '15',  '2'],
+            [Rounding_Mode::HalfDown,  '1500',  '150',  '15',  '1'],
+            [Rounding_Mode::HalfDown,  '1499',  '150',  '15',  '1'],
+            [Rounding_Mode::HalfDown,  '1001',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfDown,  '1000',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfDown,   '999',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfDown,   '501',   '50',   '5',  '1'],
+            [Rounding_Mode::HalfDown,   '500',   '50',   '5',  '0'],
+            [Rounding_Mode::HalfDown,   '499',   '50',   '5',  '0'],
+            [Rounding_Mode::HalfDown,     '1',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfDown,     '0',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfDown,    '-1',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfDown,  '-499',  '-50',  '-5',  '0'],
+            [Rounding_Mode::HalfDown,  '-500',  '-50',  '-5',  '0'],
+            [Rounding_Mode::HalfDown,  '-501',  '-50',  '-5', '-1'],
+            [Rounding_Mode::HalfDown,  '-999', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfDown, '-1000', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfDown, '-1001', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfDown, '-1499', '-150', '-15', '-1'],
+            [Rounding_Mode::HalfDown, '-1500', '-150', '-15', '-1'],
+            [Rounding_Mode::HalfDown, '-1501', '-150', '-15', '-2'],
+            [Rounding_Mode::HalfDown, '-1999', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfDown, '-2000', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfDown, '-2001', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfDown, '-2499', '-250', '-25', '-2'],
+            [Rounding_Mode::HalfDown, '-2500', '-250', '-25', '-2'],
+            [Rounding_Mode::HalfDown, '-2501', '-250', '-25', '-3'],
+            [Rounding_Mode::HalfDown, '-2999', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfDown, '-3000', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfDown, '-3001', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfDown, '-3499', '-350', '-35', '-3'],
+            [Rounding_Mode::HalfDown, '-3500', '-350', '-35', '-3'],
+            [Rounding_Mode::HalfDown, '-3501', '-350', '-35', '-4'],
 
-            [RoundingMode::HalfCeiling,  '3501',  '350',  '35',  '4'],
-            [RoundingMode::HalfCeiling,  '3500',  '350',  '35',  '4'],
-            [RoundingMode::HalfCeiling,  '3499',  '350',  '35',  '3'],
-            [RoundingMode::HalfCeiling,  '3001',  '300',  '30',  '3'],
-            [RoundingMode::HalfCeiling,  '3000',  '300',  '30',  '3'],
-            [RoundingMode::HalfCeiling,  '2999',  '300',  '30',  '3'],
-            [RoundingMode::HalfCeiling,  '2501',  '250',  '25',  '3'],
-            [RoundingMode::HalfCeiling,  '2500',  '250',  '25',  '3'],
-            [RoundingMode::HalfCeiling,  '2499',  '250',  '25',  '2'],
-            [RoundingMode::HalfCeiling,  '2001',  '200',  '20',  '2'],
-            [RoundingMode::HalfCeiling,  '2000',  '200',  '20',  '2'],
-            [RoundingMode::HalfCeiling,  '1999',  '200',  '20',  '2'],
-            [RoundingMode::HalfCeiling,  '1501',  '150',  '15',  '2'],
-            [RoundingMode::HalfCeiling,  '1500',  '150',  '15',  '2'],
-            [RoundingMode::HalfCeiling,  '1499',  '150',  '15',  '1'],
-            [RoundingMode::HalfCeiling,  '1001',  '100',  '10',  '1'],
-            [RoundingMode::HalfCeiling,  '1000',  '100',  '10',  '1'],
-            [RoundingMode::HalfCeiling,   '999',  '100',  '10',  '1'],
-            [RoundingMode::HalfCeiling,   '501',   '50',   '5',  '1'],
-            [RoundingMode::HalfCeiling,   '500',   '50',   '5',  '1'],
-            [RoundingMode::HalfCeiling,   '499',   '50',   '5',  '0'],
-            [RoundingMode::HalfCeiling,     '1',    '0',   '0',  '0'],
-            [RoundingMode::HalfCeiling,     '0',    '0',   '0',  '0'],
-            [RoundingMode::HalfCeiling,    '-1',    '0',   '0',  '0'],
-            [RoundingMode::HalfCeiling,  '-499',  '-50',  '-5',  '0'],
-            [RoundingMode::HalfCeiling,  '-500',  '-50',  '-5',  '0'],
-            [RoundingMode::HalfCeiling,  '-501',  '-50',  '-5', '-1'],
-            [RoundingMode::HalfCeiling,  '-999', '-100', '-10', '-1'],
-            [RoundingMode::HalfCeiling, '-1000', '-100', '-10', '-1'],
-            [RoundingMode::HalfCeiling, '-1001', '-100', '-10', '-1'],
-            [RoundingMode::HalfCeiling, '-1499', '-150', '-15', '-1'],
-            [RoundingMode::HalfCeiling, '-1500', '-150', '-15', '-1'],
-            [RoundingMode::HalfCeiling, '-1501', '-150', '-15', '-2'],
-            [RoundingMode::HalfCeiling, '-1999', '-200', '-20', '-2'],
-            [RoundingMode::HalfCeiling, '-2000', '-200', '-20', '-2'],
-            [RoundingMode::HalfCeiling, '-2001', '-200', '-20', '-2'],
-            [RoundingMode::HalfCeiling, '-2499', '-250', '-25', '-2'],
-            [RoundingMode::HalfCeiling, '-2500', '-250', '-25', '-2'],
-            [RoundingMode::HalfCeiling, '-2501', '-250', '-25', '-3'],
-            [RoundingMode::HalfCeiling, '-2999', '-300', '-30', '-3'],
-            [RoundingMode::HalfCeiling, '-3000', '-300', '-30', '-3'],
-            [RoundingMode::HalfCeiling, '-3001', '-300', '-30', '-3'],
-            [RoundingMode::HalfCeiling, '-3499', '-350', '-35', '-3'],
-            [RoundingMode::HalfCeiling, '-3500', '-350', '-35', '-3'],
-            [RoundingMode::HalfCeiling, '-3501', '-350', '-35', '-4'],
+            [Rounding_Mode::HalfCeiling,  '3501',  '350',  '35',  '4'],
+            [Rounding_Mode::HalfCeiling,  '3500',  '350',  '35',  '4'],
+            [Rounding_Mode::HalfCeiling,  '3499',  '350',  '35',  '3'],
+            [Rounding_Mode::HalfCeiling,  '3001',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfCeiling,  '3000',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfCeiling,  '2999',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfCeiling,  '2501',  '250',  '25',  '3'],
+            [Rounding_Mode::HalfCeiling,  '2500',  '250',  '25',  '3'],
+            [Rounding_Mode::HalfCeiling,  '2499',  '250',  '25',  '2'],
+            [Rounding_Mode::HalfCeiling,  '2001',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfCeiling,  '2000',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfCeiling,  '1999',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfCeiling,  '1501',  '150',  '15',  '2'],
+            [Rounding_Mode::HalfCeiling,  '1500',  '150',  '15',  '2'],
+            [Rounding_Mode::HalfCeiling,  '1499',  '150',  '15',  '1'],
+            [Rounding_Mode::HalfCeiling,  '1001',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfCeiling,  '1000',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfCeiling,   '999',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfCeiling,   '501',   '50',   '5',  '1'],
+            [Rounding_Mode::HalfCeiling,   '500',   '50',   '5',  '1'],
+            [Rounding_Mode::HalfCeiling,   '499',   '50',   '5',  '0'],
+            [Rounding_Mode::HalfCeiling,     '1',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfCeiling,     '0',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfCeiling,    '-1',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfCeiling,  '-499',  '-50',  '-5',  '0'],
+            [Rounding_Mode::HalfCeiling,  '-500',  '-50',  '-5',  '0'],
+            [Rounding_Mode::HalfCeiling,  '-501',  '-50',  '-5', '-1'],
+            [Rounding_Mode::HalfCeiling,  '-999', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfCeiling, '-1000', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfCeiling, '-1001', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfCeiling, '-1499', '-150', '-15', '-1'],
+            [Rounding_Mode::HalfCeiling, '-1500', '-150', '-15', '-1'],
+            [Rounding_Mode::HalfCeiling, '-1501', '-150', '-15', '-2'],
+            [Rounding_Mode::HalfCeiling, '-1999', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfCeiling, '-2000', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfCeiling, '-2001', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfCeiling, '-2499', '-250', '-25', '-2'],
+            [Rounding_Mode::HalfCeiling, '-2500', '-250', '-25', '-2'],
+            [Rounding_Mode::HalfCeiling, '-2501', '-250', '-25', '-3'],
+            [Rounding_Mode::HalfCeiling, '-2999', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfCeiling, '-3000', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfCeiling, '-3001', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfCeiling, '-3499', '-350', '-35', '-3'],
+            [Rounding_Mode::HalfCeiling, '-3500', '-350', '-35', '-3'],
+            [Rounding_Mode::HalfCeiling, '-3501', '-350', '-35', '-4'],
 
-            [RoundingMode::HalfFloor,  '3501',  '350',  '35',  '4'],
-            [RoundingMode::HalfFloor,  '3500',  '350',  '35',  '3'],
-            [RoundingMode::HalfFloor,  '3499',  '350',  '35',  '3'],
-            [RoundingMode::HalfFloor,  '3001',  '300',  '30',  '3'],
-            [RoundingMode::HalfFloor,  '3000',  '300',  '30',  '3'],
-            [RoundingMode::HalfFloor,  '2999',  '300',  '30',  '3'],
-            [RoundingMode::HalfFloor,  '2501',  '250',  '25',  '3'],
-            [RoundingMode::HalfFloor,  '2500',  '250',  '25',  '2'],
-            [RoundingMode::HalfFloor,  '2499',  '250',  '25',  '2'],
-            [RoundingMode::HalfFloor,  '2001',  '200',  '20',  '2'],
-            [RoundingMode::HalfFloor,  '2000',  '200',  '20',  '2'],
-            [RoundingMode::HalfFloor,  '1999',  '200',  '20',  '2'],
-            [RoundingMode::HalfFloor,  '1501',  '150',  '15',  '2'],
-            [RoundingMode::HalfFloor,  '1500',  '150',  '15',  '1'],
-            [RoundingMode::HalfFloor,  '1499',  '150',  '15',  '1'],
-            [RoundingMode::HalfFloor,  '1001',  '100',  '10',  '1'],
-            [RoundingMode::HalfFloor,  '1000',  '100',  '10',  '1'],
-            [RoundingMode::HalfFloor,   '999',  '100',  '10',  '1'],
-            [RoundingMode::HalfFloor,   '501',   '50',   '5',  '1'],
-            [RoundingMode::HalfFloor,   '500',   '50',   '5',  '0'],
-            [RoundingMode::HalfFloor,   '499',   '50',   '5',  '0'],
-            [RoundingMode::HalfFloor,     '1',    '0',   '0',  '0'],
-            [RoundingMode::HalfFloor,     '0',    '0',   '0',  '0'],
-            [RoundingMode::HalfFloor,    '-1',    '0',   '0',  '0'],
-            [RoundingMode::HalfFloor,  '-499',  '-50',  '-5',  '0'],
-            [RoundingMode::HalfFloor,  '-500',  '-50',  '-5', '-1'],
-            [RoundingMode::HalfFloor,  '-501',  '-50',  '-5', '-1'],
-            [RoundingMode::HalfFloor,  '-999', '-100', '-10', '-1'],
-            [RoundingMode::HalfFloor, '-1000', '-100', '-10', '-1'],
-            [RoundingMode::HalfFloor, '-1001', '-100', '-10', '-1'],
-            [RoundingMode::HalfFloor, '-1499', '-150', '-15', '-1'],
-            [RoundingMode::HalfFloor, '-1500', '-150', '-15', '-2'],
-            [RoundingMode::HalfFloor, '-1501', '-150', '-15', '-2'],
-            [RoundingMode::HalfFloor, '-1999', '-200', '-20', '-2'],
-            [RoundingMode::HalfFloor, '-2000', '-200', '-20', '-2'],
-            [RoundingMode::HalfFloor, '-2001', '-200', '-20', '-2'],
-            [RoundingMode::HalfFloor, '-2499', '-250', '-25', '-2'],
-            [RoundingMode::HalfFloor, '-2500', '-250', '-25', '-3'],
-            [RoundingMode::HalfFloor, '-2501', '-250', '-25', '-3'],
-            [RoundingMode::HalfFloor, '-2999', '-300', '-30', '-3'],
-            [RoundingMode::HalfFloor, '-3000', '-300', '-30', '-3'],
-            [RoundingMode::HalfFloor, '-3001', '-300', '-30', '-3'],
-            [RoundingMode::HalfFloor, '-3499', '-350', '-35', '-3'],
-            [RoundingMode::HalfFloor, '-3500', '-350', '-35', '-4'],
-            [RoundingMode::HalfFloor, '-3501', '-350', '-35', '-4'],
+            [Rounding_Mode::HalfFloor,  '3501',  '350',  '35',  '4'],
+            [Rounding_Mode::HalfFloor,  '3500',  '350',  '35',  '3'],
+            [Rounding_Mode::HalfFloor,  '3499',  '350',  '35',  '3'],
+            [Rounding_Mode::HalfFloor,  '3001',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfFloor,  '3000',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfFloor,  '2999',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfFloor,  '2501',  '250',  '25',  '3'],
+            [Rounding_Mode::HalfFloor,  '2500',  '250',  '25',  '2'],
+            [Rounding_Mode::HalfFloor,  '2499',  '250',  '25',  '2'],
+            [Rounding_Mode::HalfFloor,  '2001',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfFloor,  '2000',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfFloor,  '1999',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfFloor,  '1501',  '150',  '15',  '2'],
+            [Rounding_Mode::HalfFloor,  '1500',  '150',  '15',  '1'],
+            [Rounding_Mode::HalfFloor,  '1499',  '150',  '15',  '1'],
+            [Rounding_Mode::HalfFloor,  '1001',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfFloor,  '1000',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfFloor,   '999',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfFloor,   '501',   '50',   '5',  '1'],
+            [Rounding_Mode::HalfFloor,   '500',   '50',   '5',  '0'],
+            [Rounding_Mode::HalfFloor,   '499',   '50',   '5',  '0'],
+            [Rounding_Mode::HalfFloor,     '1',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfFloor,     '0',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfFloor,    '-1',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfFloor,  '-499',  '-50',  '-5',  '0'],
+            [Rounding_Mode::HalfFloor,  '-500',  '-50',  '-5', '-1'],
+            [Rounding_Mode::HalfFloor,  '-501',  '-50',  '-5', '-1'],
+            [Rounding_Mode::HalfFloor,  '-999', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfFloor, '-1000', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfFloor, '-1001', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfFloor, '-1499', '-150', '-15', '-1'],
+            [Rounding_Mode::HalfFloor, '-1500', '-150', '-15', '-2'],
+            [Rounding_Mode::HalfFloor, '-1501', '-150', '-15', '-2'],
+            [Rounding_Mode::HalfFloor, '-1999', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfFloor, '-2000', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfFloor, '-2001', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfFloor, '-2499', '-250', '-25', '-2'],
+            [Rounding_Mode::HalfFloor, '-2500', '-250', '-25', '-3'],
+            [Rounding_Mode::HalfFloor, '-2501', '-250', '-25', '-3'],
+            [Rounding_Mode::HalfFloor, '-2999', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfFloor, '-3000', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfFloor, '-3001', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfFloor, '-3499', '-350', '-35', '-3'],
+            [Rounding_Mode::HalfFloor, '-3500', '-350', '-35', '-4'],
+            [Rounding_Mode::HalfFloor, '-3501', '-350', '-35', '-4'],
 
-            [RoundingMode::HalfEven,  '3501',  '350',  '35',  '4'],
-            [RoundingMode::HalfEven,  '3500',  '350',  '35',  '4'],
-            [RoundingMode::HalfEven,  '3499',  '350',  '35',  '3'],
-            [RoundingMode::HalfEven,  '3001',  '300',  '30',  '3'],
-            [RoundingMode::HalfEven,  '3000',  '300',  '30',  '3'],
-            [RoundingMode::HalfEven,  '2999',  '300',  '30',  '3'],
-            [RoundingMode::HalfEven,  '2501',  '250',  '25',  '3'],
-            [RoundingMode::HalfEven,  '2500',  '250',  '25',  '2'],
-            [RoundingMode::HalfEven,  '2499',  '250',  '25',  '2'],
-            [RoundingMode::HalfEven,  '2001',  '200',  '20',  '2'],
-            [RoundingMode::HalfEven,  '2000',  '200',  '20',  '2'],
-            [RoundingMode::HalfEven,  '1999',  '200',  '20',  '2'],
-            [RoundingMode::HalfEven,  '1501',  '150',  '15',  '2'],
-            [RoundingMode::HalfEven,  '1500',  '150',  '15',  '2'],
-            [RoundingMode::HalfEven,  '1499',  '150',  '15',  '1'],
-            [RoundingMode::HalfEven,  '1001',  '100',  '10',  '1'],
-            [RoundingMode::HalfEven,  '1000',  '100',  '10',  '1'],
-            [RoundingMode::HalfEven,   '999',  '100',  '10',  '1'],
-            [RoundingMode::HalfEven,   '501',   '50',   '5',  '1'],
-            [RoundingMode::HalfEven,   '500',   '50',   '5',  '0'],
-            [RoundingMode::HalfEven,   '499',   '50',   '5',  '0'],
-            [RoundingMode::HalfEven,     '1',    '0',   '0',  '0'],
-            [RoundingMode::HalfEven,     '0',    '0',   '0',  '0'],
-            [RoundingMode::HalfEven,    '-1',    '0',   '0',  '0'],
-            [RoundingMode::HalfEven,  '-499',  '-50',  '-5',  '0'],
-            [RoundingMode::HalfEven,  '-500',  '-50',  '-5',  '0'],
-            [RoundingMode::HalfEven,  '-501',  '-50',  '-5', '-1'],
-            [RoundingMode::HalfEven,  '-999', '-100', '-10', '-1'],
-            [RoundingMode::HalfEven, '-1000', '-100', '-10', '-1'],
-            [RoundingMode::HalfEven, '-1001', '-100', '-10', '-1'],
-            [RoundingMode::HalfEven, '-1499', '-150', '-15', '-1'],
-            [RoundingMode::HalfEven, '-1500', '-150', '-15', '-2'],
-            [RoundingMode::HalfEven, '-1501', '-150', '-15', '-2'],
-            [RoundingMode::HalfEven, '-1999', '-200', '-20', '-2'],
-            [RoundingMode::HalfEven, '-2000', '-200', '-20', '-2'],
-            [RoundingMode::HalfEven, '-2001', '-200', '-20', '-2'],
-            [RoundingMode::HalfEven, '-2499', '-250', '-25', '-2'],
-            [RoundingMode::HalfEven, '-2500', '-250', '-25', '-2'],
-            [RoundingMode::HalfEven, '-2501', '-250', '-25', '-3'],
-            [RoundingMode::HalfEven, '-2999', '-300', '-30', '-3'],
-            [RoundingMode::HalfEven, '-3000', '-300', '-30', '-3'],
-            [RoundingMode::HalfEven, '-3001', '-300', '-30', '-3'],
-            [RoundingMode::HalfEven, '-3499', '-350', '-35', '-3'],
-            [RoundingMode::HalfEven, '-3500', '-350', '-35', '-4'],
-            [RoundingMode::HalfEven, '-3501', '-350', '-35', '-4'],
+            [Rounding_Mode::HalfEven,  '3501',  '350',  '35',  '4'],
+            [Rounding_Mode::HalfEven,  '3500',  '350',  '35',  '4'],
+            [Rounding_Mode::HalfEven,  '3499',  '350',  '35',  '3'],
+            [Rounding_Mode::HalfEven,  '3001',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfEven,  '3000',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfEven,  '2999',  '300',  '30',  '3'],
+            [Rounding_Mode::HalfEven,  '2501',  '250',  '25',  '3'],
+            [Rounding_Mode::HalfEven,  '2500',  '250',  '25',  '2'],
+            [Rounding_Mode::HalfEven,  '2499',  '250',  '25',  '2'],
+            [Rounding_Mode::HalfEven,  '2001',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfEven,  '2000',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfEven,  '1999',  '200',  '20',  '2'],
+            [Rounding_Mode::HalfEven,  '1501',  '150',  '15',  '2'],
+            [Rounding_Mode::HalfEven,  '1500',  '150',  '15',  '2'],
+            [Rounding_Mode::HalfEven,  '1499',  '150',  '15',  '1'],
+            [Rounding_Mode::HalfEven,  '1001',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfEven,  '1000',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfEven,   '999',  '100',  '10',  '1'],
+            [Rounding_Mode::HalfEven,   '501',   '50',   '5',  '1'],
+            [Rounding_Mode::HalfEven,   '500',   '50',   '5',  '0'],
+            [Rounding_Mode::HalfEven,   '499',   '50',   '5',  '0'],
+            [Rounding_Mode::HalfEven,     '1',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfEven,     '0',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfEven,    '-1',    '0',   '0',  '0'],
+            [Rounding_Mode::HalfEven,  '-499',  '-50',  '-5',  '0'],
+            [Rounding_Mode::HalfEven,  '-500',  '-50',  '-5',  '0'],
+            [Rounding_Mode::HalfEven,  '-501',  '-50',  '-5', '-1'],
+            [Rounding_Mode::HalfEven,  '-999', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfEven, '-1000', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfEven, '-1001', '-100', '-10', '-1'],
+            [Rounding_Mode::HalfEven, '-1499', '-150', '-15', '-1'],
+            [Rounding_Mode::HalfEven, '-1500', '-150', '-15', '-2'],
+            [Rounding_Mode::HalfEven, '-1501', '-150', '-15', '-2'],
+            [Rounding_Mode::HalfEven, '-1999', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfEven, '-2000', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfEven, '-2001', '-200', '-20', '-2'],
+            [Rounding_Mode::HalfEven, '-2499', '-250', '-25', '-2'],
+            [Rounding_Mode::HalfEven, '-2500', '-250', '-25', '-2'],
+            [Rounding_Mode::HalfEven, '-2501', '-250', '-25', '-3'],
+            [Rounding_Mode::HalfEven, '-2999', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfEven, '-3000', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfEven, '-3001', '-300', '-30', '-3'],
+            [Rounding_Mode::HalfEven, '-3499', '-350', '-35', '-3'],
+            [Rounding_Mode::HalfEven, '-3500', '-350', '-35', '-4'],
+            [Rounding_Mode::HalfEven, '-3501', '-350', '-35', '-4'],
 
-            [RoundingMode::Unnecessary,  '3501',   null,  null, null],
-            [RoundingMode::Unnecessary,  '3500',  '350',  '35', null],
-            [RoundingMode::Unnecessary,  '3499',   null,  null, null],
-            [RoundingMode::Unnecessary,  '3001',   null,  null, null],
-            [RoundingMode::Unnecessary,  '3000',  '300',  '30',  '3'],
-            [RoundingMode::Unnecessary,  '2999',   null,  null, null],
-            [RoundingMode::Unnecessary,  '2501',   null,  null, null],
-            [RoundingMode::Unnecessary,  '2500',  '250',  '25', null],
-            [RoundingMode::Unnecessary,  '2499',   null,  null, null],
-            [RoundingMode::Unnecessary,  '2001',   null,  null, null],
-            [RoundingMode::Unnecessary,  '2000',  '200',  '20',  '2'],
-            [RoundingMode::Unnecessary,  '1999',   null,  null, null],
-            [RoundingMode::Unnecessary,  '1501',   null,  null, null],
-            [RoundingMode::Unnecessary,  '1500',  '150',  '15', null],
-            [RoundingMode::Unnecessary,  '1499',   null,  null, null],
-            [RoundingMode::Unnecessary,  '1001',   null,  null, null],
-            [RoundingMode::Unnecessary,  '1000',  '100',  '10',  '1'],
-            [RoundingMode::Unnecessary,   '999',   null,  null, null],
-            [RoundingMode::Unnecessary,   '501',   null,  null, null],
-            [RoundingMode::Unnecessary,   '500',   '50',   '5', null],
-            [RoundingMode::Unnecessary,   '499',   null,  null, null],
-            [RoundingMode::Unnecessary,     '1',   null,  null, null],
-            [RoundingMode::Unnecessary,     '0',    '0',   '0',  '0'],
-            [RoundingMode::Unnecessary,    '-1',   null,  null, null],
-            [RoundingMode::Unnecessary,  '-499',   null,  null, null],
-            [RoundingMode::Unnecessary,  '-500',  '-50',  '-5', null],
-            [RoundingMode::Unnecessary,  '-501',   null,  null, null],
-            [RoundingMode::Unnecessary,  '-999',   null,  null, null],
-            [RoundingMode::Unnecessary, '-1000', '-100', '-10', '-1'],
-            [RoundingMode::Unnecessary, '-1001',   null,  null, null],
-            [RoundingMode::Unnecessary, '-1499',   null,  null, null],
-            [RoundingMode::Unnecessary, '-1500', '-150', '-15', null],
-            [RoundingMode::Unnecessary, '-1501',   null,  null, null],
-            [RoundingMode::Unnecessary, '-1999',   null,  null, null],
-            [RoundingMode::Unnecessary, '-2000', '-200', '-20', '-2'],
-            [RoundingMode::Unnecessary, '-2001',   null,  null, null],
-            [RoundingMode::Unnecessary, '-2499',   null,  null, null],
-            [RoundingMode::Unnecessary, '-2500', '-250', '-25', null],
-            [RoundingMode::Unnecessary, '-2501',   null,  null, null],
-            [RoundingMode::Unnecessary, '-2999',   null,  null, null],
-            [RoundingMode::Unnecessary, '-3000', '-300', '-30', '-3'],
-            [RoundingMode::Unnecessary, '-3001',   null,  null, null],
-            [RoundingMode::Unnecessary, '-3499',   null,  null, null],
-            [RoundingMode::Unnecessary, '-3500', '-350', '-35', null],
-            [RoundingMode::Unnecessary, '-3501',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '3501',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '3500',  '350',  '35', null],
+            [Rounding_Mode::Unnecessary,  '3499',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '3001',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '3000',  '300',  '30',  '3'],
+            [Rounding_Mode::Unnecessary,  '2999',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '2501',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '2500',  '250',  '25', null],
+            [Rounding_Mode::Unnecessary,  '2499',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '2001',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '2000',  '200',  '20',  '2'],
+            [Rounding_Mode::Unnecessary,  '1999',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '1501',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '1500',  '150',  '15', null],
+            [Rounding_Mode::Unnecessary,  '1499',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '1001',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '1000',  '100',  '10',  '1'],
+            [Rounding_Mode::Unnecessary,   '999',   null,  null, null],
+            [Rounding_Mode::Unnecessary,   '501',   null,  null, null],
+            [Rounding_Mode::Unnecessary,   '500',   '50',   '5', null],
+            [Rounding_Mode::Unnecessary,   '499',   null,  null, null],
+            [Rounding_Mode::Unnecessary,     '1',   null,  null, null],
+            [Rounding_Mode::Unnecessary,     '0',    '0',   '0',  '0'],
+            [Rounding_Mode::Unnecessary,    '-1',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '-499',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '-500',  '-50',  '-5', null],
+            [Rounding_Mode::Unnecessary,  '-501',   null,  null, null],
+            [Rounding_Mode::Unnecessary,  '-999',   null,  null, null],
+            [Rounding_Mode::Unnecessary, '-1000', '-100', '-10', '-1'],
+            [Rounding_Mode::Unnecessary, '-1001',   null,  null, null],
+            [Rounding_Mode::Unnecessary, '-1499',   null,  null, null],
+            [Rounding_Mode::Unnecessary, '-1500', '-150', '-15', null],
+            [Rounding_Mode::Unnecessary, '-1501',   null,  null, null],
+            [Rounding_Mode::Unnecessary, '-1999',   null,  null, null],
+            [Rounding_Mode::Unnecessary, '-2000', '-200', '-20', '-2'],
+            [Rounding_Mode::Unnecessary, '-2001',   null,  null, null],
+            [Rounding_Mode::Unnecessary, '-2499',   null,  null, null],
+            [Rounding_Mode::Unnecessary, '-2500', '-250', '-25', null],
+            [Rounding_Mode::Unnecessary, '-2501',   null,  null, null],
+            [Rounding_Mode::Unnecessary, '-2999',   null,  null, null],
+            [Rounding_Mode::Unnecessary, '-3000', '-300', '-30', '-3'],
+            [Rounding_Mode::Unnecessary, '-3001',   null,  null, null],
+            [Rounding_Mode::Unnecessary, '-3499',   null,  null, null],
+            [Rounding_Mode::Unnecessary, '-3500', '-350', '-35', null],
+            [Rounding_Mode::Unnecessary, '-3501',   null,  null, null],
         ];
     }
 
@@ -1241,14 +1241,14 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerQuotientAndRemainder')]
     public function testQuotient(string $dividend, string $divisor, string $quotient): void
     {
-        self::assertBigIntegerEquals($quotient, BigInteger::of($dividend)->quotient($divisor));
+        self::assertBigIntegerEquals($quotient, Big_Integer::of($dividend)->quotient($divisor));
     }
 
     public function testQuotientOfZeroThrowsException(): void
     {
-        $one = BigInteger::one();
+        $one = Big_Integer::one();
 
-        $this->expectException(DivisionByZeroException::class);
+        $this->expectException(Division_By_Zero_Exception::class);
         $this->expectExceptionMessageExact('Division by zero.');
 
         $one->quotient(0);
@@ -1263,14 +1263,14 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerQuotientAndRemainder')]
     public function testRemainder(string $dividend, string $divisor, string $quotient, string $remainder): void
     {
-        self::assertBigIntegerEquals($remainder, BigInteger::of($dividend)->remainder($divisor));
+        self::assertBigIntegerEquals($remainder, Big_Integer::of($dividend)->remainder($divisor));
     }
 
     public function testRemainderOfZeroThrowsException(): void
     {
-        $one = BigInteger::one();
+        $one = Big_Integer::one();
 
-        $this->expectException(DivisionByZeroException::class);
+        $this->expectException(Division_By_Zero_Exception::class);
         $this->expectExceptionMessageExact('Division by zero.');
 
         $one->remainder(0);
@@ -1285,7 +1285,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerQuotientAndRemainder')]
     public function testQuotientAndRemainder(string $dividend, string $divisor, string $quotient, string $remainder): void
     {
-        [$q, $r] = BigInteger::of($dividend)->quotientAndRemainder($divisor);
+        [$q, $r] = Big_Integer::of($dividend)->quotient_and_remainder($divisor);
 
         self::assertBigIntegerEquals($quotient, $q);
         self::assertBigIntegerEquals($remainder, $r);
@@ -1358,18 +1358,18 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testQuotientAndRemainderByZeroThrowsException(): void
     {
-        $one = BigInteger::one();
+        $one = Big_Integer::one();
 
-        $this->expectException(DivisionByZeroException::class);
+        $this->expectException(Division_By_Zero_Exception::class);
         $this->expectExceptionMessageExact('Division by zero.');
 
-        $one->quotientAndRemainder(0);
+        $one->quotient_and_remainder(0);
     }
 
     #[DataProvider('providerMod')]
     public function testMod(string $dividend, string $divisor, string $expected): void
     {
-        self::assertBigIntegerEquals($expected, BigInteger::of($dividend)->mod($divisor));
+        self::assertBigIntegerEquals($expected, Big_Integer::of($dividend)->mod($divisor));
     }
 
     public static function providerMod(): array
@@ -1426,9 +1426,9 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testModZeroThrowsException(): void
     {
-        $one = BigInteger::one();
+        $one = Big_Integer::one();
 
-        $this->expectException(DivisionByZeroException::class);
+        $this->expectException(Division_By_Zero_Exception::class);
         $this->expectExceptionMessageExact('The modulus must not be zero.');
 
         $one->mod(0);
@@ -1436,9 +1436,9 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testModNegativeThrowsException(): void
     {
-        $one = BigInteger::one();
+        $one = Big_Integer::one();
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact('The modulus must not be negative.');
 
         $one->mod(-1);
@@ -1447,7 +1447,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerModPow')]
     public function testModPow(string $base, string $exp, string $mod, string $expected): void
     {
-        self::assertBigIntegerEquals($expected, BigInteger::of($base)->modPow($exp, $mod));
+        self::assertBigIntegerEquals($expected, Big_Integer::of($base)->mod_pow($exp, $mod));
     }
 
     public static function providerModPow(): array
@@ -1523,13 +1523,13 @@ class BigIntegerTest extends AbstractTestCase
      */
     public function testModPowCrypto(): void
     {
-        if (CalculatorRegistry::get() instanceof Calculator\NativeCalculator) {
+        if (Calculator_Registry::get() instanceof Calculator\Native_Calculator) {
             if (getenv('CI') === 'true') {
                 self::markTestSkipped('This test is currently too slow for the CI.');
             }
         }
 
-        $prime = BigInteger::fromBase(
+        $prime = Big_Integer::from_base(
             'FFFFFFFFFFFFFFFFC90FDAA22168C234C4C6628B80DC1CD1' .
             '29024E088A67CC74020BBEA63B139B22514A08798E3404DD' .
             'EF9519B3CD3A431B302B0A6DF25F14374FE1356D6D51C245' .
@@ -1544,40 +1544,40 @@ class BigIntegerTest extends AbstractTestCase
             16,
         );
 
-        $generator = BigInteger::of(2);
+        $generator = Big_Integer::of(2);
 
-        $alicePrivate = BigInteger::fromBase(
+        $alicePrivate = Big_Integer::from_base(
             '22606EDA7960458BC9D65F46DD96F114F9A004F0493C1F26' .
             '2139D2C8063B733162E876182CA3BF063AB1A167ABDB7F03' .
             'E0A225A6205660439F6CE46D252069FF',
             16,
         );
 
-        $bobPrivate = BigInteger::fromBase(
+        $bobPrivate = Big_Integer::from_base(
             '6E3EFA13A96025D63E4B0D88A09B3A46DDFE9DD3BC9D1655' .
             '4898C02B4AC181F0CEB4E818664B12F02C71A07215C400F9' .
             '88352A4779F3E88836F7C3D3B3C739DE',
             16,
         );
 
-        $alicePublic = $generator->modPow($alicePrivate, $prime);
-        $bobPublic = $generator->modPow($bobPrivate, $prime);
+        $alicePublic = $generator->mod_pow($alicePrivate, $prime);
+        $bobPublic = $generator->mod_pow($bobPrivate, $prime);
 
-        $aliceShared = $bobPublic->modPow($alicePrivate, $prime);
-        $bobShared = $alicePublic->modPow($bobPrivate, $prime);
+        $aliceShared = $bobPublic->mod_pow($alicePrivate, $prime);
+        $bobShared = $alicePublic->mod_pow($bobPrivate, $prime);
 
-        self::assertTrue($aliceShared->isEqualTo($bobShared));
+        self::assertTrue($aliceShared->is_equal_to($bobShared));
     }
 
     #[DataProvider('providerModPowNegativeThrowsException')]
     public function testModPowNegativeThrowsException(int $exp, int $mod, string $expectedExceptionMessage): void
     {
-        $one = BigInteger::one();
+        $one = Big_Integer::one();
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact($expectedExceptionMessage);
 
-        $one->modPow($exp, $mod);
+        $one->mod_pow($exp, $mod);
     }
 
     public static function providerModPowNegativeThrowsException(): array
@@ -1590,18 +1590,18 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testModPowZeroThrowsException(): void
     {
-        $one = BigInteger::one();
+        $one = Big_Integer::one();
 
-        $this->expectException(DivisionByZeroException::class);
+        $this->expectException(Division_By_Zero_Exception::class);
         $this->expectExceptionMessageExact('The modulus must not be zero.');
 
-        $one->modPow(1, 0);
+        $one->mod_pow(1, 0);
     }
 
     #[DataProvider('providerClamp')]
     public function testClamp(string $number, string $min, string $max, string $expected): void
     {
-        self::assertBigIntegerEquals($expected, BigInteger::of($number)->clamp($min, $max));
+        self::assertBigIntegerEquals($expected, Big_Integer::of($number)->clamp($min, $max));
     }
 
     public static function providerClamp(): array
@@ -1622,8 +1622,8 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testClampWithInvertedBoundsThrowsException(): void
     {
-        $number = BigInteger::of(5);
-        $this->expectException(InvalidArgumentException::class);
+        $number = Big_Integer::of(5);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact('The minimum value must be less than or equal to the maximum value.');
 
         $number->clamp(10, 0);
@@ -1637,7 +1637,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerPower')]
     public function testPower(string $number, int $exponent, string $expected): void
     {
-        self::assertBigIntegerEquals($expected, BigInteger::of($number)->power($exponent));
+        self::assertBigIntegerEquals($expected, Big_Integer::of($number)->power($exponent));
     }
 
     public static function providerPower(): array
@@ -1699,9 +1699,9 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testPowerWithNegativeExponentThrowsException(): void
     {
-        $one = BigInteger::one();
+        $one = Big_Integer::one();
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact('The exponent must not be negative.');
 
         $one->power(-1);
@@ -1715,8 +1715,8 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerGcd')]
     public function testGcd(string $a, string $b, string $gcd): void
     {
-        $a = BigInteger::of($a);
-        $b = BigInteger::of($b);
+        $a = Big_Integer::of($a);
+        $b = Big_Integer::of($b);
 
         self::assertBigIntegerEquals($gcd, $a->gcd($b));
     }
@@ -1814,8 +1814,8 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerLcm')]
     public function testLcm(string $a, string $b, string $lcm): void
     {
-        $a = BigInteger::of($a);
-        $b = BigInteger::of($b);
+        $a = Big_Integer::of($a);
+        $b = Big_Integer::of($b);
 
         self::assertBigIntegerEquals($lcm, $a->lcm($b));
     }
@@ -1852,12 +1852,12 @@ class BigIntegerTest extends AbstractTestCase
     }
 
     #[DataProvider('providerSqrt')]
-    public function testSqrt(string $number, RoundingMode $roundingMode, ?string $expected): void
+    public function testSqrt(string $number, Rounding_Mode $roundingMode, ?string $expected): void
     {
-        $number = BigInteger::of($number);
+        $number = Big_Integer::of($number);
 
         if ($expected === null) {
-            $this->expectException(RoundingNecessaryException::class);
+            $this->expectException(Rounding_Necessary_Exception::class);
             $this->expectExceptionMessageExact('The square root is not exact and cannot be represented as an integer without rounding.');
         }
 
@@ -1871,1778 +1871,1778 @@ class BigIntegerTest extends AbstractTestCase
     public static function providerSqrt(): Generator
     {
         $tests = [
-            ['0', RoundingMode::Unnecessary, '0'],
-            ['0', RoundingMode::Down, '0'],
-            ['0', RoundingMode::Up, '0'],
-            ['0', RoundingMode::HalfUp, '0'],
-
-            ['1', RoundingMode::Unnecessary, '1'],
-            ['1', RoundingMode::Down, '1'],
-            ['1', RoundingMode::Up, '1'],
-            ['1', RoundingMode::HalfUp, '1'],
-
-            ['2', RoundingMode::Unnecessary, null],
-            ['2', RoundingMode::Down, '1'],
-            ['2', RoundingMode::Up, '2'],
-            ['2', RoundingMode::HalfUp, '1'],
-
-            ['3', RoundingMode::Unnecessary, null],
-            ['3', RoundingMode::Down, '1'],
-            ['3', RoundingMode::Up, '2'],
-            ['3', RoundingMode::HalfUp, '2'],
-
-            ['4', RoundingMode::Unnecessary, '2'],
-            ['4', RoundingMode::Down, '2'],
-            ['4', RoundingMode::Up, '2'],
-            ['4', RoundingMode::HalfUp, '2'],
-
-            ['5', RoundingMode::Unnecessary, null],
-            ['5', RoundingMode::Down, '2'],
-            ['5', RoundingMode::Up, '3'],
-            ['5', RoundingMode::HalfUp, '2'],
-
-            ['8', RoundingMode::Unnecessary, null],
-            ['8', RoundingMode::Down, '2'],
-            ['8', RoundingMode::Up, '3'],
-            ['8', RoundingMode::HalfUp, '3'],
-
-            ['9', RoundingMode::Unnecessary, '3'],
-            ['9', RoundingMode::Down, '3'],
-            ['9', RoundingMode::Up, '3'],
-            ['9', RoundingMode::HalfUp, '3'],
-
-            ['10', RoundingMode::Unnecessary, null],
-            ['10', RoundingMode::Down, '3'],
-            ['10', RoundingMode::Up, '4'],
-            ['10', RoundingMode::HalfUp, '3'],
-
-            ['15', RoundingMode::Unnecessary, null],
-            ['15', RoundingMode::Down, '3'],
-            ['15', RoundingMode::Up, '4'],
-            ['15', RoundingMode::HalfUp, '4'],
-
-            ['16', RoundingMode::Unnecessary, '4'],
-            ['16', RoundingMode::Down, '4'],
-            ['16', RoundingMode::Up, '4'],
-            ['16', RoundingMode::HalfUp, '4'],
-
-            ['17', RoundingMode::Unnecessary, null],
-            ['17', RoundingMode::Down, '4'],
-            ['17', RoundingMode::Up, '5'],
-            ['17', RoundingMode::HalfUp, '4'],
-
-            ['20', RoundingMode::Unnecessary, null],
-            ['20', RoundingMode::Down, '4'],
-            ['20', RoundingMode::Up, '5'],
-            ['20', RoundingMode::HalfUp, '4'],
-
-            ['21', RoundingMode::Unnecessary, null],
-            ['21', RoundingMode::Down, '4'],
-            ['21', RoundingMode::Up, '5'],
-            ['21', RoundingMode::HalfUp, '5'],
-
-            ['24', RoundingMode::Unnecessary, null],
-            ['24', RoundingMode::Down, '4'],
-            ['24', RoundingMode::Up, '5'],
-            ['24', RoundingMode::HalfUp, '5'],
-
-            ['25', RoundingMode::Unnecessary, '5'],
-            ['25', RoundingMode::Down, '5'],
-            ['25', RoundingMode::Up, '5'],
-            ['25', RoundingMode::HalfUp, '5'],
-
-            ['30', RoundingMode::Unnecessary, null],
-            ['30', RoundingMode::Down, '5'],
-            ['30', RoundingMode::Up, '6'],
-            ['30', RoundingMode::HalfUp, '5'],
-
-            ['31', RoundingMode::Unnecessary, null],
-            ['31', RoundingMode::Down, '5'],
-            ['31', RoundingMode::Up, '6'],
-            ['31', RoundingMode::HalfUp, '6'],
-
-            ['35', RoundingMode::Unnecessary, null],
-            ['35', RoundingMode::Down, '5'],
-            ['35', RoundingMode::Up, '6'],
-            ['35', RoundingMode::HalfUp, '6'],
-
-            ['36', RoundingMode::Unnecessary, '6'],
-            ['36', RoundingMode::Down, '6'],
-            ['36', RoundingMode::Up, '6'],
-            ['36', RoundingMode::HalfUp, '6'],
-
-            ['48', RoundingMode::Unnecessary, null],
-            ['48', RoundingMode::Down, '6'],
-            ['48', RoundingMode::Up, '7'],
-            ['48', RoundingMode::HalfUp, '7'],
-
-            ['49', RoundingMode::Unnecessary, '7'],
-            ['49', RoundingMode::Down, '7'],
-            ['49', RoundingMode::Up, '7'],
-            ['49', RoundingMode::HalfUp, '7'],
-
-            ['63', RoundingMode::Unnecessary, null],
-            ['63', RoundingMode::Down, '7'],
-            ['63', RoundingMode::Up, '8'],
-            ['63', RoundingMode::HalfUp, '8'],
-
-            ['64', RoundingMode::Unnecessary, '8'],
-            ['64', RoundingMode::Down, '8'],
-            ['64', RoundingMode::Up, '8'],
-            ['64', RoundingMode::HalfUp, '8'],
-
-            ['80', RoundingMode::Unnecessary, null],
-            ['80', RoundingMode::Down, '8'],
-            ['80', RoundingMode::Up, '9'],
-            ['80', RoundingMode::HalfUp, '9'],
-
-            ['81', RoundingMode::Unnecessary, '9'],
-            ['81', RoundingMode::Down, '9'],
-            ['81', RoundingMode::Up, '9'],
-            ['81', RoundingMode::HalfUp, '9'],
-
-            ['99', RoundingMode::Unnecessary, null],
-            ['99', RoundingMode::Down, '9'],
-            ['99', RoundingMode::Up, '10'],
-            ['99', RoundingMode::HalfUp, '10'],
-
-            ['100', RoundingMode::Unnecessary, '10'],
-            ['100', RoundingMode::Down, '10'],
-            ['100', RoundingMode::Up, '10'],
-            ['100', RoundingMode::HalfUp, '10'],
-
-            ['101', RoundingMode::Unnecessary, null],
-            ['101', RoundingMode::Down, '10'],
-            ['101', RoundingMode::Up, '11'],
-            ['101', RoundingMode::HalfUp, '10'],
-
-            ['10000', RoundingMode::Unnecessary, '100'],
-            ['10000', RoundingMode::Down, '100'],
-            ['10000', RoundingMode::Up, '100'],
-            ['10000', RoundingMode::HalfUp, '100'],
-
-            ['10001', RoundingMode::Unnecessary, null],
-            ['10001', RoundingMode::Down, '100'],
-            ['10001', RoundingMode::Up, '101'],
-            ['10001', RoundingMode::HalfUp, '100'],
-
-            ['12344', RoundingMode::Unnecessary, null],
-            ['12344', RoundingMode::Down, '111'],
-            ['12344', RoundingMode::Up, '112'],
-            ['12344', RoundingMode::HalfUp, '111'],
-
-            ['12346', RoundingMode::Unnecessary, null],
-            ['12346', RoundingMode::Down, '111'],
-            ['12346', RoundingMode::Up, '112'],
-            ['12346', RoundingMode::HalfUp, '111'],
-
-            ['1000000', RoundingMode::Unnecessary, '1000'],
-            ['1000000', RoundingMode::Down, '1000'],
-            ['1000000', RoundingMode::Up, '1000'],
-            ['1000000', RoundingMode::HalfUp, '1000'],
-
-            ['152399025', RoundingMode::Unnecessary, '12345'],
-            ['152399025', RoundingMode::Down, '12345'],
-            ['152399025', RoundingMode::Up, '12345'],
-            ['152399025', RoundingMode::HalfUp, '12345'],
-
-            ['1000000000000000000000000000000000000000000000000000000000000', RoundingMode::Unnecessary, '1000000000000000000000000000000'],
-            ['1000000000000000000000000000000000000000000000000000000000000', RoundingMode::Down, '1000000000000000000000000000000'],
-            ['1000000000000000000000000000000000000000000000000000000000000', RoundingMode::Up, '1000000000000000000000000000000'],
-
-            ['1000000000000000000000000000000000000000000000000000000000001', RoundingMode::Unnecessary, null],
-            ['1000000000000000000000000000000000000000000000000000000000001', RoundingMode::Down, '1000000000000000000000000000000'],
-            ['1000000000000000000000000000000000000000000000000000000000001', RoundingMode::Up, '1000000000000000000000000000001'],
-
-            ['536137214136734800142146901787504368108126328549238033123877', RoundingMode::Unnecessary, null],
-            ['536137214136734800142146901787504368108126328549238033123877', RoundingMode::Down, '732213912826528310663262741626'],
-            ['536137214136734800142146901787504368108126328549238033123877', RoundingMode::Up, '732213912826528310663262741627'],
-            ['536137214136734800142146901787504368108126328549238033123877', RoundingMode::HalfUp, '732213912826528310663262741626'],
-
-            ['536137214136734800142146901786039940282473271927911507640624', RoundingMode::Unnecessary, null],
-            ['536137214136734800142146901786039940282473271927911507640624', RoundingMode::Down, '732213912826528310663262741624'],
-            ['536137214136734800142146901786039940282473271927911507640624', RoundingMode::Up, '732213912826528310663262741625'],
-            ['536137214136734800142146901786039940282473271927911507640624', RoundingMode::HalfUp, '732213912826528310663262741625'],
-
-            ['536137214136734800142146901786039940282473271927911507640625', RoundingMode::Unnecessary, '732213912826528310663262741625'],
-            ['536137214136734800142146901786039940282473271927911507640625', RoundingMode::Down, '732213912826528310663262741625'],
-            ['536137214136734800142146901786039940282473271927911507640625', RoundingMode::Up, '732213912826528310663262741625'],
-            ['536137214136734800142146901786039940282473271927911507640625', RoundingMode::HalfUp, '732213912826528310663262741625'],
-
-            ['536137214136734800142146901786039940282473271927911507640626', RoundingMode::Unnecessary, null],
-            ['536137214136734800142146901786039940282473271927911507640626', RoundingMode::Down, '732213912826528310663262741625'],
-            ['536137214136734800142146901786039940282473271927911507640626', RoundingMode::Up, '732213912826528310663262741626'],
-            ['536137214136734800142146901786039940282473271927911507640626', RoundingMode::HalfUp, '732213912826528310663262741625'],
-
-            ['536137214136734800142146901787504368108126328549238033123875', RoundingMode::Unnecessary, null],
-            ['536137214136734800142146901787504368108126328549238033123875', RoundingMode::Down, '732213912826528310663262741625'],
-            ['536137214136734800142146901787504368108126328549238033123875', RoundingMode::Up, '732213912826528310663262741626'],
-            ['536137214136734800142146901787504368108126328549238033123875', RoundingMode::HalfUp, '732213912826528310663262741626'],
-
-            ['536137214136734800142146901787504368108126328549238033123876', RoundingMode::Unnecessary, '732213912826528310663262741626'],
-            ['536137214136734800142146901787504368108126328549238033123876', RoundingMode::Down, '732213912826528310663262741626'],
-            ['536137214136734800142146901787504368108126328549238033123876', RoundingMode::Up, '732213912826528310663262741626'],
-            ['536137214136734800142146901787504368108126328549238033123876', RoundingMode::HalfUp, '732213912826528310663262741626'],
-
-            ['5651495859544574019979802175954184725583245698990648064256', RoundingMode::Unnecessary, '75176431543034642899535752016'],
-            ['5651495859544574019979802175954184725583245698990648064256', RoundingMode::Down, '75176431543034642899535752016'],
-            ['5651495859544574019979802175954184725583245698990648064256', RoundingMode::Up, '75176431543034642899535752016'],
-            ['5651495859544574019979802175954184725583245698990648064256', RoundingMode::HalfUp, '75176431543034642899535752016'],
-
-            ['5651495859544574019979802176104537588669314984789719568288', RoundingMode::Unnecessary, null],
-            ['5651495859544574019979802176104537588669314984789719568288', RoundingMode::Down, '75176431543034642899535752016'],
-            ['5651495859544574019979802176104537588669314984789719568288', RoundingMode::Up, '75176431543034642899535752017'],
-            ['5651495859544574019979802176104537588669314984789719568288', RoundingMode::HalfUp, '75176431543034642899535752017'],
-
-            ['5651495859544574019979802176104537588669314984789719568289', RoundingMode::Unnecessary, '75176431543034642899535752017'],
-            ['5651495859544574019979802176104537588669314984789719568289', RoundingMode::Down, '75176431543034642899535752017'],
-            ['5651495859544574019979802176104537588669314984789719568289', RoundingMode::Up, '75176431543034642899535752017'],
-            ['5651495859544574019979802176104537588669314984789719568289', RoundingMode::HalfUp, '75176431543034642899535752017'],
-
-            ['303791344535904055863813752643405021077478121784571407761729', RoundingMode::Unnecessary, '551172699374618931119694672223'],
-            ['303791344535904055863813752643405021077478121784571407761729', RoundingMode::Down, '551172699374618931119694672223'],
-            ['303791344535904055863813752643405021077478121784571407761729', RoundingMode::Up, '551172699374618931119694672223'],
-            ['303791344535904055863813752643405021077478121784571407761729', RoundingMode::HalfUp, '551172699374618931119694672223'],
-
-            ['303791344535904055863813752643956193776852740715691102433952', RoundingMode::Unnecessary, null],
-            ['303791344535904055863813752643956193776852740715691102433952', RoundingMode::Down, '551172699374618931119694672223'],
-            ['303791344535904055863813752643956193776852740715691102433952', RoundingMode::Up, '551172699374618931119694672224'],
-            ['303791344535904055863813752643956193776852740715691102433952', RoundingMode::HalfUp, '551172699374618931119694672223'],
-
-            ['303791344535904055863813752644507366476227359646810797106176', RoundingMode::Unnecessary, '551172699374618931119694672224'],
-            ['303791344535904055863813752644507366476227359646810797106176', RoundingMode::Down, '551172699374618931119694672224'],
-            ['303791344535904055863813752644507366476227359646810797106176', RoundingMode::Up, '551172699374618931119694672224'],
-            ['303791344535904055863813752644507366476227359646810797106176', RoundingMode::HalfUp, '551172699374618931119694672224'],
-
-            ['563247882222081148212230590155705163466381822617812257437849', RoundingMode::Unnecessary, '750498422531374244468346132293'],
-            ['563247882222081148212230590155705163466381822617812257437849', RoundingMode::Down, '750498422531374244468346132293'],
-            ['563247882222081148212230590155705163466381822617812257437849', RoundingMode::Up, '750498422531374244468346132293'],
-            ['563247882222081148212230590155705163466381822617812257437849', RoundingMode::HalfUp, '750498422531374244468346132293'],
-
-            ['563247882222081148212230590157206160311444571106748949702435', RoundingMode::Unnecessary, null],
-            ['563247882222081148212230590157206160311444571106748949702435', RoundingMode::Down, '750498422531374244468346132293'],
-            ['563247882222081148212230590157206160311444571106748949702435', RoundingMode::Up, '750498422531374244468346132294'],
-            ['563247882222081148212230590157206160311444571106748949702435', RoundingMode::HalfUp, '750498422531374244468346132294'],
-
-            ['563247882222081148212230590157206160311444571106748949702436', RoundingMode::Unnecessary, '750498422531374244468346132294'],
-            ['563247882222081148212230590157206160311444571106748949702436', RoundingMode::Down, '750498422531374244468346132294'],
-            ['563247882222081148212230590157206160311444571106748949702436', RoundingMode::Up, '750498422531374244468346132294'],
-            ['563247882222081148212230590157206160311444571106748949702436', RoundingMode::HalfUp, '750498422531374244468346132294'],
-
-            ['396189426113498637323382117462633843296333578307938768136329', RoundingMode::Unnecessary, '629435799834660371475569807677'],
-            ['396189426113498637323382117462633843296333578307938768136329', RoundingMode::Down, '629435799834660371475569807677'],
-            ['396189426113498637323382117462633843296333578307938768136329', RoundingMode::Up, '629435799834660371475569807677'],
-            ['396189426113498637323382117462633843296333578307938768136329', RoundingMode::HalfUp, '629435799834660371475569807677'],
-
-            ['396189426113498637323382117463263279096168238679414337944006', RoundingMode::Unnecessary, null],
-            ['396189426113498637323382117463263279096168238679414337944006', RoundingMode::Down, '629435799834660371475569807677'],
-            ['396189426113498637323382117463263279096168238679414337944006', RoundingMode::Up, '629435799834660371475569807678'],
-            ['396189426113498637323382117463263279096168238679414337944006', RoundingMode::HalfUp, '629435799834660371475569807677'],
-
-            ['396189426113498637323382117463892714896002899050889907751684', RoundingMode::Unnecessary, '629435799834660371475569807678'],
-            ['396189426113498637323382117463892714896002899050889907751684', RoundingMode::Down, '629435799834660371475569807678'],
-            ['396189426113498637323382117463892714896002899050889907751684', RoundingMode::Up, '629435799834660371475569807678'],
-            ['396189426113498637323382117463892714896002899050889907751684', RoundingMode::HalfUp, '629435799834660371475569807678'],
-
-            ['80479328054895287914569547663334257436697869675619064535360356', RoundingMode::Unnecessary, '8971027146034911420307518533066'],
-            ['80479328054895287914569547663334257436697869675619064535360356', RoundingMode::Down, '8971027146034911420307518533066'],
-            ['80479328054895287914569547663334257436697869675619064535360356', RoundingMode::Up, '8971027146034911420307518533066'],
-            ['80479328054895287914569547663334257436697869675619064535360356', RoundingMode::HalfUp, '8971027146034911420307518533066'],
-
-            ['80479328054895287914569547663352199490989939498459679572426488', RoundingMode::Unnecessary, null],
-            ['80479328054895287914569547663352199490989939498459679572426488', RoundingMode::Down, '8971027146034911420307518533066'],
-            ['80479328054895287914569547663352199490989939498459679572426488', RoundingMode::Up, '8971027146034911420307518533067'],
-            ['80479328054895287914569547663352199490989939498459679572426488', RoundingMode::HalfUp, '8971027146034911420307518533067'],
-
-            ['80479328054895287914569547663352199490989939498459679572426489', RoundingMode::Unnecessary, '8971027146034911420307518533067'],
-            ['80479328054895287914569547663352199490989939498459679572426489', RoundingMode::Down, '8971027146034911420307518533067'],
-            ['80479328054895287914569547663352199490989939498459679572426489', RoundingMode::Up, '8971027146034911420307518533067'],
-            ['80479328054895287914569547663352199490989939498459679572426489', RoundingMode::HalfUp, '8971027146034911420307518533067'],
-
-            ['681849477075053403257629437089098232501847587591122144140625', RoundingMode::Unnecessary, '825741773846432819101899135625'],
-            ['681849477075053403257629437089098232501847587591122144140625', RoundingMode::Down, '825741773846432819101899135625'],
-            ['681849477075053403257629437089098232501847587591122144140625', RoundingMode::Up, '825741773846432819101899135625'],
-            ['681849477075053403257629437089098232501847587591122144140625', RoundingMode::HalfUp, '825741773846432819101899135625'],
-
-            ['681849477075053403257629437089923974275694020410224043276250', RoundingMode::Unnecessary, null],
-            ['681849477075053403257629437089923974275694020410224043276250', RoundingMode::Down, '825741773846432819101899135625'],
-            ['681849477075053403257629437089923974275694020410224043276250', RoundingMode::Up, '825741773846432819101899135626'],
-            ['681849477075053403257629437089923974275694020410224043276250', RoundingMode::HalfUp, '825741773846432819101899135625'],
-
-            ['681849477075053403257629437090749716049540453229325942411876', RoundingMode::Unnecessary, '825741773846432819101899135626'],
-            ['681849477075053403257629437090749716049540453229325942411876', RoundingMode::Down, '825741773846432819101899135626'],
-            ['681849477075053403257629437090749716049540453229325942411876', RoundingMode::Up, '825741773846432819101899135626'],
-            ['681849477075053403257629437090749716049540453229325942411876', RoundingMode::HalfUp, '825741773846432819101899135626'],
-
-            ['74137461815059419705618984794190691016668430175974095624129600', RoundingMode::Unnecessary, '8610311365743948501801103299640'],
-            ['74137461815059419705618984794190691016668430175974095624129600', RoundingMode::Down, '8610311365743948501801103299640'],
-            ['74137461815059419705618984794190691016668430175974095624129600', RoundingMode::Up, '8610311365743948501801103299640'],
-            ['74137461815059419705618984794190691016668430175974095624129600', RoundingMode::HalfUp, '8610311365743948501801103299640'],
-
-            ['74137461815059419705618984794207911639399918072977697830728880', RoundingMode::Unnecessary, null],
-            ['74137461815059419705618984794207911639399918072977697830728880', RoundingMode::Down, '8610311365743948501801103299640'],
-            ['74137461815059419705618984794207911639399918072977697830728880', RoundingMode::Up, '8610311365743948501801103299641'],
-            ['74137461815059419705618984794207911639399918072977697830728880', RoundingMode::HalfUp, '8610311365743948501801103299641'],
-
-            ['74137461815059419705618984794207911639399918072977697830728881', RoundingMode::Unnecessary, '8610311365743948501801103299641'],
-            ['74137461815059419705618984794207911639399918072977697830728881', RoundingMode::Down, '8610311365743948501801103299641'],
-            ['74137461815059419705618984794207911639399918072977697830728881', RoundingMode::Up, '8610311365743948501801103299641'],
-            ['74137461815059419705618984794207911639399918072977697830728881', RoundingMode::HalfUp, '8610311365743948501801103299641'],
-
-            ['6679657010858483937903991845397665010485952775098785560735409', RoundingMode::Unnecessary, '2584503242570704134867997320903'],
-            ['6679657010858483937903991845397665010485952775098785560735409', RoundingMode::Down, '2584503242570704134867997320903'],
-            ['6679657010858483937903991845397665010485952775098785560735409', RoundingMode::Up, '2584503242570704134867997320903'],
-            ['6679657010858483937903991845397665010485952775098785560735409', RoundingMode::HalfUp, '2584503242570704134867997320903'],
-
-            ['6679657010858483937903991845400249513728523479233653558056312', RoundingMode::Unnecessary, null],
-            ['6679657010858483937903991845400249513728523479233653558056312', RoundingMode::Down, '2584503242570704134867997320903'],
-            ['6679657010858483937903991845400249513728523479233653558056312', RoundingMode::Up, '2584503242570704134867997320904'],
-            ['6679657010858483937903991845400249513728523479233653558056312', RoundingMode::HalfUp, '2584503242570704134867997320903'],
-
-            ['6679657010858483937903991845402834016971094183368521555377216', RoundingMode::Unnecessary, '2584503242570704134867997320904'],
-            ['6679657010858483937903991845402834016971094183368521555377216', RoundingMode::Down, '2584503242570704134867997320904'],
-            ['6679657010858483937903991845402834016971094183368521555377216', RoundingMode::Up, '2584503242570704134867997320904'],
-            ['6679657010858483937903991845402834016971094183368521555377216', RoundingMode::HalfUp, '2584503242570704134867997320904'],
-
-            ['76167329888878964758237229146072291137608533898056659182403025', RoundingMode::Unnecessary, '8727389637736988579847341871305'],
-            ['76167329888878964758237229146072291137608533898056659182403025', RoundingMode::Down, '8727389637736988579847341871305'],
-            ['76167329888878964758237229146072291137608533898056659182403025', RoundingMode::Up, '8727389637736988579847341871305'],
-            ['76167329888878964758237229146072291137608533898056659182403025', RoundingMode::HalfUp, '8727389637736988579847341871305'],
-
-            ['76167329888878964758237229146089745916884007875216353866145635', RoundingMode::Unnecessary, null],
-            ['76167329888878964758237229146089745916884007875216353866145635', RoundingMode::Down, '8727389637736988579847341871305'],
-            ['76167329888878964758237229146089745916884007875216353866145635', RoundingMode::Up, '8727389637736988579847341871306'],
-            ['76167329888878964758237229146089745916884007875216353866145635', RoundingMode::HalfUp, '8727389637736988579847341871306'],
-
-            ['76167329888878964758237229146089745916884007875216353866145636', RoundingMode::Unnecessary, '8727389637736988579847341871306'],
-            ['76167329888878964758237229146089745916884007875216353866145636', RoundingMode::Down, '8727389637736988579847341871306'],
-            ['76167329888878964758237229146089745916884007875216353866145636', RoundingMode::Up, '8727389637736988579847341871306'],
-            ['76167329888878964758237229146089745916884007875216353866145636', RoundingMode::HalfUp, '8727389637736988579847341871306'],
-
-            ['6743391560146249598812429163892766868360953827745248726306064', RoundingMode::Unnecessary, '2596804105077287033903247753508'],
-            ['6743391560146249598812429163892766868360953827745248726306064', RoundingMode::Down, '2596804105077287033903247753508'],
-            ['6743391560146249598812429163892766868360953827745248726306064', RoundingMode::Up, '2596804105077287033903247753508'],
-            ['6743391560146249598812429163892766868360953827745248726306064', RoundingMode::HalfUp, '2596804105077287033903247753508'],
-
-            ['6743391560146249598812429163895363672466031114779151974059572', RoundingMode::Unnecessary, null],
-            ['6743391560146249598812429163895363672466031114779151974059572', RoundingMode::Down, '2596804105077287033903247753508'],
-            ['6743391560146249598812429163895363672466031114779151974059572', RoundingMode::Up, '2596804105077287033903247753509'],
-            ['6743391560146249598812429163895363672466031114779151974059572', RoundingMode::HalfUp, '2596804105077287033903247753508'],
-
-            ['6743391560146249598812429163897960476571108401813055221813081', RoundingMode::Unnecessary, '2596804105077287033903247753509'],
-            ['6743391560146249598812429163897960476571108401813055221813081', RoundingMode::Down, '2596804105077287033903247753509'],
-            ['6743391560146249598812429163897960476571108401813055221813081', RoundingMode::Up, '2596804105077287033903247753509'],
-            ['6743391560146249598812429163897960476571108401813055221813081', RoundingMode::HalfUp, '2596804105077287033903247753509'],
-
-            ['1867791142724588955955814039055642821336323719154250751224723556', RoundingMode::Unnecessary, '43217949311884164825638553209334'],
-            ['1867791142724588955955814039055642821336323719154250751224723556', RoundingMode::Down, '43217949311884164825638553209334'],
-            ['1867791142724588955955814039055642821336323719154250751224723556', RoundingMode::Up, '43217949311884164825638553209334'],
-            ['1867791142724588955955814039055642821336323719154250751224723556', RoundingMode::HalfUp, '43217949311884164825638553209334'],
-
-            ['1867791142724588955955814039055729257234947487483902028331142224', RoundingMode::Unnecessary, null],
-            ['1867791142724588955955814039055729257234947487483902028331142224', RoundingMode::Down, '43217949311884164825638553209334'],
-            ['1867791142724588955955814039055729257234947487483902028331142224', RoundingMode::Up, '43217949311884164825638553209335'],
-            ['1867791142724588955955814039055729257234947487483902028331142224', RoundingMode::HalfUp, '43217949311884164825638553209335'],
-
-            ['1867791142724588955955814039055729257234947487483902028331142225', RoundingMode::Unnecessary, '43217949311884164825638553209335'],
-            ['1867791142724588955955814039055729257234947487483902028331142225', RoundingMode::Down, '43217949311884164825638553209335'],
-            ['1867791142724588955955814039055729257234947487483902028331142225', RoundingMode::Up, '43217949311884164825638553209335'],
-            ['1867791142724588955955814039055729257234947487483902028331142225', RoundingMode::HalfUp, '43217949311884164825638553209335'],
-
-            ['9830504148113505106730565430925806810010750548232214925001449636', RoundingMode::Unnecessary, '99148898874942151859351963400806'],
-            ['9830504148113505106730565430925806810010750548232214925001449636', RoundingMode::Down, '99148898874942151859351963400806'],
-            ['9830504148113505106730565430925806810010750548232214925001449636', RoundingMode::Up, '99148898874942151859351963400806'],
-            ['9830504148113505106730565430925806810010750548232214925001449636', RoundingMode::HalfUp, '99148898874942151859351963400806'],
-
-            ['9830504148113505106730565430925905958909625490384074276964850442', RoundingMode::Unnecessary, null],
-            ['9830504148113505106730565430925905958909625490384074276964850442', RoundingMode::Down, '99148898874942151859351963400806'],
-            ['9830504148113505106730565430925905958909625490384074276964850442', RoundingMode::Up, '99148898874942151859351963400807'],
-            ['9830504148113505106730565430925905958909625490384074276964850442', RoundingMode::HalfUp, '99148898874942151859351963400806'],
-
-            ['9830504148113505106730565430926005107808500432535933628928251249', RoundingMode::Unnecessary, '99148898874942151859351963400807'],
-            ['9830504148113505106730565430926005107808500432535933628928251249', RoundingMode::Down, '99148898874942151859351963400807'],
-            ['9830504148113505106730565430926005107808500432535933628928251249', RoundingMode::Up, '99148898874942151859351963400807'],
-            ['9830504148113505106730565430926005107808500432535933628928251249', RoundingMode::HalfUp, '99148898874942151859351963400807'],
-
-            ['7591171119877361934423335814652578116545218322867005352922382400', RoundingMode::Unnecessary, '87127327055737007353139169677320'],
-            ['7591171119877361934423335814652578116545218322867005352922382400', RoundingMode::Down, '87127327055737007353139169677320'],
-            ['7591171119877361934423335814652578116545218322867005352922382400', RoundingMode::Up, '87127327055737007353139169677320'],
-            ['7591171119877361934423335814652578116545218322867005352922382400', RoundingMode::HalfUp, '87127327055737007353139169677320'],
-
-            ['7591171119877361934423335814652752371199329796881711631261737040', RoundingMode::Unnecessary, null],
-            ['7591171119877361934423335814652752371199329796881711631261737040', RoundingMode::Down, '87127327055737007353139169677320'],
-            ['7591171119877361934423335814652752371199329796881711631261737040', RoundingMode::Up, '87127327055737007353139169677321'],
-            ['7591171119877361934423335814652752371199329796881711631261737040', RoundingMode::HalfUp, '87127327055737007353139169677321'],
-
-            ['7591171119877361934423335814652752371199329796881711631261737041', RoundingMode::Unnecessary, '87127327055737007353139169677321'],
-            ['7591171119877361934423335814652752371199329796881711631261737041', RoundingMode::Down, '87127327055737007353139169677321'],
-            ['7591171119877361934423335814652752371199329796881711631261737041', RoundingMode::Up, '87127327055737007353139169677321'],
-            ['7591171119877361934423335814652752371199329796881711631261737041', RoundingMode::HalfUp, '87127327055737007353139169677321'],
-
-            ['8534704621867005063010169093165229825021562891964253458234113600', RoundingMode::Unnecessary, '92383465089089427718873950884440'],
-            ['8534704621867005063010169093165229825021562891964253458234113600', RoundingMode::Down, '92383465089089427718873950884440'],
-            ['8534704621867005063010169093165229825021562891964253458234113600', RoundingMode::Up, '92383465089089427718873950884440'],
-            ['8534704621867005063010169093165229825021562891964253458234113600', RoundingMode::HalfUp, '92383465089089427718873950884440'],
-
-            ['8534704621867005063010169093165322208486651981391972332184998040', RoundingMode::Unnecessary, null],
-            ['8534704621867005063010169093165322208486651981391972332184998040', RoundingMode::Down, '92383465089089427718873950884440'],
-            ['8534704621867005063010169093165322208486651981391972332184998040', RoundingMode::Up, '92383465089089427718873950884441'],
-            ['8534704621867005063010169093165322208486651981391972332184998040', RoundingMode::HalfUp, '92383465089089427718873950884440'],
-
-            ['8534704621867005063010169093165414591951741070819691206135882481', RoundingMode::Unnecessary, '92383465089089427718873950884441'],
-            ['8534704621867005063010169093165414591951741070819691206135882481', RoundingMode::Down, '92383465089089427718873950884441'],
-            ['8534704621867005063010169093165414591951741070819691206135882481', RoundingMode::Up, '92383465089089427718873950884441'],
-            ['8534704621867005063010169093165414591951741070819691206135882481', RoundingMode::HalfUp, '92383465089089427718873950884441'],
-
-            ['558060557515620507133380963948250962461823927030515012873505842176', RoundingMode::Unnecessary, '747034508918845399769072043504224'],
-            ['558060557515620507133380963948250962461823927030515012873505842176', RoundingMode::Down, '747034508918845399769072043504224'],
-            ['558060557515620507133380963948250962461823927030515012873505842176', RoundingMode::Up, '747034508918845399769072043504224'],
-            ['558060557515620507133380963948250962461823927030515012873505842176', RoundingMode::HalfUp, '747034508918845399769072043504224'],
-
-            ['558060557515620507133380963948252456530841764721314551017592850624', RoundingMode::Unnecessary, null],
-            ['558060557515620507133380963948252456530841764721314551017592850624', RoundingMode::Down, '747034508918845399769072043504224'],
-            ['558060557515620507133380963948252456530841764721314551017592850624', RoundingMode::Up, '747034508918845399769072043504225'],
-            ['558060557515620507133380963948252456530841764721314551017592850624', RoundingMode::HalfUp, '747034508918845399769072043504225'],
-
-            ['558060557515620507133380963948252456530841764721314551017592850625', RoundingMode::Unnecessary, '747034508918845399769072043504225'],
-            ['558060557515620507133380963948252456530841764721314551017592850625', RoundingMode::Down, '747034508918845399769072043504225'],
-            ['558060557515620507133380963948252456530841764721314551017592850625', RoundingMode::Up, '747034508918845399769072043504225'],
-            ['558060557515620507133380963948252456530841764721314551017592850625', RoundingMode::HalfUp, '747034508918845399769072043504225'],
-
-            ['200538408436782201630574692476963942210287537291410052113367162944', RoundingMode::Unnecessary, '447815149851791192871220236705288'],
-            ['200538408436782201630574692476963942210287537291410052113367162944', RoundingMode::Down, '447815149851791192871220236705288'],
-            ['200538408436782201630574692476963942210287537291410052113367162944', RoundingMode::Up, '447815149851791192871220236705288'],
-            ['200538408436782201630574692476963942210287537291410052113367162944', RoundingMode::HalfUp, '447815149851791192871220236705288'],
-
-            ['200538408436782201630574692476964390025437389082602923333603868232', RoundingMode::Unnecessary, null],
-            ['200538408436782201630574692476964390025437389082602923333603868232', RoundingMode::Down, '447815149851791192871220236705288'],
-            ['200538408436782201630574692476964390025437389082602923333603868232', RoundingMode::Up, '447815149851791192871220236705289'],
-            ['200538408436782201630574692476964390025437389082602923333603868232', RoundingMode::HalfUp, '447815149851791192871220236705288'],
-
-            ['200538408436782201630574692476964837840587240873795794553840573521', RoundingMode::Unnecessary, '447815149851791192871220236705289'],
-            ['200538408436782201630574692476964837840587240873795794553840573521', RoundingMode::Down, '447815149851791192871220236705289'],
-            ['200538408436782201630574692476964837840587240873795794553840573521', RoundingMode::Up, '447815149851791192871220236705289'],
-            ['200538408436782201630574692476964837840587240873795794553840573521', RoundingMode::HalfUp, '447815149851791192871220236705289'],
-
-            ['191302866278956628715433979906440851661028066577090295375612311364', RoundingMode::Unnecessary, '437381831217251900054617942999442'],
-            ['191302866278956628715433979906440851661028066577090295375612311364', RoundingMode::Down, '437381831217251900054617942999442'],
-            ['191302866278956628715433979906440851661028066577090295375612311364', RoundingMode::Up, '437381831217251900054617942999442'],
-            ['191302866278956628715433979906440851661028066577090295375612311364', RoundingMode::HalfUp, '437381831217251900054617942999442'],
-
-            ['191302866278956628715433979906441726424690501080890404611498310248', RoundingMode::Unnecessary, null],
-            ['191302866278956628715433979906441726424690501080890404611498310248', RoundingMode::Down, '437381831217251900054617942999442'],
-            ['191302866278956628715433979906441726424690501080890404611498310248', RoundingMode::Up, '437381831217251900054617942999443'],
-            ['191302866278956628715433979906441726424690501080890404611498310248', RoundingMode::HalfUp, '437381831217251900054617942999443'],
-
-            ['191302866278956628715433979906441726424690501080890404611498310249', RoundingMode::Unnecessary, '437381831217251900054617942999443'],
-            ['191302866278956628715433979906441726424690501080890404611498310249', RoundingMode::Down, '437381831217251900054617942999443'],
-            ['191302866278956628715433979906441726424690501080890404611498310249', RoundingMode::Up, '437381831217251900054617942999443'],
-            ['191302866278956628715433979906441726424690501080890404611498310249', RoundingMode::HalfUp, '437381831217251900054617942999443'],
-
-            ['291290137244253022092289121327605756463305738312066948462328733721', RoundingMode::Unnecessary, '539713013780706442298424414941189'],
-            ['291290137244253022092289121327605756463305738312066948462328733721', RoundingMode::Down, '539713013780706442298424414941189'],
-            ['291290137244253022092289121327605756463305738312066948462328733721', RoundingMode::Up, '539713013780706442298424414941189'],
-            ['291290137244253022092289121327605756463305738312066948462328733721', RoundingMode::HalfUp, '539713013780706442298424414941189'],
-
-            ['291290137244253022092289121327606296176319519018509246886743674910', RoundingMode::Unnecessary, null],
-            ['291290137244253022092289121327606296176319519018509246886743674910', RoundingMode::Down, '539713013780706442298424414941189'],
-            ['291290137244253022092289121327606296176319519018509246886743674910', RoundingMode::Up, '539713013780706442298424414941190'],
-            ['291290137244253022092289121327606296176319519018509246886743674910', RoundingMode::HalfUp, '539713013780706442298424414941189'],
-
-            ['291290137244253022092289121327606835889333299724951545311158616100', RoundingMode::Unnecessary, '539713013780706442298424414941190'],
-            ['291290137244253022092289121327606835889333299724951545311158616100', RoundingMode::Down, '539713013780706442298424414941190'],
-            ['291290137244253022092289121327606835889333299724951545311158616100', RoundingMode::Up, '539713013780706442298424414941190'],
-            ['291290137244253022092289121327606835889333299724951545311158616100', RoundingMode::HalfUp, '539713013780706442298424414941190'],
-
-            ['5025051069729848944739380852251409470255071569439258719898537481', RoundingMode::Unnecessary, '70887594610974415152598103986941'],
-            ['5025051069729848944739380852251409470255071569439258719898537481', RoundingMode::Down, '70887594610974415152598103986941'],
-            ['5025051069729848944739380852251409470255071569439258719898537481', RoundingMode::Up, '70887594610974415152598103986941'],
-            ['5025051069729848944739380852251409470255071569439258719898537481', RoundingMode::HalfUp, '70887594610974415152598103986941'],
-
-            ['5025051069729848944739380852251551245444293518269563916106511363', RoundingMode::Unnecessary, null],
-            ['5025051069729848944739380852251551245444293518269563916106511363', RoundingMode::Down, '70887594610974415152598103986941'],
-            ['5025051069729848944739380852251551245444293518269563916106511363', RoundingMode::Up, '70887594610974415152598103986942'],
-            ['5025051069729848944739380852251551245444293518269563916106511363', RoundingMode::HalfUp, '70887594610974415152598103986942'],
-
-            ['5025051069729848944739380852251551245444293518269563916106511364', RoundingMode::Unnecessary, '70887594610974415152598103986942'],
-            ['5025051069729848944739380852251551245444293518269563916106511364', RoundingMode::Down, '70887594610974415152598103986942'],
-            ['5025051069729848944739380852251551245444293518269563916106511364', RoundingMode::Up, '70887594610974415152598103986942'],
-            ['5025051069729848944739380852251551245444293518269563916106511364', RoundingMode::HalfUp, '70887594610974415152598103986942'],
-
-            ['6238861109923404442965423418956764090860907116154205636120522931561', RoundingMode::Unnecessary, '2497771228500201225537381791181331'],
-            ['6238861109923404442965423418956764090860907116154205636120522931561', RoundingMode::Down, '2497771228500201225537381791181331'],
-            ['6238861109923404442965423418956764090860907116154205636120522931561', RoundingMode::Up, '2497771228500201225537381791181331'],
-            ['6238861109923404442965423418956764090860907116154205636120522931561', RoundingMode::HalfUp, '2497771228500201225537381791181331'],
-
-            ['6238861109923404442965423418956766588632135616355431173502314112892', RoundingMode::Unnecessary, null],
-            ['6238861109923404442965423418956766588632135616355431173502314112892', RoundingMode::Down, '2497771228500201225537381791181331'],
-            ['6238861109923404442965423418956766588632135616355431173502314112892', RoundingMode::Up, '2497771228500201225537381791181332'],
-            ['6238861109923404442965423418956766588632135616355431173502314112892', RoundingMode::HalfUp, '2497771228500201225537381791181331'],
-
-            ['6238861109923404442965423418956769086403364116556656710884105294224', RoundingMode::Unnecessary, '2497771228500201225537381791181332'],
-            ['6238861109923404442965423418956769086403364116556656710884105294224', RoundingMode::Down, '2497771228500201225537381791181332'],
-            ['6238861109923404442965423418956769086403364116556656710884105294224', RoundingMode::Up, '2497771228500201225537381791181332'],
-            ['6238861109923404442965423418956769086403364116556656710884105294224', RoundingMode::HalfUp, '2497771228500201225537381791181332'],
-
-            ['20023427755036504641354330839858631034820554187187074374005311969476', RoundingMode::Unnecessary, '4474754491034843873667293532006926'],
-            ['20023427755036504641354330839858631034820554187187074374005311969476', RoundingMode::Down, '4474754491034843873667293532006926'],
-            ['20023427755036504641354330839858631034820554187187074374005311969476', RoundingMode::Up, '4474754491034843873667293532006926'],
-            ['20023427755036504641354330839858631034820554187187074374005311969476', RoundingMode::HalfUp, '4474754491034843873667293532006926'],
-
-            ['20023427755036504641354330839858639984329536256874821708592375983328', RoundingMode::Unnecessary, null],
-            ['20023427755036504641354330839858639984329536256874821708592375983328', RoundingMode::Down, '4474754491034843873667293532006926'],
-            ['20023427755036504641354330839858639984329536256874821708592375983328', RoundingMode::Up, '4474754491034843873667293532006927'],
-            ['20023427755036504641354330839858639984329536256874821708592375983328', RoundingMode::HalfUp, '4474754491034843873667293532006927'],
-
-            ['20023427755036504641354330839858639984329536256874821708592375983329', RoundingMode::Unnecessary, '4474754491034843873667293532006927'],
-            ['20023427755036504641354330839858639984329536256874821708592375983329', RoundingMode::Down, '4474754491034843873667293532006927'],
-            ['20023427755036504641354330839858639984329536256874821708592375983329', RoundingMode::Up, '4474754491034843873667293532006927'],
-            ['20023427755036504641354330839858639984329536256874821708592375983329', RoundingMode::HalfUp, '4474754491034843873667293532006927'],
-
-            ['35963041045659882033621773487569203358608603414532908772894092442881', RoundingMode::Unnecessary, '5996919296243687322881924437376641'],
-            ['35963041045659882033621773487569203358608603414532908772894092442881', RoundingMode::Down, '5996919296243687322881924437376641'],
-            ['35963041045659882033621773487569203358608603414532908772894092442881', RoundingMode::Up, '5996919296243687322881924437376641'],
-            ['35963041045659882033621773487569203358608603414532908772894092442881', RoundingMode::HalfUp, '5996919296243687322881924437376641'],
-
-            ['35963041045659882033621773487569209355527899658220231654818529819522', RoundingMode::Unnecessary, null],
-            ['35963041045659882033621773487569209355527899658220231654818529819522', RoundingMode::Down, '5996919296243687322881924437376641'],
-            ['35963041045659882033621773487569209355527899658220231654818529819522', RoundingMode::Up, '5996919296243687322881924437376642'],
-            ['35963041045659882033621773487569209355527899658220231654818529819522', RoundingMode::HalfUp, '5996919296243687322881924437376641'],
-
-            ['35963041045659882033621773487569215352447195901907554536742967196164', RoundingMode::Unnecessary, '5996919296243687322881924437376642'],
-            ['35963041045659882033621773487569215352447195901907554536742967196164', RoundingMode::Down, '5996919296243687322881924437376642'],
-            ['35963041045659882033621773487569215352447195901907554536742967196164', RoundingMode::Up, '5996919296243687322881924437376642'],
-            ['35963041045659882033621773487569215352447195901907554536742967196164', RoundingMode::HalfUp, '5996919296243687322881924437376642'],
-
-            ['16147491963439711944418728362110466093273207282720057861529178507569', RoundingMode::Unnecessary, '4018394202096119880426988697249913'],
-            ['16147491963439711944418728362110466093273207282720057861529178507569', RoundingMode::Down, '4018394202096119880426988697249913'],
-            ['16147491963439711944418728362110466093273207282720057861529178507569', RoundingMode::Up, '4018394202096119880426988697249913'],
-            ['16147491963439711944418728362110466093273207282720057861529178507569', RoundingMode::HalfUp, '4018394202096119880426988697249913'],
-
-            ['16147491963439711944418728362110474130061611474959818715506573007395', RoundingMode::Unnecessary, null],
-            ['16147491963439711944418728362110474130061611474959818715506573007395', RoundingMode::Down, '4018394202096119880426988697249913'],
-            ['16147491963439711944418728362110474130061611474959818715506573007395', RoundingMode::Up, '4018394202096119880426988697249914'],
-            ['16147491963439711944418728362110474130061611474959818715506573007395', RoundingMode::HalfUp, '4018394202096119880426988697249914'],
-
-            ['16147491963439711944418728362110474130061611474959818715506573007396', RoundingMode::Unnecessary, '4018394202096119880426988697249914'],
-            ['16147491963439711944418728362110474130061611474959818715506573007396', RoundingMode::Down, '4018394202096119880426988697249914'],
-            ['16147491963439711944418728362110474130061611474959818715506573007396', RoundingMode::Up, '4018394202096119880426988697249914'],
-            ['16147491963439711944418728362110474130061611474959818715506573007396', RoundingMode::HalfUp, '4018394202096119880426988697249914'],
-
-            ['59275127168144151414318593405790938619095816316145068714478973756416', RoundingMode::Unnecessary, '7699034171124593171733765899358304'],
-            ['59275127168144151414318593405790938619095816316145068714478973756416', RoundingMode::Down, '7699034171124593171733765899358304'],
-            ['59275127168144151414318593405790938619095816316145068714478973756416', RoundingMode::Up, '7699034171124593171733765899358304'],
-            ['59275127168144151414318593405790938619095816316145068714478973756416', RoundingMode::HalfUp, '7699034171124593171733765899358304'],
-
-            ['59275127168144151414318593405790946318129987440738240448244873114720', RoundingMode::Unnecessary, null],
-            ['59275127168144151414318593405790946318129987440738240448244873114720', RoundingMode::Down, '7699034171124593171733765899358304'],
-            ['59275127168144151414318593405790946318129987440738240448244873114720', RoundingMode::Up, '7699034171124593171733765899358305'],
-            ['59275127168144151414318593405790946318129987440738240448244873114720', RoundingMode::HalfUp, '7699034171124593171733765899358304'],
-
-            ['59275127168144151414318593405790954017164158565331412182010772473025', RoundingMode::Unnecessary, '7699034171124593171733765899358305'],
-            ['59275127168144151414318593405790954017164158565331412182010772473025', RoundingMode::Down, '7699034171124593171733765899358305'],
-            ['59275127168144151414318593405790954017164158565331412182010772473025', RoundingMode::Up, '7699034171124593171733765899358305'],
-            ['59275127168144151414318593405790954017164158565331412182010772473025', RoundingMode::HalfUp, '7699034171124593171733765899358305'],
-
-            ['5285010890475466266241012129886993921224228841648175760159220822102500', RoundingMode::Unnecessary, '72698080376826087595732320834198550'],
-            ['5285010890475466266241012129886993921224228841648175760159220822102500', RoundingMode::Down, '72698080376826087595732320834198550'],
-            ['5285010890475466266241012129886993921224228841648175760159220822102500', RoundingMode::Up, '72698080376826087595732320834198550'],
-            ['5285010890475466266241012129886993921224228841648175760159220822102500', RoundingMode::HalfUp, '72698080376826087595732320834198550'],
-
-            ['5285010890475466266241012129886994066620389595300350951623862490499600', RoundingMode::Unnecessary, null],
-            ['5285010890475466266241012129886994066620389595300350951623862490499600', RoundingMode::Down, '72698080376826087595732320834198550'],
-            ['5285010890475466266241012129886994066620389595300350951623862490499600', RoundingMode::Up, '72698080376826087595732320834198551'],
-            ['5285010890475466266241012129886994066620389595300350951623862490499600', RoundingMode::HalfUp, '72698080376826087595732320834198551'],
-
-            ['5285010890475466266241012129886994066620389595300350951623862490499601', RoundingMode::Unnecessary, '72698080376826087595732320834198551'],
-            ['5285010890475466266241012129886994066620389595300350951623862490499601', RoundingMode::Down, '72698080376826087595732320834198551'],
-            ['5285010890475466266241012129886994066620389595300350951623862490499601', RoundingMode::Up, '72698080376826087595732320834198551'],
-            ['5285010890475466266241012129886994066620389595300350951623862490499601', RoundingMode::HalfUp, '72698080376826087595732320834198551'],
-
-            ['138806460367120633162909304707973463857407594119348580175849319475249', RoundingMode::Unnecessary, '11781615354743195534745216445516807'],
-            ['138806460367120633162909304707973463857407594119348580175849319475249', RoundingMode::Down, '11781615354743195534745216445516807'],
-            ['138806460367120633162909304707973463857407594119348580175849319475249', RoundingMode::Up, '11781615354743195534745216445516807'],
-            ['138806460367120633162909304707973463857407594119348580175849319475249', RoundingMode::HalfUp, '11781615354743195534745216445516807'],
-
-            ['138806460367120633162909304707973475639022948862544114921065764992056', RoundingMode::Unnecessary, null],
-            ['138806460367120633162909304707973475639022948862544114921065764992056', RoundingMode::Down, '11781615354743195534745216445516807'],
-            ['138806460367120633162909304707973475639022948862544114921065764992056', RoundingMode::Up, '11781615354743195534745216445516808'],
-            ['138806460367120633162909304707973475639022948862544114921065764992056', RoundingMode::HalfUp, '11781615354743195534745216445516807'],
-
-            ['138806460367120633162909304707973487420638303605739649666282210508864', RoundingMode::Unnecessary, '11781615354743195534745216445516808'],
-            ['138806460367120633162909304707973487420638303605739649666282210508864', RoundingMode::Down, '11781615354743195534745216445516808'],
-            ['138806460367120633162909304707973487420638303605739649666282210508864', RoundingMode::Up, '11781615354743195534745216445516808'],
-            ['138806460367120633162909304707973487420638303605739649666282210508864', RoundingMode::HalfUp, '11781615354743195534745216445516808'],
-
-            ['4394593323188981215423145755036811566487951532301290484907917429040356', RoundingMode::Unnecessary, '66291728919896041699308382947726934'],
-            ['4394593323188981215423145755036811566487951532301290484907917429040356', RoundingMode::Down, '66291728919896041699308382947726934'],
-            ['4394593323188981215423145755036811566487951532301290484907917429040356', RoundingMode::Up, '66291728919896041699308382947726934'],
-            ['4394593323188981215423145755036811566487951532301290484907917429040356', RoundingMode::HalfUp, '66291728919896041699308382947726934'],
-
-            ['4394593323188981215423145755036811699071409372093373883524683324494224', RoundingMode::Unnecessary, null],
-            ['4394593323188981215423145755036811699071409372093373883524683324494224', RoundingMode::Down, '66291728919896041699308382947726934'],
-            ['4394593323188981215423145755036811699071409372093373883524683324494224', RoundingMode::Up, '66291728919896041699308382947726935'],
-            ['4394593323188981215423145755036811699071409372093373883524683324494224', RoundingMode::HalfUp, '66291728919896041699308382947726935'],
-
-            ['4394593323188981215423145755036811699071409372093373883524683324494225', RoundingMode::Unnecessary, '66291728919896041699308382947726935'],
-            ['4394593323188981215423145755036811699071409372093373883524683324494225', RoundingMode::Down, '66291728919896041699308382947726935'],
-            ['4394593323188981215423145755036811699071409372093373883524683324494225', RoundingMode::Up, '66291728919896041699308382947726935'],
-            ['4394593323188981215423145755036811699071409372093373883524683324494225', RoundingMode::HalfUp, '66291728919896041699308382947726935'],
-
-            ['2165102898894822021490897916929619474531175829310332070795169853731396', RoundingMode::Unnecessary, '46530666220190980857729715988167086'],
-            ['2165102898894822021490897916929619474531175829310332070795169853731396', RoundingMode::Down, '46530666220190980857729715988167086'],
-            ['2165102898894822021490897916929619474531175829310332070795169853731396', RoundingMode::Up, '46530666220190980857729715988167086'],
-            ['2165102898894822021490897916929619474531175829310332070795169853731396', RoundingMode::HalfUp, '46530666220190980857729715988167086'],
-
-            ['2165102898894822021490897916929619521061842049501312928524885841898482', RoundingMode::Unnecessary, null],
-            ['2165102898894822021490897916929619521061842049501312928524885841898482', RoundingMode::Down, '46530666220190980857729715988167086'],
-            ['2165102898894822021490897916929619521061842049501312928524885841898482', RoundingMode::Up, '46530666220190980857729715988167087'],
-            ['2165102898894822021490897916929619521061842049501312928524885841898482', RoundingMode::HalfUp, '46530666220190980857729715988167086'],
-
-            ['2165102898894822021490897916929619567592508269692293786254601830065569', RoundingMode::Unnecessary, '46530666220190980857729715988167087'],
-            ['2165102898894822021490897916929619567592508269692293786254601830065569', RoundingMode::Down, '46530666220190980857729715988167087'],
-            ['2165102898894822021490897916929619567592508269692293786254601830065569', RoundingMode::Up, '46530666220190980857729715988167087'],
-            ['2165102898894822021490897916929619567592508269692293786254601830065569', RoundingMode::HalfUp, '46530666220190980857729715988167087'],
-
-            ['3387136764299263076201461182231668509909087521737501460409373154998724', RoundingMode::Unnecessary, '58199113088596660127381090812371918'],
-            ['3387136764299263076201461182231668509909087521737501460409373154998724', RoundingMode::Down, '58199113088596660127381090812371918'],
-            ['3387136764299263076201461182231668509909087521737501460409373154998724', RoundingMode::Up, '58199113088596660127381090812371918'],
-            ['3387136764299263076201461182231668509909087521737501460409373154998724', RoundingMode::HalfUp, '58199113088596660127381090812371918'],
-
-            ['3387136764299263076201461182231668626307313698930821715171554779742560', RoundingMode::Unnecessary, null],
-            ['3387136764299263076201461182231668626307313698930821715171554779742560', RoundingMode::Down, '58199113088596660127381090812371918'],
-            ['3387136764299263076201461182231668626307313698930821715171554779742560', RoundingMode::Up, '58199113088596660127381090812371919'],
-            ['3387136764299263076201461182231668626307313698930821715171554779742560', RoundingMode::HalfUp, '58199113088596660127381090812371919'],
-
-            ['3387136764299263076201461182231668626307313698930821715171554779742561', RoundingMode::Unnecessary, '58199113088596660127381090812371919'],
-            ['3387136764299263076201461182231668626307313698930821715171554779742561', RoundingMode::Down, '58199113088596660127381090812371919'],
-            ['3387136764299263076201461182231668626307313698930821715171554779742561', RoundingMode::Up, '58199113088596660127381090812371919'],
-            ['3387136764299263076201461182231668626307313698930821715171554779742561', RoundingMode::HalfUp, '58199113088596660127381090812371919'],
-
-            ['598571098379632349988804996185789284322923089459844190238738309900665041', RoundingMode::Unnecessary, '773673767410807557353849214204230071'],
-            ['598571098379632349988804996185789284322923089459844190238738309900665041', RoundingMode::Down, '773673767410807557353849214204230071'],
-            ['598571098379632349988804996185789284322923089459844190238738309900665041', RoundingMode::Up, '773673767410807557353849214204230071'],
-            ['598571098379632349988804996185789284322923089459844190238738309900665041', RoundingMode::HalfUp, '773673767410807557353849214204230071'],
-
-            ['598571098379632349988804996185789285096596856870651747592587524104895112', RoundingMode::Unnecessary, null],
-            ['598571098379632349988804996185789285096596856870651747592587524104895112', RoundingMode::Down, '773673767410807557353849214204230071'],
-            ['598571098379632349988804996185789285096596856870651747592587524104895112', RoundingMode::Up, '773673767410807557353849214204230072'],
-            ['598571098379632349988804996185789285096596856870651747592587524104895112', RoundingMode::HalfUp, '773673767410807557353849214204230071'],
-
-            ['598571098379632349988804996185789285870270624281459304946436738309125184', RoundingMode::Unnecessary, '773673767410807557353849214204230072'],
-            ['598571098379632349988804996185789285870270624281459304946436738309125184', RoundingMode::Down, '773673767410807557353849214204230072'],
-            ['598571098379632349988804996185789285870270624281459304946436738309125184', RoundingMode::Up, '773673767410807557353849214204230072'],
-            ['598571098379632349988804996185789285870270624281459304946436738309125184', RoundingMode::HalfUp, '773673767410807557353849214204230072'],
-
-            ['520654040364073618548858305514718008281370888178241149423087536697602769', RoundingMode::Unnecessary, '721563607982050061031165602524215113'],
-            ['520654040364073618548858305514718008281370888178241149423087536697602769', RoundingMode::Down, '721563607982050061031165602524215113'],
-            ['520654040364073618548858305514718008281370888178241149423087536697602769', RoundingMode::Up, '721563607982050061031165602524215113'],
-            ['520654040364073618548858305514718008281370888178241149423087536697602769', RoundingMode::HalfUp, '721563607982050061031165602524215113'],
-
-            ['520654040364073618548858305514718009724498104142341271485418741746032995', RoundingMode::Unnecessary, null],
-            ['520654040364073618548858305514718009724498104142341271485418741746032995', RoundingMode::Down, '721563607982050061031165602524215113'],
-            ['520654040364073618548858305514718009724498104142341271485418741746032995', RoundingMode::Up, '721563607982050061031165602524215114'],
-            ['520654040364073618548858305514718009724498104142341271485418741746032995', RoundingMode::HalfUp, '721563607982050061031165602524215114'],
-
-            ['520654040364073618548858305514718009724498104142341271485418741746032996', RoundingMode::Unnecessary, '721563607982050061031165602524215114'],
-            ['520654040364073618548858305514718009724498104142341271485418741746032996', RoundingMode::Down, '721563607982050061031165602524215114'],
-            ['520654040364073618548858305514718009724498104142341271485418741746032996', RoundingMode::Up, '721563607982050061031165602524215114'],
-            ['520654040364073618548858305514718009724498104142341271485418741746032996', RoundingMode::HalfUp, '721563607982050061031165602524215114'],
-
-            ['49468236740249321869413367805106481368010073927095236023233757323825636', RoundingMode::Unnecessary, '222414560540107899360763128216988694'],
-            ['49468236740249321869413367805106481368010073927095236023233757323825636', RoundingMode::Down, '222414560540107899360763128216988694'],
-            ['49468236740249321869413367805106481368010073927095236023233757323825636', RoundingMode::Up, '222414560540107899360763128216988694'],
-            ['49468236740249321869413367805106481368010073927095236023233757323825636', RoundingMode::HalfUp, '222414560540107899360763128216988694'],
-
-            ['49468236740249321869413367805106481590424634467203135383996885540814330', RoundingMode::Unnecessary, null],
-            ['49468236740249321869413367805106481590424634467203135383996885540814330', RoundingMode::Down, '222414560540107899360763128216988694'],
-            ['49468236740249321869413367805106481590424634467203135383996885540814330', RoundingMode::Up, '222414560540107899360763128216988695'],
-            ['49468236740249321869413367805106481590424634467203135383996885540814330', RoundingMode::HalfUp, '222414560540107899360763128216988694'],
-
-            ['49468236740249321869413367805106481812839195007311034744760013757803025', RoundingMode::Unnecessary, '222414560540107899360763128216988695'],
-            ['49468236740249321869413367805106481812839195007311034744760013757803025', RoundingMode::Down, '222414560540107899360763128216988695'],
-            ['49468236740249321869413367805106481812839195007311034744760013757803025', RoundingMode::Up, '222414560540107899360763128216988695'],
-            ['49468236740249321869413367805106481812839195007311034744760013757803025', RoundingMode::HalfUp, '222414560540107899360763128216988695'],
-
-            ['752985146631183783668626620327136132189678265369154785125113211857131025', RoundingMode::Unnecessary, '867747167457885617308484616342840855'],
-            ['752985146631183783668626620327136132189678265369154785125113211857131025', RoundingMode::Down, '867747167457885617308484616342840855'],
-            ['752985146631183783668626620327136132189678265369154785125113211857131025', RoundingMode::Up, '867747167457885617308484616342840855'],
-            ['752985146631183783668626620327136132189678265369154785125113211857131025', RoundingMode::HalfUp, '867747167457885617308484616342840855'],
-
-            ['752985146631183783668626620327136133925172600284926019742082444542812735', RoundingMode::Unnecessary, null],
-            ['752985146631183783668626620327136133925172600284926019742082444542812735', RoundingMode::Down, '867747167457885617308484616342840855'],
-            ['752985146631183783668626620327136133925172600284926019742082444542812735', RoundingMode::Up, '867747167457885617308484616342840856'],
-            ['752985146631183783668626620327136133925172600284926019742082444542812735', RoundingMode::HalfUp, '867747167457885617308484616342840856'],
-
-            ['752985146631183783668626620327136133925172600284926019742082444542812736', RoundingMode::Unnecessary, '867747167457885617308484616342840856'],
-            ['752985146631183783668626620327136133925172600284926019742082444542812736', RoundingMode::Down, '867747167457885617308484616342840856'],
-            ['752985146631183783668626620327136133925172600284926019742082444542812736', RoundingMode::Up, '867747167457885617308484616342840856'],
-            ['752985146631183783668626620327136133925172600284926019742082444542812736', RoundingMode::HalfUp, '867747167457885617308484616342840856'],
-
-            ['4964939306071472434861762119449573856931127119323966160723135793312400', RoundingMode::Unnecessary, '70462325437580276008386497095248180'],
-            ['4964939306071472434861762119449573856931127119323966160723135793312400', RoundingMode::Down, '70462325437580276008386497095248180'],
-            ['4964939306071472434861762119449573856931127119323966160723135793312400', RoundingMode::Up, '70462325437580276008386497095248180'],
-            ['4964939306071472434861762119449573856931127119323966160723135793312400', RoundingMode::HalfUp, '70462325437580276008386497095248180'],
-
-            ['4964939306071472434861762119449573927393452556904242169109632888560580', RoundingMode::Unnecessary, null],
-            ['4964939306071472434861762119449573927393452556904242169109632888560580', RoundingMode::Down, '70462325437580276008386497095248180'],
-            ['4964939306071472434861762119449573927393452556904242169109632888560580', RoundingMode::Up, '70462325437580276008386497095248181'],
-            ['4964939306071472434861762119449573927393452556904242169109632888560580', RoundingMode::HalfUp, '70462325437580276008386497095248180'],
-
-            ['4964939306071472434861762119449573997855777994484518177496129983808761', RoundingMode::Unnecessary, '70462325437580276008386497095248181'],
-            ['4964939306071472434861762119449573997855777994484518177496129983808761', RoundingMode::Down, '70462325437580276008386497095248181'],
-            ['4964939306071472434861762119449573997855777994484518177496129983808761', RoundingMode::Up, '70462325437580276008386497095248181'],
-            ['4964939306071472434861762119449573997855777994484518177496129983808761', RoundingMode::HalfUp, '70462325437580276008386497095248181'],
-
-            ['6793060375719308872947059218122494900670395578602098991588961245675868921', RoundingMode::Unnecessary, '2606350010209547598885835947629243339'],
-            ['6793060375719308872947059218122494900670395578602098991588961245675868921', RoundingMode::Down, '2606350010209547598885835947629243339'],
-            ['6793060375719308872947059218122494900670395578602098991588961245675868921', RoundingMode::Up, '2606350010209547598885835947629243339'],
-            ['6793060375719308872947059218122494900670395578602098991588961245675868921', RoundingMode::HalfUp, '2606350010209547598885835947629243339'],
-
-            ['6793060375719308872947059218122494905883095599021194189360633140934355599', RoundingMode::Unnecessary, null],
-            ['6793060375719308872947059218122494905883095599021194189360633140934355599', RoundingMode::Down, '2606350010209547598885835947629243339'],
-            ['6793060375719308872947059218122494905883095599021194189360633140934355599', RoundingMode::Up, '2606350010209547598885835947629243340'],
-            ['6793060375719308872947059218122494905883095599021194189360633140934355599', RoundingMode::HalfUp, '2606350010209547598885835947629243340'],
-
-            ['6793060375719308872947059218122494905883095599021194189360633140934355600', RoundingMode::Unnecessary, '2606350010209547598885835947629243340'],
-            ['6793060375719308872947059218122494905883095599021194189360633140934355600', RoundingMode::Down, '2606350010209547598885835947629243340'],
-            ['6793060375719308872947059218122494905883095599021194189360633140934355600', RoundingMode::Up, '2606350010209547598885835947629243340'],
-            ['6793060375719308872947059218122494905883095599021194189360633140934355600', RoundingMode::HalfUp, '2606350010209547598885835947629243340'],
-
-            ['72434023187588979108181351955877408189952248642066292273939239044048882404', RoundingMode::Unnecessary, '8510818009309620944867597322534681898'],
-            ['72434023187588979108181351955877408189952248642066292273939239044048882404', RoundingMode::Down, '8510818009309620944867597322534681898'],
-            ['72434023187588979108181351955877408189952248642066292273939239044048882404', RoundingMode::Up, '8510818009309620944867597322534681898'],
-            ['72434023187588979108181351955877408189952248642066292273939239044048882404', RoundingMode::HalfUp, '8510818009309620944867597322534681898'],
-
-            ['72434023187588979108181351955877408198463066651375913218806836366583564302', RoundingMode::Unnecessary, null],
-            ['72434023187588979108181351955877408198463066651375913218806836366583564302', RoundingMode::Down, '8510818009309620944867597322534681898'],
-            ['72434023187588979108181351955877408198463066651375913218806836366583564302', RoundingMode::Up, '8510818009309620944867597322534681899'],
-            ['72434023187588979108181351955877408198463066651375913218806836366583564302', RoundingMode::HalfUp, '8510818009309620944867597322534681898'],
-
-            ['72434023187588979108181351955877408206973884660685534163674433689118246201', RoundingMode::Unnecessary, '8510818009309620944867597322534681899'],
-            ['72434023187588979108181351955877408206973884660685534163674433689118246201', RoundingMode::Down, '8510818009309620944867597322534681899'],
-            ['72434023187588979108181351955877408206973884660685534163674433689118246201', RoundingMode::Up, '8510818009309620944867597322534681899'],
-            ['72434023187588979108181351955877408206973884660685534163674433689118246201', RoundingMode::HalfUp, '8510818009309620944867597322534681899'],
-
-            ['11820228792957342809567646506028581034714829445539021053517615632467438404', RoundingMode::Unnecessary, '3438055961289365459878259691983242898'],
-            ['11820228792957342809567646506028581034714829445539021053517615632467438404', RoundingMode::Down, '3438055961289365459878259691983242898'],
-            ['11820228792957342809567646506028581034714829445539021053517615632467438404', RoundingMode::Up, '3438055961289365459878259691983242898'],
-            ['11820228792957342809567646506028581034714829445539021053517615632467438404', RoundingMode::HalfUp, '3438055961289365459878259691983242898'],
-
-            ['11820228792957342809567646506028581041590941368117751973274135016433924200', RoundingMode::Unnecessary, null],
-            ['11820228792957342809567646506028581041590941368117751973274135016433924200', RoundingMode::Down, '3438055961289365459878259691983242898'],
-            ['11820228792957342809567646506028581041590941368117751973274135016433924200', RoundingMode::Up, '3438055961289365459878259691983242899'],
-            ['11820228792957342809567646506028581041590941368117751973274135016433924200', RoundingMode::HalfUp, '3438055961289365459878259691983242899'],
-
-            ['11820228792957342809567646506028581041590941368117751973274135016433924201', RoundingMode::Unnecessary, '3438055961289365459878259691983242899'],
-            ['11820228792957342809567646506028581041590941368117751973274135016433924201', RoundingMode::Down, '3438055961289365459878259691983242899'],
-            ['11820228792957342809567646506028581041590941368117751973274135016433924201', RoundingMode::Up, '3438055961289365459878259691983242899'],
-            ['11820228792957342809567646506028581041590941368117751973274135016433924201', RoundingMode::HalfUp, '3438055961289365459878259691983242899'],
-
-            ['6386392982997549868964551665256601064299977946311952729197080155224215225', RoundingMode::Unnecessary, '2527131374305172498893486771925871765'],
-            ['6386392982997549868964551665256601064299977946311952729197080155224215225', RoundingMode::Down, '2527131374305172498893486771925871765'],
-            ['6386392982997549868964551665256601064299977946311952729197080155224215225', RoundingMode::Up, '2527131374305172498893486771925871765'],
-            ['6386392982997549868964551665256601064299977946311952729197080155224215225', RoundingMode::HalfUp, '2527131374305172498893486771925871765'],
-
-            ['6386392982997549868964551665256601066827109320617125228090566927150086990', RoundingMode::Unnecessary, null],
-            ['6386392982997549868964551665256601066827109320617125228090566927150086990', RoundingMode::Down, '2527131374305172498893486771925871765'],
-            ['6386392982997549868964551665256601066827109320617125228090566927150086990', RoundingMode::Up, '2527131374305172498893486771925871766'],
-            ['6386392982997549868964551665256601066827109320617125228090566927150086990', RoundingMode::HalfUp, '2527131374305172498893486771925871765'],
-
-            ['6386392982997549868964551665256601069354240694922297726984053699075958756', RoundingMode::Unnecessary, '2527131374305172498893486771925871766'],
-            ['6386392982997549868964551665256601069354240694922297726984053699075958756', RoundingMode::Down, '2527131374305172498893486771925871766'],
-            ['6386392982997549868964551665256601069354240694922297726984053699075958756', RoundingMode::Up, '2527131374305172498893486771925871766'],
-            ['6386392982997549868964551665256601069354240694922297726984053699075958756', RoundingMode::HalfUp, '2527131374305172498893486771925871766'],
-
-            ['241100595746204845568053694673173646954637963055159189070656778312291856', RoundingMode::Unnecessary, '491019954529553559943132903540543684'],
-            ['241100595746204845568053694673173646954637963055159189070656778312291856', RoundingMode::Down, '491019954529553559943132903540543684'],
-            ['241100595746204845568053694673173646954637963055159189070656778312291856', RoundingMode::Up, '491019954529553559943132903540543684'],
-            ['241100595746204845568053694673173646954637963055159189070656778312291856', RoundingMode::HalfUp, '491019954529553559943132903540543684'],
-
-            ['241100595746204845568053694673173647936677872114266308956922585393379224', RoundingMode::Unnecessary, null],
-            ['241100595746204845568053694673173647936677872114266308956922585393379224', RoundingMode::Down, '491019954529553559943132903540543684'],
-            ['241100595746204845568053694673173647936677872114266308956922585393379224', RoundingMode::Up, '491019954529553559943132903540543685'],
-            ['241100595746204845568053694673173647936677872114266308956922585393379224', RoundingMode::HalfUp, '491019954529553559943132903540543685'],
-
-            ['241100595746204845568053694673173647936677872114266308956922585393379225', RoundingMode::Unnecessary, '491019954529553559943132903540543685'],
-            ['241100595746204845568053694673173647936677872114266308956922585393379225', RoundingMode::Down, '491019954529553559943132903540543685'],
-            ['241100595746204845568053694673173647936677872114266308956922585393379225', RoundingMode::Up, '491019954529553559943132903540543685'],
-            ['241100595746204845568053694673173647936677872114266308956922585393379225', RoundingMode::HalfUp, '491019954529553559943132903540543685'],
-
-            ['9443978332159357501114101827797274207266380117275222876917889364528773973136', RoundingMode::Unnecessary, '97180133423243238008221615153136002444'],
-            ['9443978332159357501114101827797274207266380117275222876917889364528773973136', RoundingMode::Down, '97180133423243238008221615153136002444'],
-            ['9443978332159357501114101827797274207266380117275222876917889364528773973136', RoundingMode::Up, '97180133423243238008221615153136002444'],
-            ['9443978332159357501114101827797274207266380117275222876917889364528773973136', RoundingMode::HalfUp, '97180133423243238008221615153136002444'],
-
-            ['9443978332159357501114101827797274207363560250698466114926110979681909975580', RoundingMode::Unnecessary, null],
-            ['9443978332159357501114101827797274207363560250698466114926110979681909975580', RoundingMode::Down, '97180133423243238008221615153136002444'],
-            ['9443978332159357501114101827797274207363560250698466114926110979681909975580', RoundingMode::Up, '97180133423243238008221615153136002445'],
-            ['9443978332159357501114101827797274207363560250698466114926110979681909975580', RoundingMode::HalfUp, '97180133423243238008221615153136002444'],
-
-            ['9443978332159357501114101827797274207460740384121709352934332594835045978025', RoundingMode::Unnecessary, '97180133423243238008221615153136002445'],
-            ['9443978332159357501114101827797274207460740384121709352934332594835045978025', RoundingMode::Down, '97180133423243238008221615153136002445'],
-            ['9443978332159357501114101827797274207460740384121709352934332594835045978025', RoundingMode::Up, '97180133423243238008221615153136002445'],
-            ['9443978332159357501114101827797274207460740384121709352934332594835045978025', RoundingMode::HalfUp, '97180133423243238008221615153136002445'],
-
-            ['313018699256618409001992020847417266900442089718999098874457999889859130596', RoundingMode::Unnecessary, '17692334477298873658720698607769718186'],
-            ['313018699256618409001992020847417266900442089718999098874457999889859130596', RoundingMode::Down, '17692334477298873658720698607769718186'],
-            ['313018699256618409001992020847417266900442089718999098874457999889859130596', RoundingMode::Up, '17692334477298873658720698607769718186'],
-            ['313018699256618409001992020847417266900442089718999098874457999889859130596', RoundingMode::HalfUp, '17692334477298873658720698607769718186'],
-
-            ['313018699256618409001992020847417266935826758673596846191899397105398566968', RoundingMode::Unnecessary, null],
-            ['313018699256618409001992020847417266935826758673596846191899397105398566968', RoundingMode::Down, '17692334477298873658720698607769718186'],
-            ['313018699256618409001992020847417266935826758673596846191899397105398566968', RoundingMode::Up, '17692334477298873658720698607769718187'],
-            ['313018699256618409001992020847417266935826758673596846191899397105398566968', RoundingMode::HalfUp, '17692334477298873658720698607769718187'],
-
-            ['313018699256618409001992020847417266935826758673596846191899397105398566969', RoundingMode::Unnecessary, '17692334477298873658720698607769718187'],
-            ['313018699256618409001992020847417266935826758673596846191899397105398566969', RoundingMode::Down, '17692334477298873658720698607769718187'],
-            ['313018699256618409001992020847417266935826758673596846191899397105398566969', RoundingMode::Up, '17692334477298873658720698607769718187'],
-            ['313018699256618409001992020847417266935826758673596846191899397105398566969', RoundingMode::HalfUp, '17692334477298873658720698607769718187'],
-
-            ['6933071107478585245042253386666659991142755133413332931821052899578751610000', RoundingMode::Unnecessary, '83265065348431602879537003312633461900'],
-            ['6933071107478585245042253386666659991142755133413332931821052899578751610000', RoundingMode::Down, '83265065348431602879537003312633461900'],
-            ['6933071107478585245042253386666659991142755133413332931821052899578751610000', RoundingMode::Up, '83265065348431602879537003312633461900'],
-            ['6933071107478585245042253386666659991142755133413332931821052899578751610000', RoundingMode::HalfUp, '83265065348431602879537003312633461900'],
-
-            ['6933071107478585245042253386666659991226020198761764534700589902891385071900', RoundingMode::Unnecessary, null],
-            ['6933071107478585245042253386666659991226020198761764534700589902891385071900', RoundingMode::Down, '83265065348431602879537003312633461900'],
-            ['6933071107478585245042253386666659991226020198761764534700589902891385071900', RoundingMode::Up, '83265065348431602879537003312633461901'],
-            ['6933071107478585245042253386666659991226020198761764534700589902891385071900', RoundingMode::HalfUp, '83265065348431602879537003312633461900'],
-
-            ['6933071107478585245042253386666659991309285264110196137580126906204018533801', RoundingMode::Unnecessary, '83265065348431602879537003312633461901'],
-            ['6933071107478585245042253386666659991309285264110196137580126906204018533801', RoundingMode::Down, '83265065348431602879537003312633461901'],
-            ['6933071107478585245042253386666659991309285264110196137580126906204018533801', RoundingMode::Up, '83265065348431602879537003312633461901'],
-            ['6933071107478585245042253386666659991309285264110196137580126906204018533801', RoundingMode::HalfUp, '83265065348431602879537003312633461901'],
-
-            ['1579670801917993723309858041679990418433600770326208765934116379197768903056', RoundingMode::Unnecessary, '39745072674710178762237903560835952916'],
-            ['1579670801917993723309858041679990418433600770326208765934116379197768903056', RoundingMode::Down, '39745072674710178762237903560835952916'],
-            ['1579670801917993723309858041679990418433600770326208765934116379197768903056', RoundingMode::Up, '39745072674710178762237903560835952916'],
-            ['1579670801917993723309858041679990418433600770326208765934116379197768903056', RoundingMode::HalfUp, '39745072674710178762237903560835952916'],
-
-            ['1579670801917993723309858041679990418513090915675629123458592186319440808888', RoundingMode::Unnecessary, null],
-            ['1579670801917993723309858041679990418513090915675629123458592186319440808888', RoundingMode::Down, '39745072674710178762237903560835952916'],
-            ['1579670801917993723309858041679990418513090915675629123458592186319440808888', RoundingMode::Up, '39745072674710178762237903560835952917'],
-            ['1579670801917993723309858041679990418513090915675629123458592186319440808888', RoundingMode::HalfUp, '39745072674710178762237903560835952917'],
-
-            ['1579670801917993723309858041679990418513090915675629123458592186319440808889', RoundingMode::Unnecessary, '39745072674710178762237903560835952917'],
-            ['1579670801917993723309858041679990418513090915675629123458592186319440808889', RoundingMode::Down, '39745072674710178762237903560835952917'],
-            ['1579670801917993723309858041679990418513090915675629123458592186319440808889', RoundingMode::Up, '39745072674710178762237903560835952917'],
-            ['1579670801917993723309858041679990418513090915675629123458592186319440808889', RoundingMode::HalfUp, '39745072674710178762237903560835952917'],
-
-            ['681867337215944596936584982759400170727379727957999719338051977506244355625', RoundingMode::Unnecessary, '26112589630596667363860934899092645325'],
-            ['681867337215944596936584982759400170727379727957999719338051977506244355625', RoundingMode::Down, '26112589630596667363860934899092645325'],
-            ['681867337215944596936584982759400170727379727957999719338051977506244355625', RoundingMode::Up, '26112589630596667363860934899092645325'],
-            ['681867337215944596936584982759400170727379727957999719338051977506244355625', RoundingMode::HalfUp, '26112589630596667363860934899092645325'],
-
-            ['681867337215944596936584982759400170753492317588596386701912912405337000950', RoundingMode::Unnecessary, null],
-            ['681867337215944596936584982759400170753492317588596386701912912405337000950', RoundingMode::Down, '26112589630596667363860934899092645325'],
-            ['681867337215944596936584982759400170753492317588596386701912912405337000950', RoundingMode::Up, '26112589630596667363860934899092645326'],
-            ['681867337215944596936584982759400170753492317588596386701912912405337000950', RoundingMode::HalfUp, '26112589630596667363860934899092645325'],
-
-            ['681867337215944596936584982759400170779604907219193054065773847304429646276', RoundingMode::Unnecessary, '26112589630596667363860934899092645326'],
-            ['681867337215944596936584982759400170779604907219193054065773847304429646276', RoundingMode::Down, '26112589630596667363860934899092645326'],
-            ['681867337215944596936584982759400170779604907219193054065773847304429646276', RoundingMode::Up, '26112589630596667363860934899092645326'],
-            ['681867337215944596936584982759400170779604907219193054065773847304429646276', RoundingMode::HalfUp, '26112589630596667363860934899092645326'],
-
-            ['288453689043393924123357086972242613663177706471101442929325163584978377458225', RoundingMode::Unnecessary, '537078848069251303040109060485183727865'],
-            ['288453689043393924123357086972242613663177706471101442929325163584978377458225', RoundingMode::Down, '537078848069251303040109060485183727865'],
-            ['288453689043393924123357086972242613663177706471101442929325163584978377458225', RoundingMode::Up, '537078848069251303040109060485183727865'],
-            ['288453689043393924123357086972242613663177706471101442929325163584978377458225', RoundingMode::HalfUp, '537078848069251303040109060485183727865'],
-
-            ['288453689043393924123357086972242613664251864167239945535405381705948744913955', RoundingMode::Unnecessary, null],
-            ['288453689043393924123357086972242613664251864167239945535405381705948744913955', RoundingMode::Down, '537078848069251303040109060485183727865'],
-            ['288453689043393924123357086972242613664251864167239945535405381705948744913955', RoundingMode::Up, '537078848069251303040109060485183727866'],
-            ['288453689043393924123357086972242613664251864167239945535405381705948744913955', RoundingMode::HalfUp, '537078848069251303040109060485183727866'],
-
-            ['288453689043393924123357086972242613664251864167239945535405381705948744913956', RoundingMode::Unnecessary, '537078848069251303040109060485183727866'],
-            ['288453689043393924123357086972242613664251864167239945535405381705948744913956', RoundingMode::Down, '537078848069251303040109060485183727866'],
-            ['288453689043393924123357086972242613664251864167239945535405381705948744913956', RoundingMode::Up, '537078848069251303040109060485183727866'],
-            ['288453689043393924123357086972242613664251864167239945535405381705948744913956', RoundingMode::HalfUp, '537078848069251303040109060485183727866'],
-
-            ['195356853506305520718626478206756382507801939519785697420547945042825319176129', RoundingMode::Unnecessary, '441991915657182038371378633304634321377'],
-            ['195356853506305520718626478206756382507801939519785697420547945042825319176129', RoundingMode::Down, '441991915657182038371378633304634321377'],
-            ['195356853506305520718626478206756382507801939519785697420547945042825319176129', RoundingMode::Up, '441991915657182038371378633304634321377'],
-            ['195356853506305520718626478206756382507801939519785697420547945042825319176129', RoundingMode::HalfUp, '441991915657182038371378633304634321377'],
-
-            ['195356853506305520718626478206756382508243931435442879458919323676129953497506', RoundingMode::Unnecessary, null],
-            ['195356853506305520718626478206756382508243931435442879458919323676129953497506', RoundingMode::Down, '441991915657182038371378633304634321377'],
-            ['195356853506305520718626478206756382508243931435442879458919323676129953497506', RoundingMode::Up, '441991915657182038371378633304634321378'],
-            ['195356853506305520718626478206756382508243931435442879458919323676129953497506', RoundingMode::HalfUp, '441991915657182038371378633304634321377'],
-
-            ['195356853506305520718626478206756382508685923351100061497290702309434587818884', RoundingMode::Unnecessary, '441991915657182038371378633304634321378'],
-            ['195356853506305520718626478206756382508685923351100061497290702309434587818884', RoundingMode::Down, '441991915657182038371378633304634321378'],
-            ['195356853506305520718626478206756382508685923351100061497290702309434587818884', RoundingMode::Up, '441991915657182038371378633304634321378'],
-            ['195356853506305520718626478206756382508685923351100061497290702309434587818884', RoundingMode::HalfUp, '441991915657182038371378633304634321378'],
-
-            ['171318600916753697429051575925878633930439101417068058777561592608661184180625', RoundingMode::Unnecessary, '413906512290823587410087929387066009175'],
-            ['171318600916753697429051575925878633930439101417068058777561592608661184180625', RoundingMode::Down, '413906512290823587410087929387066009175'],
-            ['171318600916753697429051575925878633930439101417068058777561592608661184180625', RoundingMode::Up, '413906512290823587410087929387066009175'],
-            ['171318600916753697429051575925878633930439101417068058777561592608661184180625', RoundingMode::HalfUp, '413906512290823587410087929387066009175'],
-
-            ['171318600916753697429051575925878633931266914441649705952381768467435316198975', RoundingMode::Unnecessary, null],
-            ['171318600916753697429051575925878633931266914441649705952381768467435316198975', RoundingMode::Down, '413906512290823587410087929387066009175'],
-            ['171318600916753697429051575925878633931266914441649705952381768467435316198975', RoundingMode::Up, '413906512290823587410087929387066009176'],
-            ['171318600916753697429051575925878633931266914441649705952381768467435316198975', RoundingMode::HalfUp, '413906512290823587410087929387066009176'],
-
-            ['171318600916753697429051575925878633931266914441649705952381768467435316198976', RoundingMode::Unnecessary, '413906512290823587410087929387066009176'],
-            ['171318600916753697429051575925878633931266914441649705952381768467435316198976', RoundingMode::Down, '413906512290823587410087929387066009176'],
-            ['171318600916753697429051575925878633931266914441649705952381768467435316198976', RoundingMode::Up, '413906512290823587410087929387066009176'],
-            ['171318600916753697429051575925878633931266914441649705952381768467435316198976', RoundingMode::HalfUp, '413906512290823587410087929387066009176'],
-
-            ['921093761539400396463886664522151015280465523566321840991339256462222570006049', RoundingMode::Unnecessary, '959736297916985317802888407093394929007'],
-            ['921093761539400396463886664522151015280465523566321840991339256462222570006049', RoundingMode::Down, '959736297916985317802888407093394929007'],
-            ['921093761539400396463886664522151015280465523566321840991339256462222570006049', RoundingMode::Up, '959736297916985317802888407093394929007'],
-            ['921093761539400396463886664522151015280465523566321840991339256462222570006049', RoundingMode::HalfUp, '959736297916985317802888407093394929007'],
-
-            ['921093761539400396463886664522151015281425259864238826309142144869315964935056', RoundingMode::Unnecessary, null],
-            ['921093761539400396463886664522151015281425259864238826309142144869315964935056', RoundingMode::Down, '959736297916985317802888407093394929007'],
-            ['921093761539400396463886664522151015281425259864238826309142144869315964935056', RoundingMode::Up, '959736297916985317802888407093394929008'],
-            ['921093761539400396463886664522151015281425259864238826309142144869315964935056', RoundingMode::HalfUp, '959736297916985317802888407093394929007'],
-
-            ['921093761539400396463886664522151015282384996162155811626945033276409359864064', RoundingMode::Unnecessary, '959736297916985317802888407093394929008'],
-            ['921093761539400396463886664522151015282384996162155811626945033276409359864064', RoundingMode::Down, '959736297916985317802888407093394929008'],
-            ['921093761539400396463886664522151015282384996162155811626945033276409359864064', RoundingMode::Up, '959736297916985317802888407093394929008'],
-            ['921093761539400396463886664522151015282384996162155811626945033276409359864064', RoundingMode::HalfUp, '959736297916985317802888407093394929008'],
-
-            ['95109948153362184845030342755869423838311917496546178503410149505934962822401', RoundingMode::Unnecessary, '308399008029147501090828356257276909951'],
-            ['95109948153362184845030342755869423838311917496546178503410149505934962822401', RoundingMode::Down, '308399008029147501090828356257276909951'],
-            ['95109948153362184845030342755869423838311917496546178503410149505934962822401', RoundingMode::Up, '308399008029147501090828356257276909951'],
-            ['95109948153362184845030342755869423838311917496546178503410149505934962822401', RoundingMode::HalfUp, '308399008029147501090828356257276909951'],
-
-            ['95109948153362184845030342755869423838928715512604473505591806218449516642303', RoundingMode::Unnecessary, null],
-            ['95109948153362184845030342755869423838928715512604473505591806218449516642303', RoundingMode::Down, '308399008029147501090828356257276909951'],
-            ['95109948153362184845030342755869423838928715512604473505591806218449516642303', RoundingMode::Up, '308399008029147501090828356257276909952'],
-            ['95109948153362184845030342755869423838928715512604473505591806218449516642303', RoundingMode::HalfUp, '308399008029147501090828356257276909952'],
-
-            ['95109948153362184845030342755869423838928715512604473505591806218449516642304', RoundingMode::Unnecessary, '308399008029147501090828356257276909952'],
-            ['95109948153362184845030342755869423838928715512604473505591806218449516642304', RoundingMode::Down, '308399008029147501090828356257276909952'],
-            ['95109948153362184845030342755869423838928715512604473505591806218449516642304', RoundingMode::Up, '308399008029147501090828356257276909952'],
-            ['95109948153362184845030342755869423838928715512604473505591806218449516642304', RoundingMode::HalfUp, '308399008029147501090828356257276909952'],
-
-            ['19331455316972407468074740850649574350712359000359926791488814669406316705438096', RoundingMode::Unnecessary, '4396755089491841080442863075541933084436'],
-            ['19331455316972407468074740850649574350712359000359926791488814669406316705438096', RoundingMode::Down, '4396755089491841080442863075541933084436'],
-            ['19331455316972407468074740850649574350712359000359926791488814669406316705438096', RoundingMode::Up, '4396755089491841080442863075541933084436'],
-            ['19331455316972407468074740850649574350712359000359926791488814669406316705438096', RoundingMode::HalfUp, '4396755089491841080442863075541933084436'],
-
-            ['19331455316972407468074740850649574350716755755449418632569257532481858638522532', RoundingMode::Unnecessary, null],
-            ['19331455316972407468074740850649574350716755755449418632569257532481858638522532', RoundingMode::Down, '4396755089491841080442863075541933084436'],
-            ['19331455316972407468074740850649574350716755755449418632569257532481858638522532', RoundingMode::Up, '4396755089491841080442863075541933084437'],
-            ['19331455316972407468074740850649574350716755755449418632569257532481858638522532', RoundingMode::HalfUp, '4396755089491841080442863075541933084436'],
-
-            ['19331455316972407468074740850649574350721152510538910473649700395557400571606969', RoundingMode::Unnecessary, '4396755089491841080442863075541933084437'],
-            ['19331455316972407468074740850649574350721152510538910473649700395557400571606969', RoundingMode::Down, '4396755089491841080442863075541933084437'],
-            ['19331455316972407468074740850649574350721152510538910473649700395557400571606969', RoundingMode::Up, '4396755089491841080442863075541933084437'],
-            ['19331455316972407468074740850649574350721152510538910473649700395557400571606969', RoundingMode::HalfUp, '4396755089491841080442863075541933084437'],
-
-            ['79265978575272061761010812898504289157311811916595218347414644480274502855387716', RoundingMode::Unnecessary, '8903144308348150197415041401715992316846'],
-            ['79265978575272061761010812898504289157311811916595218347414644480274502855387716', RoundingMode::Down, '8903144308348150197415041401715992316846'],
-            ['79265978575272061761010812898504289157311811916595218347414644480274502855387716', RoundingMode::Up, '8903144308348150197415041401715992316846'],
-            ['79265978575272061761010812898504289157311811916595218347414644480274502855387716', RoundingMode::HalfUp, '8903144308348150197415041401715992316846'],
-
-            ['79265978575272061761010812898504289157329618205211914647809474563077934840021408', RoundingMode::Unnecessary, null],
-            ['79265978575272061761010812898504289157329618205211914647809474563077934840021408', RoundingMode::Down, '8903144308348150197415041401715992316846'],
-            ['79265978575272061761010812898504289157329618205211914647809474563077934840021408', RoundingMode::Up, '8903144308348150197415041401715992316847'],
-            ['79265978575272061761010812898504289157329618205211914647809474563077934840021408', RoundingMode::HalfUp, '8903144308348150197415041401715992316847'],
-
-            ['79265978575272061761010812898504289157329618205211914647809474563077934840021409', RoundingMode::Unnecessary, '8903144308348150197415041401715992316847'],
-            ['79265978575272061761010812898504289157329618205211914647809474563077934840021409', RoundingMode::Down, '8903144308348150197415041401715992316847'],
-            ['79265978575272061761010812898504289157329618205211914647809474563077934840021409', RoundingMode::Up, '8903144308348150197415041401715992316847'],
-            ['79265978575272061761010812898504289157329618205211914647809474563077934840021409', RoundingMode::HalfUp, '8903144308348150197415041401715992316847'],
-
-            ['18253381792846313534444974681107507939609666705140666138048641067680220712870544', RoundingMode::Unnecessary, '4272397663238560654482324050372517154612'],
-            ['18253381792846313534444974681107507939609666705140666138048641067680220712870544', RoundingMode::Down, '4272397663238560654482324050372517154612'],
-            ['18253381792846313534444974681107507939609666705140666138048641067680220712870544', RoundingMode::Up, '4272397663238560654482324050372517154612'],
-            ['18253381792846313534444974681107507939609666705140666138048641067680220712870544', RoundingMode::HalfUp, '4272397663238560654482324050372517154612'],
-
-            ['18253381792846313534444974681107507939613939102803904698703123391730593230025156', RoundingMode::Unnecessary, null],
-            ['18253381792846313534444974681107507939613939102803904698703123391730593230025156', RoundingMode::Down, '4272397663238560654482324050372517154612'],
-            ['18253381792846313534444974681107507939613939102803904698703123391730593230025156', RoundingMode::Up, '4272397663238560654482324050372517154613'],
-            ['18253381792846313534444974681107507939613939102803904698703123391730593230025156', RoundingMode::HalfUp, '4272397663238560654482324050372517154612'],
-
-            ['18253381792846313534444974681107507939618211500467143259357605715780965747179769', RoundingMode::Unnecessary, '4272397663238560654482324050372517154613'],
-            ['18253381792846313534444974681107507939618211500467143259357605715780965747179769', RoundingMode::Down, '4272397663238560654482324050372517154613'],
-            ['18253381792846313534444974681107507939618211500467143259357605715780965747179769', RoundingMode::Up, '4272397663238560654482324050372517154613'],
-            ['18253381792846313534444974681107507939618211500467143259357605715780965747179769', RoundingMode::HalfUp, '4272397663238560654482324050372517154613'],
-
-            ['34902249932301330884717409262136201131799911786648110181019008640668850248149889', RoundingMode::Unnecessary, '5907812618245549169232055936851452816833'],
-            ['34902249932301330884717409262136201131799911786648110181019008640668850248149889', RoundingMode::Down, '5907812618245549169232055936851452816833'],
-            ['34902249932301330884717409262136201131799911786648110181019008640668850248149889', RoundingMode::Up, '5907812618245549169232055936851452816833'],
-            ['34902249932301330884717409262136201131799911786648110181019008640668850248149889', RoundingMode::HalfUp, '5907812618245549169232055936851452816833'],
-
-            ['34902249932301330884717409262136201131811727411884601279357472752542553153783555', RoundingMode::Unnecessary, null],
-            ['34902249932301330884717409262136201131811727411884601279357472752542553153783555', RoundingMode::Down, '5907812618245549169232055936851452816833'],
-            ['34902249932301330884717409262136201131811727411884601279357472752542553153783555', RoundingMode::Up, '5907812618245549169232055936851452816834'],
-            ['34902249932301330884717409262136201131811727411884601279357472752542553153783555', RoundingMode::HalfUp, '5907812618245549169232055936851452816834'],
-
-            ['34902249932301330884717409262136201131811727411884601279357472752542553153783556', RoundingMode::Unnecessary, '5907812618245549169232055936851452816834'],
-            ['34902249932301330884717409262136201131811727411884601279357472752542553153783556', RoundingMode::Down, '5907812618245549169232055936851452816834'],
-            ['34902249932301330884717409262136201131811727411884601279357472752542553153783556', RoundingMode::Up, '5907812618245549169232055936851452816834'],
-            ['34902249932301330884717409262136201131811727411884601279357472752542553153783556', RoundingMode::HalfUp, '5907812618245549169232055936851452816834'],
-
-            ['2599345980007138866704208379685556534258757776044753601160948822029798157394521', RoundingMode::Unnecessary, '1612248733913951277041847563008484168539'],
-            ['2599345980007138866704208379685556534258757776044753601160948822029798157394521', RoundingMode::Down, '1612248733913951277041847563008484168539'],
-            ['2599345980007138866704208379685556534258757776044753601160948822029798157394521', RoundingMode::Up, '1612248733913951277041847563008484168539'],
-            ['2599345980007138866704208379685556534258757776044753601160948822029798157394521', RoundingMode::HalfUp, '1612248733913951277041847563008484168539'],
-
-            ['2599345980007138866704208379685556534260370024778667552437990669592806641563060', RoundingMode::Unnecessary, null],
-            ['2599345980007138866704208379685556534260370024778667552437990669592806641563060', RoundingMode::Down, '1612248733913951277041847563008484168539'],
-            ['2599345980007138866704208379685556534260370024778667552437990669592806641563060', RoundingMode::Up, '1612248733913951277041847563008484168540'],
-            ['2599345980007138866704208379685556534260370024778667552437990669592806641563060', RoundingMode::HalfUp, '1612248733913951277041847563008484168539'],
-
-            ['2599345980007138866704208379685556534261982273512581503715032517155815125731600', RoundingMode::Unnecessary, '1612248733913951277041847563008484168540'],
-            ['2599345980007138866704208379685556534261982273512581503715032517155815125731600', RoundingMode::Down, '1612248733913951277041847563008484168540'],
-            ['2599345980007138866704208379685556534261982273512581503715032517155815125731600', RoundingMode::Up, '1612248733913951277041847563008484168540'],
-            ['2599345980007138866704208379685556534261982273512581503715032517155815125731600', RoundingMode::HalfUp, '1612248733913951277041847563008484168540'],
-
-            ['5316322030460586450936871958946919636668068288991234947266697538297768830115066084', RoundingMode::Unnecessary, '72913112884175960485473057702832007114922'],
-            ['5316322030460586450936871958946919636668068288991234947266697538297768830115066084', RoundingMode::Down, '72913112884175960485473057702832007114922'],
-            ['5316322030460586450936871958946919636668068288991234947266697538297768830115066084', RoundingMode::Up, '72913112884175960485473057702832007114922'],
-            ['5316322030460586450936871958946919636668068288991234947266697538297768830115066084', RoundingMode::HalfUp, '72913112884175960485473057702832007114922'],
-
-            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295928', RoundingMode::Unnecessary, null],
-            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295928', RoundingMode::Down, '72913112884175960485473057702832007114922'],
-            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295928', RoundingMode::Up, '72913112884175960485473057702832007114923'],
-            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295928', RoundingMode::HalfUp, '72913112884175960485473057702832007114923'],
-
-            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295929', RoundingMode::Unnecessary, '72913112884175960485473057702832007114923'],
-            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295929', RoundingMode::Down, '72913112884175960485473057702832007114923'],
-            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295929', RoundingMode::Up, '72913112884175960485473057702832007114923'],
-            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295929', RoundingMode::HalfUp, '72913112884175960485473057702832007114923'],
-
-            ['8002778973791813108451518291518896929427763054970205412144571951733372499281017601', RoundingMode::Unnecessary, '89458252686891962949549637560732937788801'],
-            ['8002778973791813108451518291518896929427763054970205412144571951733372499281017601', RoundingMode::Down, '89458252686891962949549637560732937788801'],
-            ['8002778973791813108451518291518896929427763054970205412144571951733372499281017601', RoundingMode::Up, '89458252686891962949549637560732937788801'],
-            ['8002778973791813108451518291518896929427763054970205412144571951733372499281017601', RoundingMode::HalfUp, '89458252686891962949549637560732937788801'],
-
-            ['8002778973791813108451518291518896929427852513222892304107521501370933232218806402', RoundingMode::Unnecessary, null],
-            ['8002778973791813108451518291518896929427852513222892304107521501370933232218806402', RoundingMode::Down, '89458252686891962949549637560732937788801'],
-            ['8002778973791813108451518291518896929427852513222892304107521501370933232218806402', RoundingMode::Up, '89458252686891962949549637560732937788802'],
-            ['8002778973791813108451518291518896929427852513222892304107521501370933232218806402', RoundingMode::HalfUp, '89458252686891962949549637560732937788801'],
-
-            ['8002778973791813108451518291518896929427941971475579196070471051008493965156595204', RoundingMode::Unnecessary, '89458252686891962949549637560732937788802'],
-            ['8002778973791813108451518291518896929427941971475579196070471051008493965156595204', RoundingMode::Down, '89458252686891962949549637560732937788802'],
-            ['8002778973791813108451518291518896929427941971475579196070471051008493965156595204', RoundingMode::Up, '89458252686891962949549637560732937788802'],
-            ['8002778973791813108451518291518896929427941971475579196070471051008493965156595204', RoundingMode::HalfUp, '89458252686891962949549637560732937788802'],
-
-            ['204434819803436425073091821729105629106597079412374857081154364351611450036288004', RoundingMode::Unnecessary, '14298070492322956269314619104943213072002'],
-            ['204434819803436425073091821729105629106597079412374857081154364351611450036288004', RoundingMode::Down, '14298070492322956269314619104943213072002'],
-            ['204434819803436425073091821729105629106597079412374857081154364351611450036288004', RoundingMode::Up, '14298070492322956269314619104943213072002'],
-            ['204434819803436425073091821729105629106597079412374857081154364351611450036288004', RoundingMode::HalfUp, '14298070492322956269314619104943213072002'],
-
-            ['204434819803436425073091821729105629106625675553359502993692993589821336462432008', RoundingMode::Unnecessary, null],
-            ['204434819803436425073091821729105629106625675553359502993692993589821336462432008', RoundingMode::Down, '14298070492322956269314619104943213072002'],
-            ['204434819803436425073091821729105629106625675553359502993692993589821336462432008', RoundingMode::Up, '14298070492322956269314619104943213072003'],
-            ['204434819803436425073091821729105629106625675553359502993692993589821336462432008', RoundingMode::HalfUp, '14298070492322956269314619104943213072003'],
-
-            ['204434819803436425073091821729105629106625675553359502993692993589821336462432009', RoundingMode::Unnecessary, '14298070492322956269314619104943213072003'],
-            ['204434819803436425073091821729105629106625675553359502993692993589821336462432009', RoundingMode::Down, '14298070492322956269314619104943213072003'],
-            ['204434819803436425073091821729105629106625675553359502993692993589821336462432009', RoundingMode::Up, '14298070492322956269314619104943213072003'],
-            ['204434819803436425073091821729105629106625675553359502993692993589821336462432009', RoundingMode::HalfUp, '14298070492322956269314619104943213072003'],
-
-            ['248985683905018963214400101508836326950598468017331056913175271121208335269369616', RoundingMode::Unnecessary, '15779280208711009616855603241137879133796'],
-            ['248985683905018963214400101508836326950598468017331056913175271121208335269369616', RoundingMode::Down, '15779280208711009616855603241137879133796'],
-            ['248985683905018963214400101508836326950598468017331056913175271121208335269369616', RoundingMode::Up, '15779280208711009616855603241137879133796'],
-            ['248985683905018963214400101508836326950598468017331056913175271121208335269369616', RoundingMode::HalfUp, '15779280208711009616855603241137879133796'],
-
-            ['248985683905018963214400101508836326950614247297539767922792126724449473148503412', RoundingMode::Unnecessary, null],
-            ['248985683905018963214400101508836326950614247297539767922792126724449473148503412', RoundingMode::Down, '15779280208711009616855603241137879133796'],
-            ['248985683905018963214400101508836326950614247297539767922792126724449473148503412', RoundingMode::Up, '15779280208711009616855603241137879133797'],
-            ['248985683905018963214400101508836326950614247297539767922792126724449473148503412', RoundingMode::HalfUp, '15779280208711009616855603241137879133796'],
-
-            ['248985683905018963214400101508836326950630026577748478932408982327690611027637209', RoundingMode::Unnecessary, '15779280208711009616855603241137879133797'],
-            ['248985683905018963214400101508836326950630026577748478932408982327690611027637209', RoundingMode::Down, '15779280208711009616855603241137879133797'],
-            ['248985683905018963214400101508836326950630026577748478932408982327690611027637209', RoundingMode::Up, '15779280208711009616855603241137879133797'],
-            ['248985683905018963214400101508836326950630026577748478932408982327690611027637209', RoundingMode::HalfUp, '15779280208711009616855603241137879133797'],
-
-            ['9931466785180918581453369553241893953494729509958339130768488436428313616867737664', RoundingMode::Unnecessary, '99656744805261016419561454808199789423608'],
-            ['9931466785180918581453369553241893953494729509958339130768488436428313616867737664', RoundingMode::Down, '99656744805261016419561454808199789423608'],
-            ['9931466785180918581453369553241893953494729509958339130768488436428313616867737664', RoundingMode::Up, '99656744805261016419561454808199789423608'],
-            ['9931466785180918581453369553241893953494729509958339130768488436428313616867737664', RoundingMode::HalfUp, '99656744805261016419561454808199789423608'],
-
-            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584880', RoundingMode::Unnecessary, null],
-            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584880', RoundingMode::Down, '99656744805261016419561454808199789423608'],
-            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584880', RoundingMode::Up, '99656744805261016419561454808199789423609'],
-            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584880', RoundingMode::HalfUp, '99656744805261016419561454808199789423609'],
-
-            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584881', RoundingMode::Unnecessary, '99656744805261016419561454808199789423609'],
-            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584881', RoundingMode::Down, '99656744805261016419561454808199789423609'],
-            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584881', RoundingMode::Up, '99656744805261016419561454808199789423609'],
-            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584881', RoundingMode::HalfUp, '99656744805261016419561454808199789423609'],
-
-            ['571034337207963083686644289650754887712756826847796234542618077049856839883774610496', RoundingMode::Unnecessary, '755668139600951472909394170487042707063864'],
-            ['571034337207963083686644289650754887712756826847796234542618077049856839883774610496', RoundingMode::Down, '755668139600951472909394170487042707063864'],
-            ['571034337207963083686644289650754887712756826847796234542618077049856839883774610496', RoundingMode::Up, '755668139600951472909394170487042707063864'],
-            ['571034337207963083686644289650754887712756826847796234542618077049856839883774610496', RoundingMode::HalfUp, '755668139600951472909394170487042707063864'],
-
-            ['571034337207963083686644289650754887712757582515935835494090986444027326926481674360', RoundingMode::Unnecessary, null],
-            ['571034337207963083686644289650754887712757582515935835494090986444027326926481674360', RoundingMode::Down, '755668139600951472909394170487042707063864'],
-            ['571034337207963083686644289650754887712757582515935835494090986444027326926481674360', RoundingMode::Up, '755668139600951472909394170487042707063865'],
-            ['571034337207963083686644289650754887712757582515935835494090986444027326926481674360', RoundingMode::HalfUp, '755668139600951472909394170487042707063864'],
-
-            ['571034337207963083686644289650754887712758338184075436445563895838197813969188738225', RoundingMode::Unnecessary, '755668139600951472909394170487042707063865'],
-            ['571034337207963083686644289650754887712758338184075436445563895838197813969188738225', RoundingMode::Down, '755668139600951472909394170487042707063865'],
-            ['571034337207963083686644289650754887712758338184075436445563895838197813969188738225', RoundingMode::Up, '755668139600951472909394170487042707063865'],
-            ['571034337207963083686644289650754887712758338184075436445563895838197813969188738225', RoundingMode::HalfUp, '755668139600951472909394170487042707063865'],
-
-            ['43282087429518774838368965030190873132157640943271155661308846536619714287766015625', RoundingMode::Unnecessary, '208043474854461068334845359605621664088125'],
-            ['43282087429518774838368965030190873132157640943271155661308846536619714287766015625', RoundingMode::Down, '208043474854461068334845359605621664088125'],
-            ['43282087429518774838368965030190873132157640943271155661308846536619714287766015625', RoundingMode::Up, '208043474854461068334845359605621664088125'],
-            ['43282087429518774838368965030190873132157640943271155661308846536619714287766015625', RoundingMode::HalfUp, '208043474854461068334845359605621664088125'],
-
-            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191875', RoundingMode::Unnecessary, null],
-            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191875', RoundingMode::Down, '208043474854461068334845359605621664088125'],
-            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191875', RoundingMode::Up, '208043474854461068334845359605621664088126'],
-            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191875', RoundingMode::HalfUp, '208043474854461068334845359605621664088126'],
-
-            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191876', RoundingMode::Unnecessary, '208043474854461068334845359605621664088126'],
-            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191876', RoundingMode::Down, '208043474854461068334845359605621664088126'],
-            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191876', RoundingMode::Up, '208043474854461068334845359605621664088126'],
-            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191876', RoundingMode::HalfUp, '208043474854461068334845359605621664088126'],
-
-            ['417927142998078702077756962900654390278806646288750249869048008644489266148390976576', RoundingMode::Unnecessary, '646472847842876307508176358984831821937976'],
-            ['417927142998078702077756962900654390278806646288750249869048008644489266148390976576', RoundingMode::Down, '646472847842876307508176358984831821937976'],
-            ['417927142998078702077756962900654390278806646288750249869048008644489266148390976576', RoundingMode::Up, '646472847842876307508176358984831821937976'],
-            ['417927142998078702077756962900654390278806646288750249869048008644489266148390976576', RoundingMode::HalfUp, '646472847842876307508176358984831821937976'],
-
-            ['417927142998078702077756962900654390278807292761598092745355516820848250980212914552', RoundingMode::Unnecessary, null],
-            ['417927142998078702077756962900654390278807292761598092745355516820848250980212914552', RoundingMode::Down, '646472847842876307508176358984831821937976'],
-            ['417927142998078702077756962900654390278807292761598092745355516820848250980212914552', RoundingMode::Up, '646472847842876307508176358984831821937977'],
-            ['417927142998078702077756962900654390278807292761598092745355516820848250980212914552', RoundingMode::HalfUp, '646472847842876307508176358984831821937976'],
-
-            ['417927142998078702077756962900654390278807939234445935621663024997207235812034852529', RoundingMode::Unnecessary, '646472847842876307508176358984831821937977'],
-            ['417927142998078702077756962900654390278807939234445935621663024997207235812034852529', RoundingMode::Down, '646472847842876307508176358984831821937977'],
-            ['417927142998078702077756962900654390278807939234445935621663024997207235812034852529', RoundingMode::Up, '646472847842876307508176358984831821937977'],
-            ['417927142998078702077756962900654390278807939234445935621663024997207235812034852529', RoundingMode::HalfUp, '646472847842876307508176358984831821937977'],
-
-            ['57289022864599235425935956369596297021969148801199969985249642058425056660901854081', RoundingMode::Unnecessary, '239351254152969157626674463098033150396991'],
-            ['57289022864599235425935956369596297021969148801199969985249642058425056660901854081', RoundingMode::Down, '239351254152969157626674463098033150396991'],
-            ['57289022864599235425935956369596297021969148801199969985249642058425056660901854081', RoundingMode::Up, '239351254152969157626674463098033150396991'],
-            ['57289022864599235425935956369596297021969148801199969985249642058425056660901854081', RoundingMode::HalfUp, '239351254152969157626674463098033150396991'],
-
-            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648063', RoundingMode::Unnecessary, null],
-            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648063', RoundingMode::Down, '239351254152969157626674463098033150396991'],
-            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648063', RoundingMode::Up, '239351254152969157626674463098033150396992'],
-            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648063', RoundingMode::HalfUp, '239351254152969157626674463098033150396992'],
-
-            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648064', RoundingMode::Unnecessary, '239351254152969157626674463098033150396992'],
-            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648064', RoundingMode::Down, '239351254152969157626674463098033150396992'],
-            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648064', RoundingMode::Up, '239351254152969157626674463098033150396992'],
-            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648064', RoundingMode::HalfUp, '239351254152969157626674463098033150396992'],
-
-            ['388204130919598896854532928319816854683262176908475545926963148518011088548336100', RoundingMode::Unnecessary, '19702896510909224609070086389295007347690'],
-            ['388204130919598896854532928319816854683262176908475545926963148518011088548336100', RoundingMode::Down, '19702896510909224609070086389295007347690'],
-            ['388204130919598896854532928319816854683262176908475545926963148518011088548336100', RoundingMode::Up, '19702896510909224609070086389295007347690'],
-            ['388204130919598896854532928319816854683262176908475545926963148518011088548336100', RoundingMode::HalfUp, '19702896510909224609070086389295007347690'],
-
-            ['388204130919598896854532928319816854683281879804986455151572218604400383555683790', RoundingMode::Unnecessary, null],
-            ['388204130919598896854532928319816854683281879804986455151572218604400383555683790', RoundingMode::Down, '19702896510909224609070086389295007347690'],
-            ['388204130919598896854532928319816854683281879804986455151572218604400383555683790', RoundingMode::Up, '19702896510909224609070086389295007347691'],
-            ['388204130919598896854532928319816854683281879804986455151572218604400383555683790', RoundingMode::HalfUp, '19702896510909224609070086389295007347690'],
-
-            ['388204130919598896854532928319816854683301582701497364376181288690789678563031481', RoundingMode::Unnecessary, '19702896510909224609070086389295007347691'],
-            ['388204130919598896854532928319816854683301582701497364376181288690789678563031481', RoundingMode::Down, '19702896510909224609070086389295007347691'],
-            ['388204130919598896854532928319816854683301582701497364376181288690789678563031481', RoundingMode::Up, '19702896510909224609070086389295007347691'],
-            ['388204130919598896854532928319816854683301582701497364376181288690789678563031481', RoundingMode::HalfUp, '19702896510909224609070086389295007347691'],
-
-            ['17641213493582550358331598783756045983107635305125558424245083335221980342711574945924', RoundingMode::Unnecessary, '4200144461037328458609200843143798139299618'],
-            ['17641213493582550358331598783756045983107635305125558424245083335221980342711574945924', RoundingMode::Down, '4200144461037328458609200843143798139299618'],
-            ['17641213493582550358331598783756045983107635305125558424245083335221980342711574945924', RoundingMode::Up, '4200144461037328458609200843143798139299618'],
-            ['17641213493582550358331598783756045983107635305125558424245083335221980342711574945924', RoundingMode::HalfUp, '4200144461037328458609200843143798139299618'],
-
-            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545160', RoundingMode::Unnecessary, null],
-            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545160', RoundingMode::Down, '4200144461037328458609200843143798139299618'],
-            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545160', RoundingMode::Up, '4200144461037328458609200843143798139299619'],
-            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545160', RoundingMode::HalfUp, '4200144461037328458609200843143798139299619'],
-
-            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545161', RoundingMode::Unnecessary, '4200144461037328458609200843143798139299619'],
-            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545161', RoundingMode::Down, '4200144461037328458609200843143798139299619'],
-            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545161', RoundingMode::Up, '4200144461037328458609200843143798139299619'],
-            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545161', RoundingMode::HalfUp, '4200144461037328458609200843143798139299619'],
-
-            ['10480850478210993041934376751763741537950365795671072307889437499081947766082767900625', RoundingMode::Unnecessary, '3237414165381221816392010300367379458321975'],
-            ['10480850478210993041934376751763741537950365795671072307889437499081947766082767900625', RoundingMode::Down, '3237414165381221816392010300367379458321975'],
-            ['10480850478210993041934376751763741537950365795671072307889437499081947766082767900625', RoundingMode::Up, '3237414165381221816392010300367379458321975'],
-            ['10480850478210993041934376751763741537950365795671072307889437499081947766082767900625', RoundingMode::HalfUp, '3237414165381221816392010300367379458321975'],
-
-            ['10480850478210993041934376751763741537950369033085237689111253891092248133462226222600', RoundingMode::Unnecessary, null],
-            ['10480850478210993041934376751763741537950369033085237689111253891092248133462226222600', RoundingMode::Down, '3237414165381221816392010300367379458321975'],
-            ['10480850478210993041934376751763741537950369033085237689111253891092248133462226222600', RoundingMode::Up, '3237414165381221816392010300367379458321976'],
-            ['10480850478210993041934376751763741537950369033085237689111253891092248133462226222600', RoundingMode::HalfUp, '3237414165381221816392010300367379458321975'],
-
-            ['10480850478210993041934376751763741537950372270499403070333070283102548500841684544576', RoundingMode::Unnecessary, '3237414165381221816392010300367379458321976'],
-            ['10480850478210993041934376751763741537950372270499403070333070283102548500841684544576', RoundingMode::Down, '3237414165381221816392010300367379458321976'],
-            ['10480850478210993041934376751763741537950372270499403070333070283102548500841684544576', RoundingMode::Up, '3237414165381221816392010300367379458321976'],
-            ['10480850478210993041934376751763741537950372270499403070333070283102548500841684544576', RoundingMode::HalfUp, '3237414165381221816392010300367379458321976'],
-
-            ['18912401257760832817656385679644608795185415305426367246326490097108178277089565964900', RoundingMode::Unnecessary, '4348839070115245459938703154127996458785930'],
-            ['18912401257760832817656385679644608795185415305426367246326490097108178277089565964900', RoundingMode::Down, '4348839070115245459938703154127996458785930'],
-            ['18912401257760832817656385679644608795185415305426367246326490097108178277089565964900', RoundingMode::Up, '4348839070115245459938703154127996458785930'],
-            ['18912401257760832817656385679644608795185415305426367246326490097108178277089565964900', RoundingMode::HalfUp, '4348839070115245459938703154127996458785930'],
-
-            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536760', RoundingMode::Unnecessary, null],
-            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536760', RoundingMode::Down, '4348839070115245459938703154127996458785930'],
-            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536760', RoundingMode::Up, '4348839070115245459938703154127996458785931'],
-            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536760', RoundingMode::HalfUp, '4348839070115245459938703154127996458785931'],
-
-            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536761', RoundingMode::Unnecessary, '4348839070115245459938703154127996458785931'],
-            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536761', RoundingMode::Down, '4348839070115245459938703154127996458785931'],
-            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536761', RoundingMode::Up, '4348839070115245459938703154127996458785931'],
-            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536761', RoundingMode::HalfUp, '4348839070115245459938703154127996458785931'],
-
-            ['4058130180100830389999063645300769577286055319083847709319631222394835048000563913616', RoundingMode::Unnecessary, '2014480126509276434961389427500807039909204'],
-            ['4058130180100830389999063645300769577286055319083847709319631222394835048000563913616', RoundingMode::Down, '2014480126509276434961389427500807039909204'],
-            ['4058130180100830389999063645300769577286055319083847709319631222394835048000563913616', RoundingMode::Up, '2014480126509276434961389427500807039909204'],
-            ['4058130180100830389999063645300769577286055319083847709319631222394835048000563913616', RoundingMode::HalfUp, '2014480126509276434961389427500807039909204'],
-
-            ['4058130180100830389999063645300769577286057333563974218596066183784262548807603822820', RoundingMode::Unnecessary, null],
-            ['4058130180100830389999063645300769577286057333563974218596066183784262548807603822820', RoundingMode::Down, '2014480126509276434961389427500807039909204'],
-            ['4058130180100830389999063645300769577286057333563974218596066183784262548807603822820', RoundingMode::Up, '2014480126509276434961389427500807039909205'],
-            ['4058130180100830389999063645300769577286057333563974218596066183784262548807603822820', RoundingMode::HalfUp, '2014480126509276434961389427500807039909204'],
-
-            ['4058130180100830389999063645300769577286059348044100727872501145173690049614643732025', RoundingMode::Unnecessary, '2014480126509276434961389427500807039909205'],
-            ['4058130180100830389999063645300769577286059348044100727872501145173690049614643732025', RoundingMode::Down, '2014480126509276434961389427500807039909205'],
-            ['4058130180100830389999063645300769577286059348044100727872501145173690049614643732025', RoundingMode::Up, '2014480126509276434961389427500807039909205'],
-            ['4058130180100830389999063645300769577286059348044100727872501145173690049614643732025', RoundingMode::HalfUp, '2014480126509276434961389427500807039909205'],
-
-            ['33468184484233190391618513143907824051569626629768396502905028100863488827541016357225', RoundingMode::Unnecessary, '5785169356573166941812342062118994545501165'],
-            ['33468184484233190391618513143907824051569626629768396502905028100863488827541016357225', RoundingMode::Down, '5785169356573166941812342062118994545501165'],
-            ['33468184484233190391618513143907824051569626629768396502905028100863488827541016357225', RoundingMode::Up, '5785169356573166941812342062118994545501165'],
-            ['33468184484233190391618513143907824051569626629768396502905028100863488827541016357225', RoundingMode::HalfUp, '5785169356573166941812342062118994545501165'],
-
-            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359555', RoundingMode::Unnecessary, null],
-            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359555', RoundingMode::Down, '5785169356573166941812342062118994545501165'],
-            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359555', RoundingMode::Up, '5785169356573166941812342062118994545501166'],
-            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359555', RoundingMode::HalfUp, '5785169356573166941812342062118994545501166'],
-
-            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359556', RoundingMode::Unnecessary, '5785169356573166941812342062118994545501166'],
-            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359556', RoundingMode::Down, '5785169356573166941812342062118994545501166'],
-            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359556', RoundingMode::Up, '5785169356573166941812342062118994545501166'],
-            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359556', RoundingMode::HalfUp, '5785169356573166941812342062118994545501166'],
-
-            ['1186174880095419715607318419843788127322568925641042677386667373975880777802263411393536', RoundingMode::Unnecessary, '34440889653076903576703209294470985379444256'],
-            ['1186174880095419715607318419843788127322568925641042677386667373975880777802263411393536', RoundingMode::Down, '34440889653076903576703209294470985379444256'],
-            ['1186174880095419715607318419843788127322568925641042677386667373975880777802263411393536', RoundingMode::Up, '34440889653076903576703209294470985379444256'],
-            ['1186174880095419715607318419843788127322568925641042677386667373975880777802263411393536', RoundingMode::HalfUp, '34440889653076903576703209294470985379444256'],
-
-            ['1186174880095419715607318419843788127322568960081932330463570950679090072273248790837792', RoundingMode::Unnecessary, null],
-            ['1186174880095419715607318419843788127322568960081932330463570950679090072273248790837792', RoundingMode::Down, '34440889653076903576703209294470985379444256'],
-            ['1186174880095419715607318419843788127322568960081932330463570950679090072273248790837792', RoundingMode::Up, '34440889653076903576703209294470985379444257'],
-            ['1186174880095419715607318419843788127322568960081932330463570950679090072273248790837792', RoundingMode::HalfUp, '34440889653076903576703209294470985379444256'],
-
-            ['1186174880095419715607318419843788127322568994522821983540474527382299366744234170282049', RoundingMode::Unnecessary, '34440889653076903576703209294470985379444257'],
-            ['1186174880095419715607318419843788127322568994522821983540474527382299366744234170282049', RoundingMode::Down, '34440889653076903576703209294470985379444257'],
-            ['1186174880095419715607318419843788127322568994522821983540474527382299366744234170282049', RoundingMode::Up, '34440889653076903576703209294470985379444257'],
-            ['1186174880095419715607318419843788127322568994522821983540474527382299366744234170282049', RoundingMode::HalfUp, '34440889653076903576703209294470985379444257'],
-
-            ['1869407664810972914760141576011747496493758522541997263089274909609818581502013012539601', RoundingMode::Unnecessary, '43236647242946265649799966945038223493750199'],
-            ['1869407664810972914760141576011747496493758522541997263089274909609818581502013012539601', RoundingMode::Down, '43236647242946265649799966945038223493750199'],
-            ['1869407664810972914760141576011747496493758522541997263089274909609818581502013012539601', RoundingMode::Up, '43236647242946265649799966945038223493750199'],
-            ['1869407664810972914760141576011747496493758522541997263089274909609818581502013012539601', RoundingMode::HalfUp, '43236647242946265649799966945038223493750199'],
-
-            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000039999', RoundingMode::Unnecessary, null],
-            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000039999', RoundingMode::Down, '43236647242946265649799966945038223493750199'],
-            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000039999', RoundingMode::Up, '43236647242946265649799966945038223493750200'],
-            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000039999', RoundingMode::HalfUp, '43236647242946265649799966945038223493750200'],
-
-            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000040000', RoundingMode::Unnecessary, '43236647242946265649799966945038223493750200'],
-            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000040000', RoundingMode::Down, '43236647242946265649799966945038223493750200'],
-            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000040000', RoundingMode::Up, '43236647242946265649799966945038223493750200'],
-            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000040000', RoundingMode::HalfUp, '43236647242946265649799966945038223493750200'],
-
-            ['4306248093986950964567669268958861794743230041121457387922204677053975232405051053143025', RoundingMode::Unnecessary, '65622009219369007099774314994059599547494695'],
-            ['4306248093986950964567669268958861794743230041121457387922204677053975232405051053143025', RoundingMode::Down, '65622009219369007099774314994059599547494695'],
-            ['4306248093986950964567669268958861794743230041121457387922204677053975232405051053143025', RoundingMode::Up, '65622009219369007099774314994059599547494695'],
-            ['4306248093986950964567669268958861794743230041121457387922204677053975232405051053143025', RoundingMode::HalfUp, '65622009219369007099774314994059599547494695'],
-
-            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132415', RoundingMode::Unnecessary, null],
-            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132415', RoundingMode::Down, '65622009219369007099774314994059599547494695'],
-            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132415', RoundingMode::Up, '65622009219369007099774314994059599547494696'],
-            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132415', RoundingMode::HalfUp, '65622009219369007099774314994059599547494696'],
-
-            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132416', RoundingMode::Unnecessary, '65622009219369007099774314994059599547494696'],
-            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132416', RoundingMode::Down, '65622009219369007099774314994059599547494696'],
-            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132416', RoundingMode::Up, '65622009219369007099774314994059599547494696'],
-            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132416', RoundingMode::HalfUp, '65622009219369007099774314994059599547494696'],
-
-            ['142958974763379486489798376541073126699563800627039429166077132824711226669748693162209', RoundingMode::Unnecessary, '11956545268737934506570289899105912433421297'],
-            ['142958974763379486489798376541073126699563800627039429166077132824711226669748693162209', RoundingMode::Down, '11956545268737934506570289899105912433421297'],
-            ['142958974763379486489798376541073126699563800627039429166077132824711226669748693162209', RoundingMode::Up, '11956545268737934506570289899105912433421297'],
-            ['142958974763379486489798376541073126699563800627039429166077132824711226669748693162209', RoundingMode::HalfUp, '11956545268737934506570289899105912433421297'],
-
-            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004803', RoundingMode::Unnecessary, null],
-            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004803', RoundingMode::Down, '11956545268737934506570289899105912433421297'],
-            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004803', RoundingMode::Up, '11956545268737934506570289899105912433421298'],
-            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004803', RoundingMode::HalfUp, '11956545268737934506570289899105912433421298'],
-
-            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004804', RoundingMode::Unnecessary, '11956545268737934506570289899105912433421298'],
-            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004804', RoundingMode::Down, '11956545268737934506570289899105912433421298'],
-            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004804', RoundingMode::Up, '11956545268737934506570289899105912433421298'],
-            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004804', RoundingMode::HalfUp, '11956545268737934506570289899105912433421298'],
-
-            ['5924043074304444391210747851995027637083074459394928466831722415634829619104396893068176', RoundingMode::Unnecessary, '76967805440355673370818024381288105628528724'],
-            ['5924043074304444391210747851995027637083074459394928466831722415634829619104396893068176', RoundingMode::Down, '76967805440355673370818024381288105628528724'],
-            ['5924043074304444391210747851995027637083074459394928466831722415634829619104396893068176', RoundingMode::Up, '76967805440355673370818024381288105628528724'],
-            ['5924043074304444391210747851995027637083074459394928466831722415634829619104396893068176', RoundingMode::HalfUp, '76967805440355673370818024381288105628528724'],
-
-            ['5924043074304444391210747851995027637083074536362733907187395786452854000392502521596900', RoundingMode::Unnecessary, null],
-            ['5924043074304444391210747851995027637083074536362733907187395786452854000392502521596900', RoundingMode::Down, '76967805440355673370818024381288105628528724'],
-            ['5924043074304444391210747851995027637083074536362733907187395786452854000392502521596900', RoundingMode::Up, '76967805440355673370818024381288105628528725'],
-            ['5924043074304444391210747851995027637083074536362733907187395786452854000392502521596900', RoundingMode::HalfUp, '76967805440355673370818024381288105628528724'],
-
-            ['5924043074304444391210747851995027637083074613330539347543069157270878381680608150125625', RoundingMode::Unnecessary, '76967805440355673370818024381288105628528725'],
-            ['5924043074304444391210747851995027637083074613330539347543069157270878381680608150125625', RoundingMode::Down, '76967805440355673370818024381288105628528725'],
-            ['5924043074304444391210747851995027637083074613330539347543069157270878381680608150125625', RoundingMode::Up, '76967805440355673370818024381288105628528725'],
-            ['5924043074304444391210747851995027637083074613330539347543069157270878381680608150125625', RoundingMode::HalfUp, '76967805440355673370818024381288105628528725'],
-
-            ['692647042392925303434391597094843086706651167173473530228926147229989661906443247661192976', RoundingMode::Unnecessary, '832254193376594110047678950757920520714968676'],
-            ['692647042392925303434391597094843086706651167173473530228926147229989661906443247661192976', RoundingMode::Down, '832254193376594110047678950757920520714968676'],
-            ['692647042392925303434391597094843086706651167173473530228926147229989661906443247661192976', RoundingMode::Up, '832254193376594110047678950757920520714968676'],
-            ['692647042392925303434391597094843086706651167173473530228926147229989661906443247661192976', RoundingMode::HalfUp, '832254193376594110047678950757920520714968676'],
-
-            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130328', RoundingMode::Unnecessary, null],
-            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130328', RoundingMode::Down, '832254193376594110047678950757920520714968676'],
-            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130328', RoundingMode::Up, '832254193376594110047678950757920520714968677'],
-            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130328', RoundingMode::HalfUp, '832254193376594110047678950757920520714968677'],
-
-            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130329', RoundingMode::Unnecessary, '832254193376594110047678950757920520714968677'],
-            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130329', RoundingMode::Down, '832254193376594110047678950757920520714968677'],
-            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130329', RoundingMode::Up, '832254193376594110047678950757920520714968677'],
-            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130329', RoundingMode::HalfUp, '832254193376594110047678950757920520714968677'],
-
-            ['63418927703603396384251230391169377358870766926264966118026529953350707524741421056456161', RoundingMode::Unnecessary, '251831149192476577524577782662609731668640369'],
-            ['63418927703603396384251230391169377358870766926264966118026529953350707524741421056456161', RoundingMode::Down, '251831149192476577524577782662609731668640369'],
-            ['63418927703603396384251230391169377358870766926264966118026529953350707524741421056456161', RoundingMode::Up, '251831149192476577524577782662609731668640369'],
-            ['63418927703603396384251230391169377358870766926264966118026529953350707524741421056456161', RoundingMode::HalfUp, '251831149192476577524577782662609731668640369'],
-
-            ['63418927703603396384251230391169377358870767178096115310503107477928490187351152725096530', RoundingMode::Unnecessary, null],
-            ['63418927703603396384251230391169377358870767178096115310503107477928490187351152725096530', RoundingMode::Down, '251831149192476577524577782662609731668640369'],
-            ['63418927703603396384251230391169377358870767178096115310503107477928490187351152725096530', RoundingMode::Up, '251831149192476577524577782662609731668640370'],
-            ['63418927703603396384251230391169377358870767178096115310503107477928490187351152725096530', RoundingMode::HalfUp, '251831149192476577524577782662609731668640369'],
-
-            ['63418927703603396384251230391169377358870767429927264502979685002506272849960884393736900', RoundingMode::Unnecessary, '251831149192476577524577782662609731668640370'],
-            ['63418927703603396384251230391169377358870767429927264502979685002506272849960884393736900', RoundingMode::Down, '251831149192476577524577782662609731668640370'],
-            ['63418927703603396384251230391169377358870767429927264502979685002506272849960884393736900', RoundingMode::Up, '251831149192476577524577782662609731668640370'],
-            ['63418927703603396384251230391169377358870767429927264502979685002506272849960884393736900', RoundingMode::HalfUp, '251831149192476577524577782662609731668640370'],
-
-            ['84173934762470484045776658803140625724430904400114977656227228331290197573900111299728676', RoundingMode::Unnecessary, '290127445724237685478628941387635987912451526'],
-            ['84173934762470484045776658803140625724430904400114977656227228331290197573900111299728676', RoundingMode::Down, '290127445724237685478628941387635987912451526'],
-            ['84173934762470484045776658803140625724430904400114977656227228331290197573900111299728676', RoundingMode::Up, '290127445724237685478628941387635987912451526'],
-            ['84173934762470484045776658803140625724430904400114977656227228331290197573900111299728676', RoundingMode::HalfUp, '290127445724237685478628941387635987912451526'],
-
-            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631728', RoundingMode::Unnecessary, null],
-            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631728', RoundingMode::Down, '290127445724237685478628941387635987912451526'],
-            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631728', RoundingMode::Up, '290127445724237685478628941387635987912451527'],
-            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631728', RoundingMode::HalfUp, '290127445724237685478628941387635987912451527'],
-
-            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631729', RoundingMode::Unnecessary, '290127445724237685478628941387635987912451527'],
-            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631729', RoundingMode::Down, '290127445724237685478628941387635987912451527'],
-            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631729', RoundingMode::Up, '290127445724237685478628941387635987912451527'],
-            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631729', RoundingMode::HalfUp, '290127445724237685478628941387635987912451527'],
-
-            ['241361038321369463167942286580817659556660094711530196521279493146351719422610472610272609', RoundingMode::Unnecessary, '491285088641380874516359084346407133019022897'],
-            ['241361038321369463167942286580817659556660094711530196521279493146351719422610472610272609', RoundingMode::Down, '491285088641380874516359084346407133019022897'],
-            ['241361038321369463167942286580817659556660094711530196521279493146351719422610472610272609', RoundingMode::Up, '491285088641380874516359084346407133019022897'],
-            ['241361038321369463167942286580817659556660094711530196521279493146351719422610472610272609', RoundingMode::HalfUp, '491285088641380874516359084346407133019022897'],
-
-            ['241361038321369463167942286580817659556660095202815285162660367662710803769017605629295506', RoundingMode::Unnecessary, null],
-            ['241361038321369463167942286580817659556660095202815285162660367662710803769017605629295506', RoundingMode::Down, '491285088641380874516359084346407133019022897'],
-            ['241361038321369463167942286580817659556660095202815285162660367662710803769017605629295506', RoundingMode::Up, '491285088641380874516359084346407133019022898'],
-            ['241361038321369463167942286580817659556660095202815285162660367662710803769017605629295506', RoundingMode::HalfUp, '491285088641380874516359084346407133019022897'],
-
-            ['241361038321369463167942286580817659556660095694100373804041242179069888115424738648318404', RoundingMode::Unnecessary, '491285088641380874516359084346407133019022898'],
-            ['241361038321369463167942286580817659556660095694100373804041242179069888115424738648318404', RoundingMode::Down, '491285088641380874516359084346407133019022898'],
-            ['241361038321369463167942286580817659556660095694100373804041242179069888115424738648318404', RoundingMode::Up, '491285088641380874516359084346407133019022898'],
-            ['241361038321369463167942286580817659556660095694100373804041242179069888115424738648318404', RoundingMode::HalfUp, '491285088641380874516359084346407133019022898'],
-
-            ['517176462045529989620702018222975120090314182384304448758922583345467659488721121496429225', RoundingMode::Unnecessary, '719149818915036638988212861879727351601847565'],
-            ['517176462045529989620702018222975120090314182384304448758922583345467659488721121496429225', RoundingMode::Down, '719149818915036638988212861879727351601847565'],
-            ['517176462045529989620702018222975120090314182384304448758922583345467659488721121496429225', RoundingMode::Up, '719149818915036638988212861879727351601847565'],
-            ['517176462045529989620702018222975120090314182384304448758922583345467659488721121496429225', RoundingMode::HalfUp, '719149818915036638988212861879727351601847565'],
-
-            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124355', RoundingMode::Unnecessary, null],
-            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124355', RoundingMode::Down, '719149818915036638988212861879727351601847565'],
-            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124355', RoundingMode::Up, '719149818915036638988212861879727351601847566'],
-            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124355', RoundingMode::HalfUp, '719149818915036638988212861879727351601847566'],
-
-            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124356', RoundingMode::Unnecessary, '719149818915036638988212861879727351601847566'],
-            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124356', RoundingMode::Down, '719149818915036638988212861879727351601847566'],
-            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124356', RoundingMode::Up, '719149818915036638988212861879727351601847566'],
-            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124356', RoundingMode::HalfUp, '719149818915036638988212861879727351601847566'],
-
-            ['77611022182569680065221018033132479141166512436949302435927867888665269025756976722964990841', RoundingMode::Unnecessary, '8809711810415235147462139161930461303380344971'],
-            ['77611022182569680065221018033132479141166512436949302435927867888665269025756976722964990841', RoundingMode::Down, '8809711810415235147462139161930461303380344971'],
-            ['77611022182569680065221018033132479141166512436949302435927867888665269025756976722964990841', RoundingMode::Up, '8809711810415235147462139161930461303380344971'],
-            ['77611022182569680065221018033132479141166512436949302435927867888665269025756976722964990841', RoundingMode::HalfUp, '8809711810415235147462139161930461303380344971'],
-
-            ['77611022182569680065221018033132479141166512445759014246343103036127408187687438026345335812', RoundingMode::Unnecessary, null],
-            ['77611022182569680065221018033132479141166512445759014246343103036127408187687438026345335812', RoundingMode::Down, '8809711810415235147462139161930461303380344971'],
-            ['77611022182569680065221018033132479141166512445759014246343103036127408187687438026345335812', RoundingMode::Up, '8809711810415235147462139161930461303380344972'],
-            ['77611022182569680065221018033132479141166512445759014246343103036127408187687438026345335812', RoundingMode::HalfUp, '8809711810415235147462139161930461303380344971'],
-
-            ['77611022182569680065221018033132479141166512454568726056758338183589547349617899329725680784', RoundingMode::Unnecessary, '8809711810415235147462139161930461303380344972'],
-            ['77611022182569680065221018033132479141166512454568726056758338183589547349617899329725680784', RoundingMode::Down, '8809711810415235147462139161930461303380344972'],
-            ['77611022182569680065221018033132479141166512454568726056758338183589547349617899329725680784', RoundingMode::Up, '8809711810415235147462139161930461303380344972'],
-            ['77611022182569680065221018033132479141166512454568726056758338183589547349617899329725680784', RoundingMode::HalfUp, '8809711810415235147462139161930461303380344972'],
-
-            ['6105408765553994361209114516342314667656879868595988990330444228342133209919341402497612900', RoundingMode::Unnecessary, '2470912537010161831197388767291893513920213770'],
-            ['6105408765553994361209114516342314667656879868595988990330444228342133209919341402497612900', RoundingMode::Down, '2470912537010161831197388767291893513920213770'],
-            ['6105408765553994361209114516342314667656879868595988990330444228342133209919341402497612900', RoundingMode::Up, '2470912537010161831197388767291893513920213770'],
-            ['6105408765553994361209114516342314667656879868595988990330444228342133209919341402497612900', RoundingMode::HalfUp, '2470912537010161831197388767291893513920213770'],
-
-            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040440', RoundingMode::Unnecessary, null],
-            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040440', RoundingMode::Down, '2470912537010161831197388767291893513920213770'],
-            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040440', RoundingMode::Up, '2470912537010161831197388767291893513920213771'],
-            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040440', RoundingMode::HalfUp, '2470912537010161831197388767291893513920213771'],
-
-            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040441', RoundingMode::Unnecessary, '2470912537010161831197388767291893513920213771'],
-            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040441', RoundingMode::Down, '2470912537010161831197388767291893513920213771'],
-            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040441', RoundingMode::Up, '2470912537010161831197388767291893513920213771'],
-            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040441', RoundingMode::HalfUp, '2470912537010161831197388767291893513920213771'],
-
-            ['90701786360131891675282105453602007239665462813393298839266200083003999684896009231900541761', RoundingMode::Unnecessary, '9523748545616473366260116123335442806957838431'],
-            ['90701786360131891675282105453602007239665462813393298839266200083003999684896009231900541761', RoundingMode::Down, '9523748545616473366260116123335442806957838431'],
-            ['90701786360131891675282105453602007239665462813393298839266200083003999684896009231900541761', RoundingMode::Up, '9523748545616473366260116123335442806957838431'],
-            ['90701786360131891675282105453602007239665462813393298839266200083003999684896009231900541761', RoundingMode::HalfUp, '9523748545616473366260116123335442806957838431'],
-
-            ['90701786360131891675282105453602007239665462822917047384882673449264115808231452038858380192', RoundingMode::Unnecessary, null],
-            ['90701786360131891675282105453602007239665462822917047384882673449264115808231452038858380192', RoundingMode::Down, '9523748545616473366260116123335442806957838431'],
-            ['90701786360131891675282105453602007239665462822917047384882673449264115808231452038858380192', RoundingMode::Up, '9523748545616473366260116123335442806957838432'],
-            ['90701786360131891675282105453602007239665462822917047384882673449264115808231452038858380192', RoundingMode::HalfUp, '9523748545616473366260116123335442806957838431'],
-
-            ['90701786360131891675282105453602007239665462832440795930499146815524231931566894845816218624', RoundingMode::Unnecessary, '9523748545616473366260116123335442806957838432'],
-            ['90701786360131891675282105453602007239665462832440795930499146815524231931566894845816218624', RoundingMode::Down, '9523748545616473366260116123335442806957838432'],
-            ['90701786360131891675282105453602007239665462832440795930499146815524231931566894845816218624', RoundingMode::Up, '9523748545616473366260116123335442806957838432'],
-            ['90701786360131891675282105453602007239665462832440795930499146815524231931566894845816218624', RoundingMode::HalfUp, '9523748545616473366260116123335442806957838432'],
-
-            ['65323751401133593272677920818977066639472955689716002480072016807758009911894964398074221636', RoundingMode::Unnecessary, '8082311018584572712389536725132408571687355694'],
-            ['65323751401133593272677920818977066639472955689716002480072016807758009911894964398074221636', RoundingMode::Down, '8082311018584572712389536725132408571687355694'],
-            ['65323751401133593272677920818977066639472955689716002480072016807758009911894964398074221636', RoundingMode::Up, '8082311018584572712389536725132408571687355694'],
-            ['65323751401133593272677920818977066639472955689716002480072016807758009911894964398074221636', RoundingMode::HalfUp, '8082311018584572712389536725132408571687355694'],
-
-            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933024', RoundingMode::Unnecessary, null],
-            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933024', RoundingMode::Down, '8082311018584572712389536725132408571687355694'],
-            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933024', RoundingMode::Up, '8082311018584572712389536725132408571687355695'],
-            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933024', RoundingMode::HalfUp, '8082311018584572712389536725132408571687355695'],
-
-            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933025', RoundingMode::Unnecessary, '8082311018584572712389536725132408571687355695'],
-            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933025', RoundingMode::Down, '8082311018584572712389536725132408571687355695'],
-            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933025', RoundingMode::Up, '8082311018584572712389536725132408571687355695'],
-            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933025', RoundingMode::HalfUp, '8082311018584572712389536725132408571687355695'],
-
-            ['54888850556449896314370999310468417973690137670860368033970930193923337744682096321526909321', RoundingMode::Unnecessary, '7408701003310222419788126612344084182212588611'],
-            ['54888850556449896314370999310468417973690137670860368033970930193923337744682096321526909321', RoundingMode::Down, '7408701003310222419788126612344084182212588611'],
-            ['54888850556449896314370999310468417973690137670860368033970930193923337744682096321526909321', RoundingMode::Up, '7408701003310222419788126612344084182212588611'],
-            ['54888850556449896314370999310468417973690137670860368033970930193923337744682096321526909321', RoundingMode::HalfUp, '7408701003310222419788126612344084182212588611'],
-
-            ['54888850556449896314370999310468417973690137678269069037281152613711464357026180503739497932', RoundingMode::Unnecessary, null],
-            ['54888850556449896314370999310468417973690137678269069037281152613711464357026180503739497932', RoundingMode::Down, '7408701003310222419788126612344084182212588611'],
-            ['54888850556449896314370999310468417973690137678269069037281152613711464357026180503739497932', RoundingMode::Up, '7408701003310222419788126612344084182212588612'],
-            ['54888850556449896314370999310468417973690137678269069037281152613711464357026180503739497932', RoundingMode::HalfUp, '7408701003310222419788126612344084182212588611'],
-
-            ['54888850556449896314370999310468417973690137685677770040591375033499590969370264685952086544', RoundingMode::Unnecessary, '7408701003310222419788126612344084182212588612'],
-            ['54888850556449896314370999310468417973690137685677770040591375033499590969370264685952086544', RoundingMode::Down, '7408701003310222419788126612344084182212588612'],
-            ['54888850556449896314370999310468417973690137685677770040591375033499590969370264685952086544', RoundingMode::Up, '7408701003310222419788126612344084182212588612'],
-            ['54888850556449896314370999310468417973690137685677770040591375033499590969370264685952086544', RoundingMode::HalfUp, '7408701003310222419788126612344084182212588612'],
-
-            ['2805085217054754253789444062542634634800093806651719072914037849606695181828139974525774321216', RoundingMode::Unnecessary, '52963055208841136620374558431841622364185138904'],
-            ['2805085217054754253789444062542634634800093806651719072914037849606695181828139974525774321216', RoundingMode::Down, '52963055208841136620374558431841622364185138904'],
-            ['2805085217054754253789444062542634634800093806651719072914037849606695181828139974525774321216', RoundingMode::Up, '52963055208841136620374558431841622364185138904'],
-            ['2805085217054754253789444062542634634800093806651719072914037849606695181828139974525774321216', RoundingMode::HalfUp, '52963055208841136620374558431841622364185138904'],
-
-            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599024', RoundingMode::Unnecessary, null],
-            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599024', RoundingMode::Down, '52963055208841136620374558431841622364185138904'],
-            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599024', RoundingMode::Up, '52963055208841136620374558431841622364185138905'],
-            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599024', RoundingMode::HalfUp, '52963055208841136620374558431841622364185138905'],
-
-            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599025', RoundingMode::Unnecessary, '52963055208841136620374558431841622364185138905'],
-            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599025', RoundingMode::Down, '52963055208841136620374558431841622364185138905'],
-            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599025', RoundingMode::Up, '52963055208841136620374558431841622364185138905'],
-            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599025', RoundingMode::HalfUp, '52963055208841136620374558431841622364185138905'],
-
-            ['1160568960830598642226220064123168954080961712013862945053127684556984147281594628487247009409', RoundingMode::Unnecessary, '34067124340492824200405891794016084650299718847'],
-            ['1160568960830598642226220064123168954080961712013862945053127684556984147281594628487247009409', RoundingMode::Down, '34067124340492824200405891794016084650299718847'],
-            ['1160568960830598642226220064123168954080961712013862945053127684556984147281594628487247009409', RoundingMode::Up, '34067124340492824200405891794016084650299718847'],
-            ['1160568960830598642226220064123168954080961712013862945053127684556984147281594628487247009409', RoundingMode::HalfUp, '34067124340492824200405891794016084650299718847'],
-
-            ['1160568960830598642226220064123168954080961712047930069393620508757390039075610713137546728256', RoundingMode::Unnecessary, null],
-            ['1160568960830598642226220064123168954080961712047930069393620508757390039075610713137546728256', RoundingMode::Down, '34067124340492824200405891794016084650299718847'],
-            ['1160568960830598642226220064123168954080961712047930069393620508757390039075610713137546728256', RoundingMode::Up, '34067124340492824200405891794016084650299718848'],
-            ['1160568960830598642226220064123168954080961712047930069393620508757390039075610713137546728256', RoundingMode::HalfUp, '34067124340492824200405891794016084650299718847'],
-
-            ['1160568960830598642226220064123168954080961712081997193734113332957795930869626797787846447104', RoundingMode::Unnecessary, '34067124340492824200405891794016084650299718848'],
-            ['1160568960830598642226220064123168954080961712081997193734113332957795930869626797787846447104', RoundingMode::Down, '34067124340492824200405891794016084650299718848'],
-            ['1160568960830598642226220064123168954080961712081997193734113332957795930869626797787846447104', RoundingMode::Up, '34067124340492824200405891794016084650299718848'],
-            ['1160568960830598642226220064123168954080961712081997193734113332957795930869626797787846447104', RoundingMode::HalfUp, '34067124340492824200405891794016084650299718848'],
-
-            ['124505361771365706389189800193135630498052202514496166178932088454657696893428061453489005584', RoundingMode::Unnecessary, '11158197066343904036990752059839856835208279172'],
-            ['124505361771365706389189800193135630498052202514496166178932088454657696893428061453489005584', RoundingMode::Down, '11158197066343904036990752059839856835208279172'],
-            ['124505361771365706389189800193135630498052202514496166178932088454657696893428061453489005584', RoundingMode::Up, '11158197066343904036990752059839856835208279172'],
-            ['124505361771365706389189800193135630498052202514496166178932088454657696893428061453489005584', RoundingMode::HalfUp, '11158197066343904036990752059839856835208279172'],
-
-            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563928', RoundingMode::Unnecessary, null],
-            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563928', RoundingMode::Down, '11158197066343904036990752059839856835208279172'],
-            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563928', RoundingMode::Up, '11158197066343904036990752059839856835208279173'],
-            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563928', RoundingMode::HalfUp, '11158197066343904036990752059839856835208279173'],
-
-            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563929', RoundingMode::Unnecessary, '11158197066343904036990752059839856835208279173'],
-            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563929', RoundingMode::Down, '11158197066343904036990752059839856835208279173'],
-            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563929', RoundingMode::Up, '11158197066343904036990752059839856835208279173'],
-            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563929', RoundingMode::HalfUp, '11158197066343904036990752059839856835208279173'],
-
-            ['8304391676065346969717869193750447720841513935376871747395147291005945252957072474745223924900', RoundingMode::Unnecessary, '91128435057699454436963842029258931771642571930'],
-            ['8304391676065346969717869193750447720841513935376871747395147291005945252957072474745223924900', RoundingMode::Down, '91128435057699454436963842029258931771642571930'],
-            ['8304391676065346969717869193750447720841513935376871747395147291005945252957072474745223924900', RoundingMode::Up, '91128435057699454436963842029258931771642571930'],
-            ['8304391676065346969717869193750447720841513935376871747395147291005945252957072474745223924900', RoundingMode::HalfUp, '91128435057699454436963842029258931771642571930'],
-
-            ['8304391676065346969717869193750447720841513935468000182452846745442909094986331406516866496830', RoundingMode::Unnecessary, null],
-            ['8304391676065346969717869193750447720841513935468000182452846745442909094986331406516866496830', RoundingMode::Down, '91128435057699454436963842029258931771642571930'],
-            ['8304391676065346969717869193750447720841513935468000182452846745442909094986331406516866496830', RoundingMode::Up, '91128435057699454436963842029258931771642571931'],
-            ['8304391676065346969717869193750447720841513935468000182452846745442909094986331406516866496830', RoundingMode::HalfUp, '91128435057699454436963842029258931771642571930'],
-
-            ['8304391676065346969717869193750447720841513935559128617510546199879872937015590338288509068761', RoundingMode::Unnecessary, '91128435057699454436963842029258931771642571931'],
-            ['8304391676065346969717869193750447720841513935559128617510546199879872937015590338288509068761', RoundingMode::Down, '91128435057699454436963842029258931771642571931'],
-            ['8304391676065346969717869193750447720841513935559128617510546199879872937015590338288509068761', RoundingMode::Up, '91128435057699454436963842029258931771642571931'],
-            ['8304391676065346969717869193750447720841513935559128617510546199879872937015590338288509068761', RoundingMode::HalfUp, '91128435057699454436963842029258931771642571931'],
-
-            ['3902633675982472936031277376575750479219313797204897526330941750565757566042240677294833640976', RoundingMode::Unnecessary, '62471062708925265536995715391198772286875632324'],
-            ['3902633675982472936031277376575750479219313797204897526330941750565757566042240677294833640976', RoundingMode::Down, '62471062708925265536995715391198772286875632324'],
-            ['3902633675982472936031277376575750479219313797204897526330941750565757566042240677294833640976', RoundingMode::Up, '62471062708925265536995715391198772286875632324'],
-            ['3902633675982472936031277376575750479219313797204897526330941750565757566042240677294833640976', RoundingMode::HalfUp, '62471062708925265536995715391198772286875632324'],
-
-            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905624', RoundingMode::Unnecessary, null],
-            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905624', RoundingMode::Down, '62471062708925265536995715391198772286875632324'],
-            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905624', RoundingMode::Up, '62471062708925265536995715391198772286875632325'],
-            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905624', RoundingMode::HalfUp, '62471062708925265536995715391198772286875632325'],
-
-            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905625', RoundingMode::Unnecessary, '62471062708925265536995715391198772286875632325'],
-            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905625', RoundingMode::Down, '62471062708925265536995715391198772286875632325'],
-            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905625', RoundingMode::Up, '62471062708925265536995715391198772286875632325'],
-            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905625', RoundingMode::HalfUp, '62471062708925265536995715391198772286875632325'],
-
-            ['21803189113281615247645689642554433787955300436727779524987566434496560052640713833839771848809', RoundingMode::Unnecessary, '147659029907695165135263001196567750660989708947'],
-            ['21803189113281615247645689642554433787955300436727779524987566434496560052640713833839771848809', RoundingMode::Down, '147659029907695165135263001196567750660989708947'],
-            ['21803189113281615247645689642554433787955300436727779524987566434496560052640713833839771848809', RoundingMode::Up, '147659029907695165135263001196567750660989708947'],
-            ['21803189113281615247645689642554433787955300436727779524987566434496560052640713833839771848809', RoundingMode::HalfUp, '147659029907695165135263001196567750660989708947'],
-
-            ['21803189113281615247645689642554433787955300436875438554895261599631823053837281584500761557756', RoundingMode::Unnecessary, null],
-            ['21803189113281615247645689642554433787955300436875438554895261599631823053837281584500761557756', RoundingMode::Down, '147659029907695165135263001196567750660989708947'],
-            ['21803189113281615247645689642554433787955300436875438554895261599631823053837281584500761557756', RoundingMode::Up, '147659029907695165135263001196567750660989708948'],
-            ['21803189113281615247645689642554433787955300436875438554895261599631823053837281584500761557756', RoundingMode::HalfUp, '147659029907695165135263001196567750660989708947'],
-
-            ['21803189113281615247645689642554433787955300437023097584802956764767086055033849335161751266704', RoundingMode::Unnecessary, '147659029907695165135263001196567750660989708948'],
-            ['21803189113281615247645689642554433787955300437023097584802956764767086055033849335161751266704', RoundingMode::Down, '147659029907695165135263001196567750660989708948'],
-            ['21803189113281615247645689642554433787955300437023097584802956764767086055033849335161751266704', RoundingMode::Up, '147659029907695165135263001196567750660989708948'],
-            ['21803189113281615247645689642554433787955300437023097584802956764767086055033849335161751266704', RoundingMode::HalfUp, '147659029907695165135263001196567750660989708948'],
-
-            ['765773631185413773891853587035522811215936001201156164967993252197672361266093168217637840800625', RoundingMode::Unnecessary, '875084927984372139644261680745245536779196496025'],
-            ['765773631185413773891853587035522811215936001201156164967993252197672361266093168217637840800625', RoundingMode::Down, '875084927984372139644261680745245536779196496025'],
-            ['765773631185413773891853587035522811215936001201156164967993252197672361266093168217637840800625', RoundingMode::Up, '875084927984372139644261680745245536779196496025'],
-            ['765773631185413773891853587035522811215936001201156164967993252197672361266093168217637840800625', RoundingMode::HalfUp, '875084927984372139644261680745245536779196496025'],
-
-            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792675', RoundingMode::Unnecessary, null],
-            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792675', RoundingMode::Down, '875084927984372139644261680745245536779196496025'],
-            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792675', RoundingMode::Up, '875084927984372139644261680745245536779196496026'],
-            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792675', RoundingMode::HalfUp, '875084927984372139644261680745245536779196496026'],
-
-            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792676', RoundingMode::Unnecessary, '875084927984372139644261680745245536779196496026'],
-            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792676', RoundingMode::Down, '875084927984372139644261680745245536779196496026'],
-            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792676', RoundingMode::Up, '875084927984372139644261680745245536779196496026'],
-            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792676', RoundingMode::HalfUp, '875084927984372139644261680745245536779196496026'],
-
-            ['371531253548731146505174144638678761062942262073337722044484956271277190798021717224921126356624', RoundingMode::Unnecessary, '609533636109387441986227427959683991839011782068'],
-            ['371531253548731146505174144638678761062942262073337722044484956271277190798021717224921126356624', RoundingMode::Down, '609533636109387441986227427959683991839011782068'],
-            ['371531253548731146505174144638678761062942262073337722044484956271277190798021717224921126356624', RoundingMode::Up, '609533636109387441986227427959683991839011782068'],
-            ['371531253548731146505174144638678761062942262073337722044484956271277190798021717224921126356624', RoundingMode::HalfUp, '609533636109387441986227427959683991839011782068'],
-
-            ['371531253548731146505174144638678761062942262073947255680594343713263418225981401216760138138692', RoundingMode::Unnecessary, null],
-            ['371531253548731146505174144638678761062942262073947255680594343713263418225981401216760138138692', RoundingMode::Down, '609533636109387441986227427959683991839011782068'],
-            ['371531253548731146505174144638678761062942262073947255680594343713263418225981401216760138138692', RoundingMode::Up, '609533636109387441986227427959683991839011782069'],
-            ['371531253548731146505174144638678761062942262073947255680594343713263418225981401216760138138692', RoundingMode::HalfUp, '609533636109387441986227427959683991839011782068'],
-
-            ['371531253548731146505174144638678761062942262074556789316703731155249645653941085208599149920761', RoundingMode::Unnecessary, '609533636109387441986227427959683991839011782069'],
-            ['371531253548731146505174144638678761062942262074556789316703731155249645653941085208599149920761', RoundingMode::Down, '609533636109387441986227427959683991839011782069'],
-            ['371531253548731146505174144638678761062942262074556789316703731155249645653941085208599149920761', RoundingMode::Up, '609533636109387441986227427959683991839011782069'],
-            ['371531253548731146505174144638678761062942262074556789316703731155249645653941085208599149920761', RoundingMode::HalfUp, '609533636109387441986227427959683991839011782069'],
-
-            ['32639765347874160297815057000511241042881990523574135639577516269227137979270282014943162493161', RoundingMode::Unnecessary, '180664787238338617809927067472657959412705501869'],
-            ['32639765347874160297815057000511241042881990523574135639577516269227137979270282014943162493161', RoundingMode::Down, '180664787238338617809927067472657959412705501869'],
-            ['32639765347874160297815057000511241042881990523574135639577516269227137979270282014943162493161', RoundingMode::Up, '180664787238338617809927067472657959412705501869'],
-            ['32639765347874160297815057000511241042881990523574135639577516269227137979270282014943162493161', RoundingMode::HalfUp, '180664787238338617809927067472657959412705501869'],
-
-            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496899', RoundingMode::Unnecessary, null],
-            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496899', RoundingMode::Down, '180664787238338617809927067472657959412705501869'],
-            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496899', RoundingMode::Up, '180664787238338617809927067472657959412705501870'],
-            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496899', RoundingMode::HalfUp, '180664787238338617809927067472657959412705501870'],
-
-            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496900', RoundingMode::Unnecessary, '180664787238338617809927067472657959412705501870'],
-            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496900', RoundingMode::Down, '180664787238338617809927067472657959412705501870'],
-            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496900', RoundingMode::Up, '180664787238338617809927067472657959412705501870'],
-            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496900', RoundingMode::HalfUp, '180664787238338617809927067472657959412705501870'],
-
-            ['23312804018277899268530151932487478598118645419296370443140824162402663914524726804469078709025', RoundingMode::Unnecessary, '152685310420740538469311655525476411276716730095'],
-            ['23312804018277899268530151932487478598118645419296370443140824162402663914524726804469078709025', RoundingMode::Down, '152685310420740538469311655525476411276716730095'],
-            ['23312804018277899268530151932487478598118645419296370443140824162402663914524726804469078709025', RoundingMode::Up, '152685310420740538469311655525476411276716730095'],
-            ['23312804018277899268530151932487478598118645419296370443140824162402663914524726804469078709025', RoundingMode::HalfUp, '152685310420740538469311655525476411276716730095'],
-
-            ['23312804018277899268530151932487478598118645419449055753561564700871975570050203215745795439120', RoundingMode::Unnecessary, null],
-            ['23312804018277899268530151932487478598118645419449055753561564700871975570050203215745795439120', RoundingMode::Down, '152685310420740538469311655525476411276716730095'],
-            ['23312804018277899268530151932487478598118645419449055753561564700871975570050203215745795439120', RoundingMode::Up, '152685310420740538469311655525476411276716730096'],
-            ['23312804018277899268530151932487478598118645419449055753561564700871975570050203215745795439120', RoundingMode::HalfUp, '152685310420740538469311655525476411276716730095'],
-
-            ['23312804018277899268530151932487478598118645419601741063982305239341287225575679627022512169216', RoundingMode::Unnecessary, '152685310420740538469311655525476411276716730096'],
-            ['23312804018277899268530151932487478598118645419601741063982305239341287225575679627022512169216', RoundingMode::Down, '152685310420740538469311655525476411276716730096'],
-            ['23312804018277899268530151932487478598118645419601741063982305239341287225575679627022512169216', RoundingMode::Up, '152685310420740538469311655525476411276716730096'],
-            ['23312804018277899268530151932487478598118645419601741063982305239341287225575679627022512169216', RoundingMode::HalfUp, '152685310420740538469311655525476411276716730096'],
-
-            ['69351939896058034711498082880502238045919014432567876454734811966028586293551025867711349695480441', RoundingMode::Unnecessary, '8327781210866315423454045118194686369495352533771'],
-            ['69351939896058034711498082880502238045919014432567876454734811966028586293551025867711349695480441', RoundingMode::Down, '8327781210866315423454045118194686369495352533771'],
-            ['69351939896058034711498082880502238045919014432567876454734811966028586293551025867711349695480441', RoundingMode::Up, '8327781210866315423454045118194686369495352533771'],
-            ['69351939896058034711498082880502238045919014432567876454734811966028586293551025867711349695480441', RoundingMode::HalfUp, '8327781210866315423454045118194686369495352533771'],
-
-            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547983', RoundingMode::Unnecessary, null],
-            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547983', RoundingMode::Down, '8327781210866315423454045118194686369495352533771'],
-            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547983', RoundingMode::Up, '8327781210866315423454045118194686369495352533772'],
-            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547983', RoundingMode::HalfUp, '8327781210866315423454045118194686369495352533772'],
-
-            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547984', RoundingMode::Unnecessary, '8327781210866315423454045118194686369495352533772'],
-            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547984', RoundingMode::Down, '8327781210866315423454045118194686369495352533772'],
-            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547984', RoundingMode::Up, '8327781210866315423454045118194686369495352533772'],
-            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547984', RoundingMode::HalfUp, '8327781210866315423454045118194686369495352533772'],
-
-            ['56907419683049340072215388152597682083224395922699571395667588185898365170014916921330096015050884', RoundingMode::Unnecessary, '7543700662344002371027341442602779762847104806622'],
-            ['56907419683049340072215388152597682083224395922699571395667588185898365170014916921330096015050884', RoundingMode::Down, '7543700662344002371027341442602779762847104806622'],
-            ['56907419683049340072215388152597682083224395922699571395667588185898365170014916921330096015050884', RoundingMode::Up, '7543700662344002371027341442602779762847104806622'],
-            ['56907419683049340072215388152597682083224395922699571395667588185898365170014916921330096015050884', RoundingMode::HalfUp, '7543700662344002371027341442602779762847104806622'],
-
-            ['56907419683049340072215388152597682083224395922707115096329932188269392511457519701092943119857506', RoundingMode::Unnecessary, null],
-            ['56907419683049340072215388152597682083224395922707115096329932188269392511457519701092943119857506', RoundingMode::Down, '7543700662344002371027341442602779762847104806622'],
-            ['56907419683049340072215388152597682083224395922707115096329932188269392511457519701092943119857506', RoundingMode::Up, '7543700662344002371027341442602779762847104806623'],
-            ['56907419683049340072215388152597682083224395922707115096329932188269392511457519701092943119857506', RoundingMode::HalfUp, '7543700662344002371027341442602779762847104806622'],
-
-            ['56907419683049340072215388152597682083224395922714658796992276190640419852900122480855790224664129', RoundingMode::Unnecessary, '7543700662344002371027341442602779762847104806623'],
-            ['56907419683049340072215388152597682083224395922714658796992276190640419852900122480855790224664129', RoundingMode::Down, '7543700662344002371027341442602779762847104806623'],
-            ['56907419683049340072215388152597682083224395922714658796992276190640419852900122480855790224664129', RoundingMode::Up, '7543700662344002371027341442602779762847104806623'],
-            ['56907419683049340072215388152597682083224395922714658796992276190640419852900122480855790224664129', RoundingMode::HalfUp, '7543700662344002371027341442602779762847104806623'],
-
-            ['1163525248981521754155547339230838194099208908132096593234853200207208035365529397606592383400336', RoundingMode::Unnecessary, '1078668275690687843154790865870705804593431876844'],
-            ['1163525248981521754155547339230838194099208908132096593234853200207208035365529397606592383400336', RoundingMode::Down, '1078668275690687843154790865870705804593431876844'],
-            ['1163525248981521754155547339230838194099208908132096593234853200207208035365529397606592383400336', RoundingMode::Up, '1078668275690687843154790865870705804593431876844'],
-            ['1163525248981521754155547339230838194099208908132096593234853200207208035365529397606592383400336', RoundingMode::HalfUp, '1078668275690687843154790865870705804593431876844'],
-
-            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154024', RoundingMode::Unnecessary, null],
-            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154024', RoundingMode::Down, '1078668275690687843154790865870705804593431876844'],
-            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154024', RoundingMode::Up, '1078668275690687843154790865870705804593431876845'],
-            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154024', RoundingMode::HalfUp, '1078668275690687843154790865870705804593431876845'],
-
-            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154025', RoundingMode::Unnecessary, '1078668275690687843154790865870705804593431876845'],
-            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154025', RoundingMode::Down, '1078668275690687843154790865870705804593431876845'],
-            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154025', RoundingMode::Up, '1078668275690687843154790865870705804593431876845'],
-            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154025', RoundingMode::HalfUp, '1078668275690687843154790865870705804593431876845'],
-
-            ['12630009931573082897907144855573901252532449094542217468986509301292277005832281659959934465254400', RoundingMode::Unnecessary, '3553872526072521203015975245855936611531238601120'],
-            ['12630009931573082897907144855573901252532449094542217468986509301292277005832281659959934465254400', RoundingMode::Down, '3553872526072521203015975245855936611531238601120'],
-            ['12630009931573082897907144855573901252532449094542217468986509301292277005832281659959934465254400', RoundingMode::Up, '3553872526072521203015975245855936611531238601120'],
-            ['12630009931573082897907144855573901252532449094542217468986509301292277005832281659959934465254400', RoundingMode::HalfUp, '3553872526072521203015975245855936611531238601120'],
-
-            ['12630009931573082897907144855573901252532449094545771341512581822495292981078137596571465703855520', RoundingMode::Unnecessary, null],
-            ['12630009931573082897907144855573901252532449094545771341512581822495292981078137596571465703855520', RoundingMode::Down, '3553872526072521203015975245855936611531238601120'],
-            ['12630009931573082897907144855573901252532449094545771341512581822495292981078137596571465703855520', RoundingMode::Up, '3553872526072521203015975245855936611531238601121'],
-            ['12630009931573082897907144855573901252532449094545771341512581822495292981078137596571465703855520', RoundingMode::HalfUp, '3553872526072521203015975245855936611531238601120'],
-
-            ['12630009931573082897907144855573901252532449094549325214038654343698308956323993533182996942456641', RoundingMode::Unnecessary, '3553872526072521203015975245855936611531238601121'],
-            ['12630009931573082897907144855573901252532449094549325214038654343698308956323993533182996942456641', RoundingMode::Down, '3553872526072521203015975245855936611531238601121'],
-            ['12630009931573082897907144855573901252532449094549325214038654343698308956323993533182996942456641', RoundingMode::Up, '3553872526072521203015975245855936611531238601121'],
-            ['12630009931573082897907144855573901252532449094549325214038654343698308956323993533182996942456641', RoundingMode::HalfUp, '3553872526072521203015975245855936611531238601121'],
-
-            ['31255308963169979605103962253255036593975285646828038303401111783018980508885388211539730531736976', RoundingMode::Unnecessary, '5590644771685103192691707139464277920149086765676'],
-            ['31255308963169979605103962253255036593975285646828038303401111783018980508885388211539730531736976', RoundingMode::Down, '5590644771685103192691707139464277920149086765676'],
-            ['31255308963169979605103962253255036593975285646828038303401111783018980508885388211539730531736976', RoundingMode::Up, '5590644771685103192691707139464277920149086765676'],
-            ['31255308963169979605103962253255036593975285646828038303401111783018980508885388211539730531736976', RoundingMode::HalfUp, '5590644771685103192691707139464277920149086765676'],
-
-            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268328', RoundingMode::Unnecessary, null],
-            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268328', RoundingMode::Down, '5590644771685103192691707139464277920149086765676'],
-            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268328', RoundingMode::Up, '5590644771685103192691707139464277920149086765677'],
-            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268328', RoundingMode::HalfUp, '5590644771685103192691707139464277920149086765677'],
-
-            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268329', RoundingMode::Unnecessary, '5590644771685103192691707139464277920149086765677'],
-            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268329', RoundingMode::Down, '5590644771685103192691707139464277920149086765677'],
-            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268329', RoundingMode::Up, '5590644771685103192691707139464277920149086765677'],
-            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268329', RoundingMode::HalfUp, '5590644771685103192691707139464277920149086765677'],
-
-            ['8628012985404686018689218847909668804260178206412486603741772756323555243760489710208140383228648196', RoundingMode::Unnecessary, '92887098056752133732654744820968248061511732728514'],
-            ['8628012985404686018689218847909668804260178206412486603741772756323555243760489710208140383228648196', RoundingMode::Down, '92887098056752133732654744820968248061511732728514'],
-            ['8628012985404686018689218847909668804260178206412486603741772756323555243760489710208140383228648196', RoundingMode::Up, '92887098056752133732654744820968248061511732728514'],
-            ['8628012985404686018689218847909668804260178206412486603741772756323555243760489710208140383228648196', RoundingMode::HalfUp, '92887098056752133732654744820968248061511732728514'],
-
-            ['8628012985404686018689218847909668804260178206412579490839829508457287898505310678456201894961376710', RoundingMode::Unnecessary, null],
-            ['8628012985404686018689218847909668804260178206412579490839829508457287898505310678456201894961376710', RoundingMode::Down, '92887098056752133732654744820968248061511732728514'],
-            ['8628012985404686018689218847909668804260178206412579490839829508457287898505310678456201894961376710', RoundingMode::Up, '92887098056752133732654744820968248061511732728515'],
-            ['8628012985404686018689218847909668804260178206412579490839829508457287898505310678456201894961376710', RoundingMode::HalfUp, '92887098056752133732654744820968248061511732728514'],
-
-            ['8628012985404686018689218847909668804260178206412672377937886260591020553250131646704263406694105225', RoundingMode::Unnecessary, '92887098056752133732654744820968248061511732728515'],
-            ['8628012985404686018689218847909668804260178206412672377937886260591020553250131646704263406694105225', RoundingMode::Down, '92887098056752133732654744820968248061511732728515'],
-            ['8628012985404686018689218847909668804260178206412672377937886260591020553250131646704263406694105225', RoundingMode::Up, '92887098056752133732654744820968248061511732728515'],
-            ['8628012985404686018689218847909668804260178206412672377937886260591020553250131646704263406694105225', RoundingMode::HalfUp, '92887098056752133732654744820968248061511732728515'],
-
-            ['9233511524782328316011754355906749687042442384057568340621550432564122836332981092655854023226646089', RoundingMode::Unnecessary, '96091162573788898435727389725088702432559537501283'],
-            ['9233511524782328316011754355906749687042442384057568340621550432564122836332981092655854023226646089', RoundingMode::Down, '96091162573788898435727389725088702432559537501283'],
-            ['9233511524782328316011754355906749687042442384057568340621550432564122836332981092655854023226646089', RoundingMode::Up, '96091162573788898435727389725088702432559537501283'],
-            ['9233511524782328316011754355906749687042442384057568340621550432564122836332981092655854023226646089', RoundingMode::HalfUp, '96091162573788898435727389725088702432559537501283'],
-
-            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648655', RoundingMode::Unnecessary, null],
-            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648655', RoundingMode::Down, '96091162573788898435727389725088702432559537501283'],
-            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648655', RoundingMode::Up, '96091162573788898435727389725088702432559537501284'],
-            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648655', RoundingMode::HalfUp, '96091162573788898435727389725088702432559537501284'],
-
-            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648656', RoundingMode::Unnecessary, '96091162573788898435727389725088702432559537501284'],
-            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648656', RoundingMode::Down, '96091162573788898435727389725088702432559537501284'],
-            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648656', RoundingMode::Up, '96091162573788898435727389725088702432559537501284'],
-            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648656', RoundingMode::HalfUp, '96091162573788898435727389725088702432559537501284'],
-
-            ['453765858005120177768073445581083997020624166557446581526841386118834645505297210629607793706393856', RoundingMode::Unnecessary, '21301780629917306933323409392321012226117710104816'],
-            ['453765858005120177768073445581083997020624166557446581526841386118834645505297210629607793706393856', RoundingMode::Down, '21301780629917306933323409392321012226117710104816'],
-            ['453765858005120177768073445581083997020624166557446581526841386118834645505297210629607793706393856', RoundingMode::Up, '21301780629917306933323409392321012226117710104816'],
-            ['453765858005120177768073445581083997020624166557446581526841386118834645505297210629607793706393856', RoundingMode::HalfUp, '21301780629917306933323409392321012226117710104816'],
-
-            ['453765858005120177768073445581083997020624166557467883307471303425767968914689531641833911416498672', RoundingMode::Unnecessary, null],
-            ['453765858005120177768073445581083997020624166557467883307471303425767968914689531641833911416498672', RoundingMode::Down, '21301780629917306933323409392321012226117710104816'],
-            ['453765858005120177768073445581083997020624166557467883307471303425767968914689531641833911416498672', RoundingMode::Up, '21301780629917306933323409392321012226117710104817'],
-            ['453765858005120177768073445581083997020624166557467883307471303425767968914689531641833911416498672', RoundingMode::HalfUp, '21301780629917306933323409392321012226117710104816'],
-
-            ['453765858005120177768073445581083997020624166557489185088101220732701292324081852654060029126603489', RoundingMode::Unnecessary, '21301780629917306933323409392321012226117710104817'],
-            ['453765858005120177768073445581083997020624166557489185088101220732701292324081852654060029126603489', RoundingMode::Down, '21301780629917306933323409392321012226117710104817'],
-            ['453765858005120177768073445581083997020624166557489185088101220732701292324081852654060029126603489', RoundingMode::Up, '21301780629917306933323409392321012226117710104817'],
-            ['453765858005120177768073445581083997020624166557489185088101220732701292324081852654060029126603489', RoundingMode::HalfUp, '21301780629917306933323409392321012226117710104817'],
-
-            ['1371661154627246967424438399063581804666179749323634366508032096471110921410597239232159814550961124', RoundingMode::Unnecessary, '37035944089860149903963455856570016412483527052182'],
-            ['1371661154627246967424438399063581804666179749323634366508032096471110921410597239232159814550961124', RoundingMode::Down, '37035944089860149903963455856570016412483527052182'],
-            ['1371661154627246967424438399063581804666179749323634366508032096471110921410597239232159814550961124', RoundingMode::Up, '37035944089860149903963455856570016412483527052182'],
-            ['1371661154627246967424438399063581804666179749323634366508032096471110921410597239232159814550961124', RoundingMode::HalfUp, '37035944089860149903963455856570016412483527052182'],
-
-            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065488', RoundingMode::Unnecessary, null],
-            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065488', RoundingMode::Down, '37035944089860149903963455856570016412483527052182'],
-            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065488', RoundingMode::Up, '37035944089860149903963455856570016412483527052183'],
-            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065488', RoundingMode::HalfUp, '37035944089860149903963455856570016412483527052183'],
-
-            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065489', RoundingMode::Unnecessary, '37035944089860149903963455856570016412483527052183'],
-            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065489', RoundingMode::Down, '37035944089860149903963455856570016412483527052183'],
-            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065489', RoundingMode::Up, '37035944089860149903963455856570016412483527052183'],
-            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065489', RoundingMode::HalfUp, '37035944089860149903963455856570016412483527052183'],
-
-            ['370256269805896436402015708175373292783056837812420632207201736440955067457713055190230384049843049', RoundingMode::Unnecessary, '19242044325016415375787142063732125294673656555757'],
-            ['370256269805896436402015708175373292783056837812420632207201736440955067457713055190230384049843049', RoundingMode::Down, '19242044325016415375787142063732125294673656555757'],
-            ['370256269805896436402015708175373292783056837812420632207201736440955067457713055190230384049843049', RoundingMode::Up, '19242044325016415375787142063732125294673656555757'],
-            ['370256269805896436402015708175373292783056837812420632207201736440955067457713055190230384049843049', RoundingMode::HalfUp, '19242044325016415375787142063732125294673656555757'],
-
-            ['370256269805896436402015708175373292783056837812439874251526752856330854599776787315525057706398806', RoundingMode::Unnecessary, null],
-            ['370256269805896436402015708175373292783056837812439874251526752856330854599776787315525057706398806', RoundingMode::Down, '19242044325016415375787142063732125294673656555757'],
-            ['370256269805896436402015708175373292783056837812439874251526752856330854599776787315525057706398806', RoundingMode::Up, '19242044325016415375787142063732125294673656555758'],
-            ['370256269805896436402015708175373292783056837812439874251526752856330854599776787315525057706398806', RoundingMode::HalfUp, '19242044325016415375787142063732125294673656555757'],
-
-            ['370256269805896436402015708175373292783056837812459116295851769271706641741840519440819731362954564', RoundingMode::Unnecessary, '19242044325016415375787142063732125294673656555758'],
-            ['370256269805896436402015708175373292783056837812459116295851769271706641741840519440819731362954564', RoundingMode::Down, '19242044325016415375787142063732125294673656555758'],
-            ['370256269805896436402015708175373292783056837812459116295851769271706641741840519440819731362954564', RoundingMode::Up, '19242044325016415375787142063732125294673656555758'],
-            ['370256269805896436402015708175373292783056837812459116295851769271706641741840519440819731362954564', RoundingMode::HalfUp, '19242044325016415375787142063732125294673656555758'],
+            ['0', Rounding_Mode::Unnecessary, '0'],
+            ['0', Rounding_Mode::Down, '0'],
+            ['0', Rounding_Mode::Up, '0'],
+            ['0', Rounding_Mode::HalfUp, '0'],
+
+            ['1', Rounding_Mode::Unnecessary, '1'],
+            ['1', Rounding_Mode::Down, '1'],
+            ['1', Rounding_Mode::Up, '1'],
+            ['1', Rounding_Mode::HalfUp, '1'],
+
+            ['2', Rounding_Mode::Unnecessary, null],
+            ['2', Rounding_Mode::Down, '1'],
+            ['2', Rounding_Mode::Up, '2'],
+            ['2', Rounding_Mode::HalfUp, '1'],
+
+            ['3', Rounding_Mode::Unnecessary, null],
+            ['3', Rounding_Mode::Down, '1'],
+            ['3', Rounding_Mode::Up, '2'],
+            ['3', Rounding_Mode::HalfUp, '2'],
+
+            ['4', Rounding_Mode::Unnecessary, '2'],
+            ['4', Rounding_Mode::Down, '2'],
+            ['4', Rounding_Mode::Up, '2'],
+            ['4', Rounding_Mode::HalfUp, '2'],
+
+            ['5', Rounding_Mode::Unnecessary, null],
+            ['5', Rounding_Mode::Down, '2'],
+            ['5', Rounding_Mode::Up, '3'],
+            ['5', Rounding_Mode::HalfUp, '2'],
+
+            ['8', Rounding_Mode::Unnecessary, null],
+            ['8', Rounding_Mode::Down, '2'],
+            ['8', Rounding_Mode::Up, '3'],
+            ['8', Rounding_Mode::HalfUp, '3'],
+
+            ['9', Rounding_Mode::Unnecessary, '3'],
+            ['9', Rounding_Mode::Down, '3'],
+            ['9', Rounding_Mode::Up, '3'],
+            ['9', Rounding_Mode::HalfUp, '3'],
+
+            ['10', Rounding_Mode::Unnecessary, null],
+            ['10', Rounding_Mode::Down, '3'],
+            ['10', Rounding_Mode::Up, '4'],
+            ['10', Rounding_Mode::HalfUp, '3'],
+
+            ['15', Rounding_Mode::Unnecessary, null],
+            ['15', Rounding_Mode::Down, '3'],
+            ['15', Rounding_Mode::Up, '4'],
+            ['15', Rounding_Mode::HalfUp, '4'],
+
+            ['16', Rounding_Mode::Unnecessary, '4'],
+            ['16', Rounding_Mode::Down, '4'],
+            ['16', Rounding_Mode::Up, '4'],
+            ['16', Rounding_Mode::HalfUp, '4'],
+
+            ['17', Rounding_Mode::Unnecessary, null],
+            ['17', Rounding_Mode::Down, '4'],
+            ['17', Rounding_Mode::Up, '5'],
+            ['17', Rounding_Mode::HalfUp, '4'],
+
+            ['20', Rounding_Mode::Unnecessary, null],
+            ['20', Rounding_Mode::Down, '4'],
+            ['20', Rounding_Mode::Up, '5'],
+            ['20', Rounding_Mode::HalfUp, '4'],
+
+            ['21', Rounding_Mode::Unnecessary, null],
+            ['21', Rounding_Mode::Down, '4'],
+            ['21', Rounding_Mode::Up, '5'],
+            ['21', Rounding_Mode::HalfUp, '5'],
+
+            ['24', Rounding_Mode::Unnecessary, null],
+            ['24', Rounding_Mode::Down, '4'],
+            ['24', Rounding_Mode::Up, '5'],
+            ['24', Rounding_Mode::HalfUp, '5'],
+
+            ['25', Rounding_Mode::Unnecessary, '5'],
+            ['25', Rounding_Mode::Down, '5'],
+            ['25', Rounding_Mode::Up, '5'],
+            ['25', Rounding_Mode::HalfUp, '5'],
+
+            ['30', Rounding_Mode::Unnecessary, null],
+            ['30', Rounding_Mode::Down, '5'],
+            ['30', Rounding_Mode::Up, '6'],
+            ['30', Rounding_Mode::HalfUp, '5'],
+
+            ['31', Rounding_Mode::Unnecessary, null],
+            ['31', Rounding_Mode::Down, '5'],
+            ['31', Rounding_Mode::Up, '6'],
+            ['31', Rounding_Mode::HalfUp, '6'],
+
+            ['35', Rounding_Mode::Unnecessary, null],
+            ['35', Rounding_Mode::Down, '5'],
+            ['35', Rounding_Mode::Up, '6'],
+            ['35', Rounding_Mode::HalfUp, '6'],
+
+            ['36', Rounding_Mode::Unnecessary, '6'],
+            ['36', Rounding_Mode::Down, '6'],
+            ['36', Rounding_Mode::Up, '6'],
+            ['36', Rounding_Mode::HalfUp, '6'],
+
+            ['48', Rounding_Mode::Unnecessary, null],
+            ['48', Rounding_Mode::Down, '6'],
+            ['48', Rounding_Mode::Up, '7'],
+            ['48', Rounding_Mode::HalfUp, '7'],
+
+            ['49', Rounding_Mode::Unnecessary, '7'],
+            ['49', Rounding_Mode::Down, '7'],
+            ['49', Rounding_Mode::Up, '7'],
+            ['49', Rounding_Mode::HalfUp, '7'],
+
+            ['63', Rounding_Mode::Unnecessary, null],
+            ['63', Rounding_Mode::Down, '7'],
+            ['63', Rounding_Mode::Up, '8'],
+            ['63', Rounding_Mode::HalfUp, '8'],
+
+            ['64', Rounding_Mode::Unnecessary, '8'],
+            ['64', Rounding_Mode::Down, '8'],
+            ['64', Rounding_Mode::Up, '8'],
+            ['64', Rounding_Mode::HalfUp, '8'],
+
+            ['80', Rounding_Mode::Unnecessary, null],
+            ['80', Rounding_Mode::Down, '8'],
+            ['80', Rounding_Mode::Up, '9'],
+            ['80', Rounding_Mode::HalfUp, '9'],
+
+            ['81', Rounding_Mode::Unnecessary, '9'],
+            ['81', Rounding_Mode::Down, '9'],
+            ['81', Rounding_Mode::Up, '9'],
+            ['81', Rounding_Mode::HalfUp, '9'],
+
+            ['99', Rounding_Mode::Unnecessary, null],
+            ['99', Rounding_Mode::Down, '9'],
+            ['99', Rounding_Mode::Up, '10'],
+            ['99', Rounding_Mode::HalfUp, '10'],
+
+            ['100', Rounding_Mode::Unnecessary, '10'],
+            ['100', Rounding_Mode::Down, '10'],
+            ['100', Rounding_Mode::Up, '10'],
+            ['100', Rounding_Mode::HalfUp, '10'],
+
+            ['101', Rounding_Mode::Unnecessary, null],
+            ['101', Rounding_Mode::Down, '10'],
+            ['101', Rounding_Mode::Up, '11'],
+            ['101', Rounding_Mode::HalfUp, '10'],
+
+            ['10000', Rounding_Mode::Unnecessary, '100'],
+            ['10000', Rounding_Mode::Down, '100'],
+            ['10000', Rounding_Mode::Up, '100'],
+            ['10000', Rounding_Mode::HalfUp, '100'],
+
+            ['10001', Rounding_Mode::Unnecessary, null],
+            ['10001', Rounding_Mode::Down, '100'],
+            ['10001', Rounding_Mode::Up, '101'],
+            ['10001', Rounding_Mode::HalfUp, '100'],
+
+            ['12344', Rounding_Mode::Unnecessary, null],
+            ['12344', Rounding_Mode::Down, '111'],
+            ['12344', Rounding_Mode::Up, '112'],
+            ['12344', Rounding_Mode::HalfUp, '111'],
+
+            ['12346', Rounding_Mode::Unnecessary, null],
+            ['12346', Rounding_Mode::Down, '111'],
+            ['12346', Rounding_Mode::Up, '112'],
+            ['12346', Rounding_Mode::HalfUp, '111'],
+
+            ['1000000', Rounding_Mode::Unnecessary, '1000'],
+            ['1000000', Rounding_Mode::Down, '1000'],
+            ['1000000', Rounding_Mode::Up, '1000'],
+            ['1000000', Rounding_Mode::HalfUp, '1000'],
+
+            ['152399025', Rounding_Mode::Unnecessary, '12345'],
+            ['152399025', Rounding_Mode::Down, '12345'],
+            ['152399025', Rounding_Mode::Up, '12345'],
+            ['152399025', Rounding_Mode::HalfUp, '12345'],
+
+            ['1000000000000000000000000000000000000000000000000000000000000', Rounding_Mode::Unnecessary, '1000000000000000000000000000000'],
+            ['1000000000000000000000000000000000000000000000000000000000000', Rounding_Mode::Down, '1000000000000000000000000000000'],
+            ['1000000000000000000000000000000000000000000000000000000000000', Rounding_Mode::Up, '1000000000000000000000000000000'],
+
+            ['1000000000000000000000000000000000000000000000000000000000001', Rounding_Mode::Unnecessary, null],
+            ['1000000000000000000000000000000000000000000000000000000000001', Rounding_Mode::Down, '1000000000000000000000000000000'],
+            ['1000000000000000000000000000000000000000000000000000000000001', Rounding_Mode::Up, '1000000000000000000000000000001'],
+
+            ['536137214136734800142146901787504368108126328549238033123877', Rounding_Mode::Unnecessary, null],
+            ['536137214136734800142146901787504368108126328549238033123877', Rounding_Mode::Down, '732213912826528310663262741626'],
+            ['536137214136734800142146901787504368108126328549238033123877', Rounding_Mode::Up, '732213912826528310663262741627'],
+            ['536137214136734800142146901787504368108126328549238033123877', Rounding_Mode::HalfUp, '732213912826528310663262741626'],
+
+            ['536137214136734800142146901786039940282473271927911507640624', Rounding_Mode::Unnecessary, null],
+            ['536137214136734800142146901786039940282473271927911507640624', Rounding_Mode::Down, '732213912826528310663262741624'],
+            ['536137214136734800142146901786039940282473271927911507640624', Rounding_Mode::Up, '732213912826528310663262741625'],
+            ['536137214136734800142146901786039940282473271927911507640624', Rounding_Mode::HalfUp, '732213912826528310663262741625'],
+
+            ['536137214136734800142146901786039940282473271927911507640625', Rounding_Mode::Unnecessary, '732213912826528310663262741625'],
+            ['536137214136734800142146901786039940282473271927911507640625', Rounding_Mode::Down, '732213912826528310663262741625'],
+            ['536137214136734800142146901786039940282473271927911507640625', Rounding_Mode::Up, '732213912826528310663262741625'],
+            ['536137214136734800142146901786039940282473271927911507640625', Rounding_Mode::HalfUp, '732213912826528310663262741625'],
+
+            ['536137214136734800142146901786039940282473271927911507640626', Rounding_Mode::Unnecessary, null],
+            ['536137214136734800142146901786039940282473271927911507640626', Rounding_Mode::Down, '732213912826528310663262741625'],
+            ['536137214136734800142146901786039940282473271927911507640626', Rounding_Mode::Up, '732213912826528310663262741626'],
+            ['536137214136734800142146901786039940282473271927911507640626', Rounding_Mode::HalfUp, '732213912826528310663262741625'],
+
+            ['536137214136734800142146901787504368108126328549238033123875', Rounding_Mode::Unnecessary, null],
+            ['536137214136734800142146901787504368108126328549238033123875', Rounding_Mode::Down, '732213912826528310663262741625'],
+            ['536137214136734800142146901787504368108126328549238033123875', Rounding_Mode::Up, '732213912826528310663262741626'],
+            ['536137214136734800142146901787504368108126328549238033123875', Rounding_Mode::HalfUp, '732213912826528310663262741626'],
+
+            ['536137214136734800142146901787504368108126328549238033123876', Rounding_Mode::Unnecessary, '732213912826528310663262741626'],
+            ['536137214136734800142146901787504368108126328549238033123876', Rounding_Mode::Down, '732213912826528310663262741626'],
+            ['536137214136734800142146901787504368108126328549238033123876', Rounding_Mode::Up, '732213912826528310663262741626'],
+            ['536137214136734800142146901787504368108126328549238033123876', Rounding_Mode::HalfUp, '732213912826528310663262741626'],
+
+            ['5651495859544574019979802175954184725583245698990648064256', Rounding_Mode::Unnecessary, '75176431543034642899535752016'],
+            ['5651495859544574019979802175954184725583245698990648064256', Rounding_Mode::Down, '75176431543034642899535752016'],
+            ['5651495859544574019979802175954184725583245698990648064256', Rounding_Mode::Up, '75176431543034642899535752016'],
+            ['5651495859544574019979802175954184725583245698990648064256', Rounding_Mode::HalfUp, '75176431543034642899535752016'],
+
+            ['5651495859544574019979802176104537588669314984789719568288', Rounding_Mode::Unnecessary, null],
+            ['5651495859544574019979802176104537588669314984789719568288', Rounding_Mode::Down, '75176431543034642899535752016'],
+            ['5651495859544574019979802176104537588669314984789719568288', Rounding_Mode::Up, '75176431543034642899535752017'],
+            ['5651495859544574019979802176104537588669314984789719568288', Rounding_Mode::HalfUp, '75176431543034642899535752017'],
+
+            ['5651495859544574019979802176104537588669314984789719568289', Rounding_Mode::Unnecessary, '75176431543034642899535752017'],
+            ['5651495859544574019979802176104537588669314984789719568289', Rounding_Mode::Down, '75176431543034642899535752017'],
+            ['5651495859544574019979802176104537588669314984789719568289', Rounding_Mode::Up, '75176431543034642899535752017'],
+            ['5651495859544574019979802176104537588669314984789719568289', Rounding_Mode::HalfUp, '75176431543034642899535752017'],
+
+            ['303791344535904055863813752643405021077478121784571407761729', Rounding_Mode::Unnecessary, '551172699374618931119694672223'],
+            ['303791344535904055863813752643405021077478121784571407761729', Rounding_Mode::Down, '551172699374618931119694672223'],
+            ['303791344535904055863813752643405021077478121784571407761729', Rounding_Mode::Up, '551172699374618931119694672223'],
+            ['303791344535904055863813752643405021077478121784571407761729', Rounding_Mode::HalfUp, '551172699374618931119694672223'],
+
+            ['303791344535904055863813752643956193776852740715691102433952', Rounding_Mode::Unnecessary, null],
+            ['303791344535904055863813752643956193776852740715691102433952', Rounding_Mode::Down, '551172699374618931119694672223'],
+            ['303791344535904055863813752643956193776852740715691102433952', Rounding_Mode::Up, '551172699374618931119694672224'],
+            ['303791344535904055863813752643956193776852740715691102433952', Rounding_Mode::HalfUp, '551172699374618931119694672223'],
+
+            ['303791344535904055863813752644507366476227359646810797106176', Rounding_Mode::Unnecessary, '551172699374618931119694672224'],
+            ['303791344535904055863813752644507366476227359646810797106176', Rounding_Mode::Down, '551172699374618931119694672224'],
+            ['303791344535904055863813752644507366476227359646810797106176', Rounding_Mode::Up, '551172699374618931119694672224'],
+            ['303791344535904055863813752644507366476227359646810797106176', Rounding_Mode::HalfUp, '551172699374618931119694672224'],
+
+            ['563247882222081148212230590155705163466381822617812257437849', Rounding_Mode::Unnecessary, '750498422531374244468346132293'],
+            ['563247882222081148212230590155705163466381822617812257437849', Rounding_Mode::Down, '750498422531374244468346132293'],
+            ['563247882222081148212230590155705163466381822617812257437849', Rounding_Mode::Up, '750498422531374244468346132293'],
+            ['563247882222081148212230590155705163466381822617812257437849', Rounding_Mode::HalfUp, '750498422531374244468346132293'],
+
+            ['563247882222081148212230590157206160311444571106748949702435', Rounding_Mode::Unnecessary, null],
+            ['563247882222081148212230590157206160311444571106748949702435', Rounding_Mode::Down, '750498422531374244468346132293'],
+            ['563247882222081148212230590157206160311444571106748949702435', Rounding_Mode::Up, '750498422531374244468346132294'],
+            ['563247882222081148212230590157206160311444571106748949702435', Rounding_Mode::HalfUp, '750498422531374244468346132294'],
+
+            ['563247882222081148212230590157206160311444571106748949702436', Rounding_Mode::Unnecessary, '750498422531374244468346132294'],
+            ['563247882222081148212230590157206160311444571106748949702436', Rounding_Mode::Down, '750498422531374244468346132294'],
+            ['563247882222081148212230590157206160311444571106748949702436', Rounding_Mode::Up, '750498422531374244468346132294'],
+            ['563247882222081148212230590157206160311444571106748949702436', Rounding_Mode::HalfUp, '750498422531374244468346132294'],
+
+            ['396189426113498637323382117462633843296333578307938768136329', Rounding_Mode::Unnecessary, '629435799834660371475569807677'],
+            ['396189426113498637323382117462633843296333578307938768136329', Rounding_Mode::Down, '629435799834660371475569807677'],
+            ['396189426113498637323382117462633843296333578307938768136329', Rounding_Mode::Up, '629435799834660371475569807677'],
+            ['396189426113498637323382117462633843296333578307938768136329', Rounding_Mode::HalfUp, '629435799834660371475569807677'],
+
+            ['396189426113498637323382117463263279096168238679414337944006', Rounding_Mode::Unnecessary, null],
+            ['396189426113498637323382117463263279096168238679414337944006', Rounding_Mode::Down, '629435799834660371475569807677'],
+            ['396189426113498637323382117463263279096168238679414337944006', Rounding_Mode::Up, '629435799834660371475569807678'],
+            ['396189426113498637323382117463263279096168238679414337944006', Rounding_Mode::HalfUp, '629435799834660371475569807677'],
+
+            ['396189426113498637323382117463892714896002899050889907751684', Rounding_Mode::Unnecessary, '629435799834660371475569807678'],
+            ['396189426113498637323382117463892714896002899050889907751684', Rounding_Mode::Down, '629435799834660371475569807678'],
+            ['396189426113498637323382117463892714896002899050889907751684', Rounding_Mode::Up, '629435799834660371475569807678'],
+            ['396189426113498637323382117463892714896002899050889907751684', Rounding_Mode::HalfUp, '629435799834660371475569807678'],
+
+            ['80479328054895287914569547663334257436697869675619064535360356', Rounding_Mode::Unnecessary, '8971027146034911420307518533066'],
+            ['80479328054895287914569547663334257436697869675619064535360356', Rounding_Mode::Down, '8971027146034911420307518533066'],
+            ['80479328054895287914569547663334257436697869675619064535360356', Rounding_Mode::Up, '8971027146034911420307518533066'],
+            ['80479328054895287914569547663334257436697869675619064535360356', Rounding_Mode::HalfUp, '8971027146034911420307518533066'],
+
+            ['80479328054895287914569547663352199490989939498459679572426488', Rounding_Mode::Unnecessary, null],
+            ['80479328054895287914569547663352199490989939498459679572426488', Rounding_Mode::Down, '8971027146034911420307518533066'],
+            ['80479328054895287914569547663352199490989939498459679572426488', Rounding_Mode::Up, '8971027146034911420307518533067'],
+            ['80479328054895287914569547663352199490989939498459679572426488', Rounding_Mode::HalfUp, '8971027146034911420307518533067'],
+
+            ['80479328054895287914569547663352199490989939498459679572426489', Rounding_Mode::Unnecessary, '8971027146034911420307518533067'],
+            ['80479328054895287914569547663352199490989939498459679572426489', Rounding_Mode::Down, '8971027146034911420307518533067'],
+            ['80479328054895287914569547663352199490989939498459679572426489', Rounding_Mode::Up, '8971027146034911420307518533067'],
+            ['80479328054895287914569547663352199490989939498459679572426489', Rounding_Mode::HalfUp, '8971027146034911420307518533067'],
+
+            ['681849477075053403257629437089098232501847587591122144140625', Rounding_Mode::Unnecessary, '825741773846432819101899135625'],
+            ['681849477075053403257629437089098232501847587591122144140625', Rounding_Mode::Down, '825741773846432819101899135625'],
+            ['681849477075053403257629437089098232501847587591122144140625', Rounding_Mode::Up, '825741773846432819101899135625'],
+            ['681849477075053403257629437089098232501847587591122144140625', Rounding_Mode::HalfUp, '825741773846432819101899135625'],
+
+            ['681849477075053403257629437089923974275694020410224043276250', Rounding_Mode::Unnecessary, null],
+            ['681849477075053403257629437089923974275694020410224043276250', Rounding_Mode::Down, '825741773846432819101899135625'],
+            ['681849477075053403257629437089923974275694020410224043276250', Rounding_Mode::Up, '825741773846432819101899135626'],
+            ['681849477075053403257629437089923974275694020410224043276250', Rounding_Mode::HalfUp, '825741773846432819101899135625'],
+
+            ['681849477075053403257629437090749716049540453229325942411876', Rounding_Mode::Unnecessary, '825741773846432819101899135626'],
+            ['681849477075053403257629437090749716049540453229325942411876', Rounding_Mode::Down, '825741773846432819101899135626'],
+            ['681849477075053403257629437090749716049540453229325942411876', Rounding_Mode::Up, '825741773846432819101899135626'],
+            ['681849477075053403257629437090749716049540453229325942411876', Rounding_Mode::HalfUp, '825741773846432819101899135626'],
+
+            ['74137461815059419705618984794190691016668430175974095624129600', Rounding_Mode::Unnecessary, '8610311365743948501801103299640'],
+            ['74137461815059419705618984794190691016668430175974095624129600', Rounding_Mode::Down, '8610311365743948501801103299640'],
+            ['74137461815059419705618984794190691016668430175974095624129600', Rounding_Mode::Up, '8610311365743948501801103299640'],
+            ['74137461815059419705618984794190691016668430175974095624129600', Rounding_Mode::HalfUp, '8610311365743948501801103299640'],
+
+            ['74137461815059419705618984794207911639399918072977697830728880', Rounding_Mode::Unnecessary, null],
+            ['74137461815059419705618984794207911639399918072977697830728880', Rounding_Mode::Down, '8610311365743948501801103299640'],
+            ['74137461815059419705618984794207911639399918072977697830728880', Rounding_Mode::Up, '8610311365743948501801103299641'],
+            ['74137461815059419705618984794207911639399918072977697830728880', Rounding_Mode::HalfUp, '8610311365743948501801103299641'],
+
+            ['74137461815059419705618984794207911639399918072977697830728881', Rounding_Mode::Unnecessary, '8610311365743948501801103299641'],
+            ['74137461815059419705618984794207911639399918072977697830728881', Rounding_Mode::Down, '8610311365743948501801103299641'],
+            ['74137461815059419705618984794207911639399918072977697830728881', Rounding_Mode::Up, '8610311365743948501801103299641'],
+            ['74137461815059419705618984794207911639399918072977697830728881', Rounding_Mode::HalfUp, '8610311365743948501801103299641'],
+
+            ['6679657010858483937903991845397665010485952775098785560735409', Rounding_Mode::Unnecessary, '2584503242570704134867997320903'],
+            ['6679657010858483937903991845397665010485952775098785560735409', Rounding_Mode::Down, '2584503242570704134867997320903'],
+            ['6679657010858483937903991845397665010485952775098785560735409', Rounding_Mode::Up, '2584503242570704134867997320903'],
+            ['6679657010858483937903991845397665010485952775098785560735409', Rounding_Mode::HalfUp, '2584503242570704134867997320903'],
+
+            ['6679657010858483937903991845400249513728523479233653558056312', Rounding_Mode::Unnecessary, null],
+            ['6679657010858483937903991845400249513728523479233653558056312', Rounding_Mode::Down, '2584503242570704134867997320903'],
+            ['6679657010858483937903991845400249513728523479233653558056312', Rounding_Mode::Up, '2584503242570704134867997320904'],
+            ['6679657010858483937903991845400249513728523479233653558056312', Rounding_Mode::HalfUp, '2584503242570704134867997320903'],
+
+            ['6679657010858483937903991845402834016971094183368521555377216', Rounding_Mode::Unnecessary, '2584503242570704134867997320904'],
+            ['6679657010858483937903991845402834016971094183368521555377216', Rounding_Mode::Down, '2584503242570704134867997320904'],
+            ['6679657010858483937903991845402834016971094183368521555377216', Rounding_Mode::Up, '2584503242570704134867997320904'],
+            ['6679657010858483937903991845402834016971094183368521555377216', Rounding_Mode::HalfUp, '2584503242570704134867997320904'],
+
+            ['76167329888878964758237229146072291137608533898056659182403025', Rounding_Mode::Unnecessary, '8727389637736988579847341871305'],
+            ['76167329888878964758237229146072291137608533898056659182403025', Rounding_Mode::Down, '8727389637736988579847341871305'],
+            ['76167329888878964758237229146072291137608533898056659182403025', Rounding_Mode::Up, '8727389637736988579847341871305'],
+            ['76167329888878964758237229146072291137608533898056659182403025', Rounding_Mode::HalfUp, '8727389637736988579847341871305'],
+
+            ['76167329888878964758237229146089745916884007875216353866145635', Rounding_Mode::Unnecessary, null],
+            ['76167329888878964758237229146089745916884007875216353866145635', Rounding_Mode::Down, '8727389637736988579847341871305'],
+            ['76167329888878964758237229146089745916884007875216353866145635', Rounding_Mode::Up, '8727389637736988579847341871306'],
+            ['76167329888878964758237229146089745916884007875216353866145635', Rounding_Mode::HalfUp, '8727389637736988579847341871306'],
+
+            ['76167329888878964758237229146089745916884007875216353866145636', Rounding_Mode::Unnecessary, '8727389637736988579847341871306'],
+            ['76167329888878964758237229146089745916884007875216353866145636', Rounding_Mode::Down, '8727389637736988579847341871306'],
+            ['76167329888878964758237229146089745916884007875216353866145636', Rounding_Mode::Up, '8727389637736988579847341871306'],
+            ['76167329888878964758237229146089745916884007875216353866145636', Rounding_Mode::HalfUp, '8727389637736988579847341871306'],
+
+            ['6743391560146249598812429163892766868360953827745248726306064', Rounding_Mode::Unnecessary, '2596804105077287033903247753508'],
+            ['6743391560146249598812429163892766868360953827745248726306064', Rounding_Mode::Down, '2596804105077287033903247753508'],
+            ['6743391560146249598812429163892766868360953827745248726306064', Rounding_Mode::Up, '2596804105077287033903247753508'],
+            ['6743391560146249598812429163892766868360953827745248726306064', Rounding_Mode::HalfUp, '2596804105077287033903247753508'],
+
+            ['6743391560146249598812429163895363672466031114779151974059572', Rounding_Mode::Unnecessary, null],
+            ['6743391560146249598812429163895363672466031114779151974059572', Rounding_Mode::Down, '2596804105077287033903247753508'],
+            ['6743391560146249598812429163895363672466031114779151974059572', Rounding_Mode::Up, '2596804105077287033903247753509'],
+            ['6743391560146249598812429163895363672466031114779151974059572', Rounding_Mode::HalfUp, '2596804105077287033903247753508'],
+
+            ['6743391560146249598812429163897960476571108401813055221813081', Rounding_Mode::Unnecessary, '2596804105077287033903247753509'],
+            ['6743391560146249598812429163897960476571108401813055221813081', Rounding_Mode::Down, '2596804105077287033903247753509'],
+            ['6743391560146249598812429163897960476571108401813055221813081', Rounding_Mode::Up, '2596804105077287033903247753509'],
+            ['6743391560146249598812429163897960476571108401813055221813081', Rounding_Mode::HalfUp, '2596804105077287033903247753509'],
+
+            ['1867791142724588955955814039055642821336323719154250751224723556', Rounding_Mode::Unnecessary, '43217949311884164825638553209334'],
+            ['1867791142724588955955814039055642821336323719154250751224723556', Rounding_Mode::Down, '43217949311884164825638553209334'],
+            ['1867791142724588955955814039055642821336323719154250751224723556', Rounding_Mode::Up, '43217949311884164825638553209334'],
+            ['1867791142724588955955814039055642821336323719154250751224723556', Rounding_Mode::HalfUp, '43217949311884164825638553209334'],
+
+            ['1867791142724588955955814039055729257234947487483902028331142224', Rounding_Mode::Unnecessary, null],
+            ['1867791142724588955955814039055729257234947487483902028331142224', Rounding_Mode::Down, '43217949311884164825638553209334'],
+            ['1867791142724588955955814039055729257234947487483902028331142224', Rounding_Mode::Up, '43217949311884164825638553209335'],
+            ['1867791142724588955955814039055729257234947487483902028331142224', Rounding_Mode::HalfUp, '43217949311884164825638553209335'],
+
+            ['1867791142724588955955814039055729257234947487483902028331142225', Rounding_Mode::Unnecessary, '43217949311884164825638553209335'],
+            ['1867791142724588955955814039055729257234947487483902028331142225', Rounding_Mode::Down, '43217949311884164825638553209335'],
+            ['1867791142724588955955814039055729257234947487483902028331142225', Rounding_Mode::Up, '43217949311884164825638553209335'],
+            ['1867791142724588955955814039055729257234947487483902028331142225', Rounding_Mode::HalfUp, '43217949311884164825638553209335'],
+
+            ['9830504148113505106730565430925806810010750548232214925001449636', Rounding_Mode::Unnecessary, '99148898874942151859351963400806'],
+            ['9830504148113505106730565430925806810010750548232214925001449636', Rounding_Mode::Down, '99148898874942151859351963400806'],
+            ['9830504148113505106730565430925806810010750548232214925001449636', Rounding_Mode::Up, '99148898874942151859351963400806'],
+            ['9830504148113505106730565430925806810010750548232214925001449636', Rounding_Mode::HalfUp, '99148898874942151859351963400806'],
+
+            ['9830504148113505106730565430925905958909625490384074276964850442', Rounding_Mode::Unnecessary, null],
+            ['9830504148113505106730565430925905958909625490384074276964850442', Rounding_Mode::Down, '99148898874942151859351963400806'],
+            ['9830504148113505106730565430925905958909625490384074276964850442', Rounding_Mode::Up, '99148898874942151859351963400807'],
+            ['9830504148113505106730565430925905958909625490384074276964850442', Rounding_Mode::HalfUp, '99148898874942151859351963400806'],
+
+            ['9830504148113505106730565430926005107808500432535933628928251249', Rounding_Mode::Unnecessary, '99148898874942151859351963400807'],
+            ['9830504148113505106730565430926005107808500432535933628928251249', Rounding_Mode::Down, '99148898874942151859351963400807'],
+            ['9830504148113505106730565430926005107808500432535933628928251249', Rounding_Mode::Up, '99148898874942151859351963400807'],
+            ['9830504148113505106730565430926005107808500432535933628928251249', Rounding_Mode::HalfUp, '99148898874942151859351963400807'],
+
+            ['7591171119877361934423335814652578116545218322867005352922382400', Rounding_Mode::Unnecessary, '87127327055737007353139169677320'],
+            ['7591171119877361934423335814652578116545218322867005352922382400', Rounding_Mode::Down, '87127327055737007353139169677320'],
+            ['7591171119877361934423335814652578116545218322867005352922382400', Rounding_Mode::Up, '87127327055737007353139169677320'],
+            ['7591171119877361934423335814652578116545218322867005352922382400', Rounding_Mode::HalfUp, '87127327055737007353139169677320'],
+
+            ['7591171119877361934423335814652752371199329796881711631261737040', Rounding_Mode::Unnecessary, null],
+            ['7591171119877361934423335814652752371199329796881711631261737040', Rounding_Mode::Down, '87127327055737007353139169677320'],
+            ['7591171119877361934423335814652752371199329796881711631261737040', Rounding_Mode::Up, '87127327055737007353139169677321'],
+            ['7591171119877361934423335814652752371199329796881711631261737040', Rounding_Mode::HalfUp, '87127327055737007353139169677321'],
+
+            ['7591171119877361934423335814652752371199329796881711631261737041', Rounding_Mode::Unnecessary, '87127327055737007353139169677321'],
+            ['7591171119877361934423335814652752371199329796881711631261737041', Rounding_Mode::Down, '87127327055737007353139169677321'],
+            ['7591171119877361934423335814652752371199329796881711631261737041', Rounding_Mode::Up, '87127327055737007353139169677321'],
+            ['7591171119877361934423335814652752371199329796881711631261737041', Rounding_Mode::HalfUp, '87127327055737007353139169677321'],
+
+            ['8534704621867005063010169093165229825021562891964253458234113600', Rounding_Mode::Unnecessary, '92383465089089427718873950884440'],
+            ['8534704621867005063010169093165229825021562891964253458234113600', Rounding_Mode::Down, '92383465089089427718873950884440'],
+            ['8534704621867005063010169093165229825021562891964253458234113600', Rounding_Mode::Up, '92383465089089427718873950884440'],
+            ['8534704621867005063010169093165229825021562891964253458234113600', Rounding_Mode::HalfUp, '92383465089089427718873950884440'],
+
+            ['8534704621867005063010169093165322208486651981391972332184998040', Rounding_Mode::Unnecessary, null],
+            ['8534704621867005063010169093165322208486651981391972332184998040', Rounding_Mode::Down, '92383465089089427718873950884440'],
+            ['8534704621867005063010169093165322208486651981391972332184998040', Rounding_Mode::Up, '92383465089089427718873950884441'],
+            ['8534704621867005063010169093165322208486651981391972332184998040', Rounding_Mode::HalfUp, '92383465089089427718873950884440'],
+
+            ['8534704621867005063010169093165414591951741070819691206135882481', Rounding_Mode::Unnecessary, '92383465089089427718873950884441'],
+            ['8534704621867005063010169093165414591951741070819691206135882481', Rounding_Mode::Down, '92383465089089427718873950884441'],
+            ['8534704621867005063010169093165414591951741070819691206135882481', Rounding_Mode::Up, '92383465089089427718873950884441'],
+            ['8534704621867005063010169093165414591951741070819691206135882481', Rounding_Mode::HalfUp, '92383465089089427718873950884441'],
+
+            ['558060557515620507133380963948250962461823927030515012873505842176', Rounding_Mode::Unnecessary, '747034508918845399769072043504224'],
+            ['558060557515620507133380963948250962461823927030515012873505842176', Rounding_Mode::Down, '747034508918845399769072043504224'],
+            ['558060557515620507133380963948250962461823927030515012873505842176', Rounding_Mode::Up, '747034508918845399769072043504224'],
+            ['558060557515620507133380963948250962461823927030515012873505842176', Rounding_Mode::HalfUp, '747034508918845399769072043504224'],
+
+            ['558060557515620507133380963948252456530841764721314551017592850624', Rounding_Mode::Unnecessary, null],
+            ['558060557515620507133380963948252456530841764721314551017592850624', Rounding_Mode::Down, '747034508918845399769072043504224'],
+            ['558060557515620507133380963948252456530841764721314551017592850624', Rounding_Mode::Up, '747034508918845399769072043504225'],
+            ['558060557515620507133380963948252456530841764721314551017592850624', Rounding_Mode::HalfUp, '747034508918845399769072043504225'],
+
+            ['558060557515620507133380963948252456530841764721314551017592850625', Rounding_Mode::Unnecessary, '747034508918845399769072043504225'],
+            ['558060557515620507133380963948252456530841764721314551017592850625', Rounding_Mode::Down, '747034508918845399769072043504225'],
+            ['558060557515620507133380963948252456530841764721314551017592850625', Rounding_Mode::Up, '747034508918845399769072043504225'],
+            ['558060557515620507133380963948252456530841764721314551017592850625', Rounding_Mode::HalfUp, '747034508918845399769072043504225'],
+
+            ['200538408436782201630574692476963942210287537291410052113367162944', Rounding_Mode::Unnecessary, '447815149851791192871220236705288'],
+            ['200538408436782201630574692476963942210287537291410052113367162944', Rounding_Mode::Down, '447815149851791192871220236705288'],
+            ['200538408436782201630574692476963942210287537291410052113367162944', Rounding_Mode::Up, '447815149851791192871220236705288'],
+            ['200538408436782201630574692476963942210287537291410052113367162944', Rounding_Mode::HalfUp, '447815149851791192871220236705288'],
+
+            ['200538408436782201630574692476964390025437389082602923333603868232', Rounding_Mode::Unnecessary, null],
+            ['200538408436782201630574692476964390025437389082602923333603868232', Rounding_Mode::Down, '447815149851791192871220236705288'],
+            ['200538408436782201630574692476964390025437389082602923333603868232', Rounding_Mode::Up, '447815149851791192871220236705289'],
+            ['200538408436782201630574692476964390025437389082602923333603868232', Rounding_Mode::HalfUp, '447815149851791192871220236705288'],
+
+            ['200538408436782201630574692476964837840587240873795794553840573521', Rounding_Mode::Unnecessary, '447815149851791192871220236705289'],
+            ['200538408436782201630574692476964837840587240873795794553840573521', Rounding_Mode::Down, '447815149851791192871220236705289'],
+            ['200538408436782201630574692476964837840587240873795794553840573521', Rounding_Mode::Up, '447815149851791192871220236705289'],
+            ['200538408436782201630574692476964837840587240873795794553840573521', Rounding_Mode::HalfUp, '447815149851791192871220236705289'],
+
+            ['191302866278956628715433979906440851661028066577090295375612311364', Rounding_Mode::Unnecessary, '437381831217251900054617942999442'],
+            ['191302866278956628715433979906440851661028066577090295375612311364', Rounding_Mode::Down, '437381831217251900054617942999442'],
+            ['191302866278956628715433979906440851661028066577090295375612311364', Rounding_Mode::Up, '437381831217251900054617942999442'],
+            ['191302866278956628715433979906440851661028066577090295375612311364', Rounding_Mode::HalfUp, '437381831217251900054617942999442'],
+
+            ['191302866278956628715433979906441726424690501080890404611498310248', Rounding_Mode::Unnecessary, null],
+            ['191302866278956628715433979906441726424690501080890404611498310248', Rounding_Mode::Down, '437381831217251900054617942999442'],
+            ['191302866278956628715433979906441726424690501080890404611498310248', Rounding_Mode::Up, '437381831217251900054617942999443'],
+            ['191302866278956628715433979906441726424690501080890404611498310248', Rounding_Mode::HalfUp, '437381831217251900054617942999443'],
+
+            ['191302866278956628715433979906441726424690501080890404611498310249', Rounding_Mode::Unnecessary, '437381831217251900054617942999443'],
+            ['191302866278956628715433979906441726424690501080890404611498310249', Rounding_Mode::Down, '437381831217251900054617942999443'],
+            ['191302866278956628715433979906441726424690501080890404611498310249', Rounding_Mode::Up, '437381831217251900054617942999443'],
+            ['191302866278956628715433979906441726424690501080890404611498310249', Rounding_Mode::HalfUp, '437381831217251900054617942999443'],
+
+            ['291290137244253022092289121327605756463305738312066948462328733721', Rounding_Mode::Unnecessary, '539713013780706442298424414941189'],
+            ['291290137244253022092289121327605756463305738312066948462328733721', Rounding_Mode::Down, '539713013780706442298424414941189'],
+            ['291290137244253022092289121327605756463305738312066948462328733721', Rounding_Mode::Up, '539713013780706442298424414941189'],
+            ['291290137244253022092289121327605756463305738312066948462328733721', Rounding_Mode::HalfUp, '539713013780706442298424414941189'],
+
+            ['291290137244253022092289121327606296176319519018509246886743674910', Rounding_Mode::Unnecessary, null],
+            ['291290137244253022092289121327606296176319519018509246886743674910', Rounding_Mode::Down, '539713013780706442298424414941189'],
+            ['291290137244253022092289121327606296176319519018509246886743674910', Rounding_Mode::Up, '539713013780706442298424414941190'],
+            ['291290137244253022092289121327606296176319519018509246886743674910', Rounding_Mode::HalfUp, '539713013780706442298424414941189'],
+
+            ['291290137244253022092289121327606835889333299724951545311158616100', Rounding_Mode::Unnecessary, '539713013780706442298424414941190'],
+            ['291290137244253022092289121327606835889333299724951545311158616100', Rounding_Mode::Down, '539713013780706442298424414941190'],
+            ['291290137244253022092289121327606835889333299724951545311158616100', Rounding_Mode::Up, '539713013780706442298424414941190'],
+            ['291290137244253022092289121327606835889333299724951545311158616100', Rounding_Mode::HalfUp, '539713013780706442298424414941190'],
+
+            ['5025051069729848944739380852251409470255071569439258719898537481', Rounding_Mode::Unnecessary, '70887594610974415152598103986941'],
+            ['5025051069729848944739380852251409470255071569439258719898537481', Rounding_Mode::Down, '70887594610974415152598103986941'],
+            ['5025051069729848944739380852251409470255071569439258719898537481', Rounding_Mode::Up, '70887594610974415152598103986941'],
+            ['5025051069729848944739380852251409470255071569439258719898537481', Rounding_Mode::HalfUp, '70887594610974415152598103986941'],
+
+            ['5025051069729848944739380852251551245444293518269563916106511363', Rounding_Mode::Unnecessary, null],
+            ['5025051069729848944739380852251551245444293518269563916106511363', Rounding_Mode::Down, '70887594610974415152598103986941'],
+            ['5025051069729848944739380852251551245444293518269563916106511363', Rounding_Mode::Up, '70887594610974415152598103986942'],
+            ['5025051069729848944739380852251551245444293518269563916106511363', Rounding_Mode::HalfUp, '70887594610974415152598103986942'],
+
+            ['5025051069729848944739380852251551245444293518269563916106511364', Rounding_Mode::Unnecessary, '70887594610974415152598103986942'],
+            ['5025051069729848944739380852251551245444293518269563916106511364', Rounding_Mode::Down, '70887594610974415152598103986942'],
+            ['5025051069729848944739380852251551245444293518269563916106511364', Rounding_Mode::Up, '70887594610974415152598103986942'],
+            ['5025051069729848944739380852251551245444293518269563916106511364', Rounding_Mode::HalfUp, '70887594610974415152598103986942'],
+
+            ['6238861109923404442965423418956764090860907116154205636120522931561', Rounding_Mode::Unnecessary, '2497771228500201225537381791181331'],
+            ['6238861109923404442965423418956764090860907116154205636120522931561', Rounding_Mode::Down, '2497771228500201225537381791181331'],
+            ['6238861109923404442965423418956764090860907116154205636120522931561', Rounding_Mode::Up, '2497771228500201225537381791181331'],
+            ['6238861109923404442965423418956764090860907116154205636120522931561', Rounding_Mode::HalfUp, '2497771228500201225537381791181331'],
+
+            ['6238861109923404442965423418956766588632135616355431173502314112892', Rounding_Mode::Unnecessary, null],
+            ['6238861109923404442965423418956766588632135616355431173502314112892', Rounding_Mode::Down, '2497771228500201225537381791181331'],
+            ['6238861109923404442965423418956766588632135616355431173502314112892', Rounding_Mode::Up, '2497771228500201225537381791181332'],
+            ['6238861109923404442965423418956766588632135616355431173502314112892', Rounding_Mode::HalfUp, '2497771228500201225537381791181331'],
+
+            ['6238861109923404442965423418956769086403364116556656710884105294224', Rounding_Mode::Unnecessary, '2497771228500201225537381791181332'],
+            ['6238861109923404442965423418956769086403364116556656710884105294224', Rounding_Mode::Down, '2497771228500201225537381791181332'],
+            ['6238861109923404442965423418956769086403364116556656710884105294224', Rounding_Mode::Up, '2497771228500201225537381791181332'],
+            ['6238861109923404442965423418956769086403364116556656710884105294224', Rounding_Mode::HalfUp, '2497771228500201225537381791181332'],
+
+            ['20023427755036504641354330839858631034820554187187074374005311969476', Rounding_Mode::Unnecessary, '4474754491034843873667293532006926'],
+            ['20023427755036504641354330839858631034820554187187074374005311969476', Rounding_Mode::Down, '4474754491034843873667293532006926'],
+            ['20023427755036504641354330839858631034820554187187074374005311969476', Rounding_Mode::Up, '4474754491034843873667293532006926'],
+            ['20023427755036504641354330839858631034820554187187074374005311969476', Rounding_Mode::HalfUp, '4474754491034843873667293532006926'],
+
+            ['20023427755036504641354330839858639984329536256874821708592375983328', Rounding_Mode::Unnecessary, null],
+            ['20023427755036504641354330839858639984329536256874821708592375983328', Rounding_Mode::Down, '4474754491034843873667293532006926'],
+            ['20023427755036504641354330839858639984329536256874821708592375983328', Rounding_Mode::Up, '4474754491034843873667293532006927'],
+            ['20023427755036504641354330839858639984329536256874821708592375983328', Rounding_Mode::HalfUp, '4474754491034843873667293532006927'],
+
+            ['20023427755036504641354330839858639984329536256874821708592375983329', Rounding_Mode::Unnecessary, '4474754491034843873667293532006927'],
+            ['20023427755036504641354330839858639984329536256874821708592375983329', Rounding_Mode::Down, '4474754491034843873667293532006927'],
+            ['20023427755036504641354330839858639984329536256874821708592375983329', Rounding_Mode::Up, '4474754491034843873667293532006927'],
+            ['20023427755036504641354330839858639984329536256874821708592375983329', Rounding_Mode::HalfUp, '4474754491034843873667293532006927'],
+
+            ['35963041045659882033621773487569203358608603414532908772894092442881', Rounding_Mode::Unnecessary, '5996919296243687322881924437376641'],
+            ['35963041045659882033621773487569203358608603414532908772894092442881', Rounding_Mode::Down, '5996919296243687322881924437376641'],
+            ['35963041045659882033621773487569203358608603414532908772894092442881', Rounding_Mode::Up, '5996919296243687322881924437376641'],
+            ['35963041045659882033621773487569203358608603414532908772894092442881', Rounding_Mode::HalfUp, '5996919296243687322881924437376641'],
+
+            ['35963041045659882033621773487569209355527899658220231654818529819522', Rounding_Mode::Unnecessary, null],
+            ['35963041045659882033621773487569209355527899658220231654818529819522', Rounding_Mode::Down, '5996919296243687322881924437376641'],
+            ['35963041045659882033621773487569209355527899658220231654818529819522', Rounding_Mode::Up, '5996919296243687322881924437376642'],
+            ['35963041045659882033621773487569209355527899658220231654818529819522', Rounding_Mode::HalfUp, '5996919296243687322881924437376641'],
+
+            ['35963041045659882033621773487569215352447195901907554536742967196164', Rounding_Mode::Unnecessary, '5996919296243687322881924437376642'],
+            ['35963041045659882033621773487569215352447195901907554536742967196164', Rounding_Mode::Down, '5996919296243687322881924437376642'],
+            ['35963041045659882033621773487569215352447195901907554536742967196164', Rounding_Mode::Up, '5996919296243687322881924437376642'],
+            ['35963041045659882033621773487569215352447195901907554536742967196164', Rounding_Mode::HalfUp, '5996919296243687322881924437376642'],
+
+            ['16147491963439711944418728362110466093273207282720057861529178507569', Rounding_Mode::Unnecessary, '4018394202096119880426988697249913'],
+            ['16147491963439711944418728362110466093273207282720057861529178507569', Rounding_Mode::Down, '4018394202096119880426988697249913'],
+            ['16147491963439711944418728362110466093273207282720057861529178507569', Rounding_Mode::Up, '4018394202096119880426988697249913'],
+            ['16147491963439711944418728362110466093273207282720057861529178507569', Rounding_Mode::HalfUp, '4018394202096119880426988697249913'],
+
+            ['16147491963439711944418728362110474130061611474959818715506573007395', Rounding_Mode::Unnecessary, null],
+            ['16147491963439711944418728362110474130061611474959818715506573007395', Rounding_Mode::Down, '4018394202096119880426988697249913'],
+            ['16147491963439711944418728362110474130061611474959818715506573007395', Rounding_Mode::Up, '4018394202096119880426988697249914'],
+            ['16147491963439711944418728362110474130061611474959818715506573007395', Rounding_Mode::HalfUp, '4018394202096119880426988697249914'],
+
+            ['16147491963439711944418728362110474130061611474959818715506573007396', Rounding_Mode::Unnecessary, '4018394202096119880426988697249914'],
+            ['16147491963439711944418728362110474130061611474959818715506573007396', Rounding_Mode::Down, '4018394202096119880426988697249914'],
+            ['16147491963439711944418728362110474130061611474959818715506573007396', Rounding_Mode::Up, '4018394202096119880426988697249914'],
+            ['16147491963439711944418728362110474130061611474959818715506573007396', Rounding_Mode::HalfUp, '4018394202096119880426988697249914'],
+
+            ['59275127168144151414318593405790938619095816316145068714478973756416', Rounding_Mode::Unnecessary, '7699034171124593171733765899358304'],
+            ['59275127168144151414318593405790938619095816316145068714478973756416', Rounding_Mode::Down, '7699034171124593171733765899358304'],
+            ['59275127168144151414318593405790938619095816316145068714478973756416', Rounding_Mode::Up, '7699034171124593171733765899358304'],
+            ['59275127168144151414318593405790938619095816316145068714478973756416', Rounding_Mode::HalfUp, '7699034171124593171733765899358304'],
+
+            ['59275127168144151414318593405790946318129987440738240448244873114720', Rounding_Mode::Unnecessary, null],
+            ['59275127168144151414318593405790946318129987440738240448244873114720', Rounding_Mode::Down, '7699034171124593171733765899358304'],
+            ['59275127168144151414318593405790946318129987440738240448244873114720', Rounding_Mode::Up, '7699034171124593171733765899358305'],
+            ['59275127168144151414318593405790946318129987440738240448244873114720', Rounding_Mode::HalfUp, '7699034171124593171733765899358304'],
+
+            ['59275127168144151414318593405790954017164158565331412182010772473025', Rounding_Mode::Unnecessary, '7699034171124593171733765899358305'],
+            ['59275127168144151414318593405790954017164158565331412182010772473025', Rounding_Mode::Down, '7699034171124593171733765899358305'],
+            ['59275127168144151414318593405790954017164158565331412182010772473025', Rounding_Mode::Up, '7699034171124593171733765899358305'],
+            ['59275127168144151414318593405790954017164158565331412182010772473025', Rounding_Mode::HalfUp, '7699034171124593171733765899358305'],
+
+            ['5285010890475466266241012129886993921224228841648175760159220822102500', Rounding_Mode::Unnecessary, '72698080376826087595732320834198550'],
+            ['5285010890475466266241012129886993921224228841648175760159220822102500', Rounding_Mode::Down, '72698080376826087595732320834198550'],
+            ['5285010890475466266241012129886993921224228841648175760159220822102500', Rounding_Mode::Up, '72698080376826087595732320834198550'],
+            ['5285010890475466266241012129886993921224228841648175760159220822102500', Rounding_Mode::HalfUp, '72698080376826087595732320834198550'],
+
+            ['5285010890475466266241012129886994066620389595300350951623862490499600', Rounding_Mode::Unnecessary, null],
+            ['5285010890475466266241012129886994066620389595300350951623862490499600', Rounding_Mode::Down, '72698080376826087595732320834198550'],
+            ['5285010890475466266241012129886994066620389595300350951623862490499600', Rounding_Mode::Up, '72698080376826087595732320834198551'],
+            ['5285010890475466266241012129886994066620389595300350951623862490499600', Rounding_Mode::HalfUp, '72698080376826087595732320834198551'],
+
+            ['5285010890475466266241012129886994066620389595300350951623862490499601', Rounding_Mode::Unnecessary, '72698080376826087595732320834198551'],
+            ['5285010890475466266241012129886994066620389595300350951623862490499601', Rounding_Mode::Down, '72698080376826087595732320834198551'],
+            ['5285010890475466266241012129886994066620389595300350951623862490499601', Rounding_Mode::Up, '72698080376826087595732320834198551'],
+            ['5285010890475466266241012129886994066620389595300350951623862490499601', Rounding_Mode::HalfUp, '72698080376826087595732320834198551'],
+
+            ['138806460367120633162909304707973463857407594119348580175849319475249', Rounding_Mode::Unnecessary, '11781615354743195534745216445516807'],
+            ['138806460367120633162909304707973463857407594119348580175849319475249', Rounding_Mode::Down, '11781615354743195534745216445516807'],
+            ['138806460367120633162909304707973463857407594119348580175849319475249', Rounding_Mode::Up, '11781615354743195534745216445516807'],
+            ['138806460367120633162909304707973463857407594119348580175849319475249', Rounding_Mode::HalfUp, '11781615354743195534745216445516807'],
+
+            ['138806460367120633162909304707973475639022948862544114921065764992056', Rounding_Mode::Unnecessary, null],
+            ['138806460367120633162909304707973475639022948862544114921065764992056', Rounding_Mode::Down, '11781615354743195534745216445516807'],
+            ['138806460367120633162909304707973475639022948862544114921065764992056', Rounding_Mode::Up, '11781615354743195534745216445516808'],
+            ['138806460367120633162909304707973475639022948862544114921065764992056', Rounding_Mode::HalfUp, '11781615354743195534745216445516807'],
+
+            ['138806460367120633162909304707973487420638303605739649666282210508864', Rounding_Mode::Unnecessary, '11781615354743195534745216445516808'],
+            ['138806460367120633162909304707973487420638303605739649666282210508864', Rounding_Mode::Down, '11781615354743195534745216445516808'],
+            ['138806460367120633162909304707973487420638303605739649666282210508864', Rounding_Mode::Up, '11781615354743195534745216445516808'],
+            ['138806460367120633162909304707973487420638303605739649666282210508864', Rounding_Mode::HalfUp, '11781615354743195534745216445516808'],
+
+            ['4394593323188981215423145755036811566487951532301290484907917429040356', Rounding_Mode::Unnecessary, '66291728919896041699308382947726934'],
+            ['4394593323188981215423145755036811566487951532301290484907917429040356', Rounding_Mode::Down, '66291728919896041699308382947726934'],
+            ['4394593323188981215423145755036811566487951532301290484907917429040356', Rounding_Mode::Up, '66291728919896041699308382947726934'],
+            ['4394593323188981215423145755036811566487951532301290484907917429040356', Rounding_Mode::HalfUp, '66291728919896041699308382947726934'],
+
+            ['4394593323188981215423145755036811699071409372093373883524683324494224', Rounding_Mode::Unnecessary, null],
+            ['4394593323188981215423145755036811699071409372093373883524683324494224', Rounding_Mode::Down, '66291728919896041699308382947726934'],
+            ['4394593323188981215423145755036811699071409372093373883524683324494224', Rounding_Mode::Up, '66291728919896041699308382947726935'],
+            ['4394593323188981215423145755036811699071409372093373883524683324494224', Rounding_Mode::HalfUp, '66291728919896041699308382947726935'],
+
+            ['4394593323188981215423145755036811699071409372093373883524683324494225', Rounding_Mode::Unnecessary, '66291728919896041699308382947726935'],
+            ['4394593323188981215423145755036811699071409372093373883524683324494225', Rounding_Mode::Down, '66291728919896041699308382947726935'],
+            ['4394593323188981215423145755036811699071409372093373883524683324494225', Rounding_Mode::Up, '66291728919896041699308382947726935'],
+            ['4394593323188981215423145755036811699071409372093373883524683324494225', Rounding_Mode::HalfUp, '66291728919896041699308382947726935'],
+
+            ['2165102898894822021490897916929619474531175829310332070795169853731396', Rounding_Mode::Unnecessary, '46530666220190980857729715988167086'],
+            ['2165102898894822021490897916929619474531175829310332070795169853731396', Rounding_Mode::Down, '46530666220190980857729715988167086'],
+            ['2165102898894822021490897916929619474531175829310332070795169853731396', Rounding_Mode::Up, '46530666220190980857729715988167086'],
+            ['2165102898894822021490897916929619474531175829310332070795169853731396', Rounding_Mode::HalfUp, '46530666220190980857729715988167086'],
+
+            ['2165102898894822021490897916929619521061842049501312928524885841898482', Rounding_Mode::Unnecessary, null],
+            ['2165102898894822021490897916929619521061842049501312928524885841898482', Rounding_Mode::Down, '46530666220190980857729715988167086'],
+            ['2165102898894822021490897916929619521061842049501312928524885841898482', Rounding_Mode::Up, '46530666220190980857729715988167087'],
+            ['2165102898894822021490897916929619521061842049501312928524885841898482', Rounding_Mode::HalfUp, '46530666220190980857729715988167086'],
+
+            ['2165102898894822021490897916929619567592508269692293786254601830065569', Rounding_Mode::Unnecessary, '46530666220190980857729715988167087'],
+            ['2165102898894822021490897916929619567592508269692293786254601830065569', Rounding_Mode::Down, '46530666220190980857729715988167087'],
+            ['2165102898894822021490897916929619567592508269692293786254601830065569', Rounding_Mode::Up, '46530666220190980857729715988167087'],
+            ['2165102898894822021490897916929619567592508269692293786254601830065569', Rounding_Mode::HalfUp, '46530666220190980857729715988167087'],
+
+            ['3387136764299263076201461182231668509909087521737501460409373154998724', Rounding_Mode::Unnecessary, '58199113088596660127381090812371918'],
+            ['3387136764299263076201461182231668509909087521737501460409373154998724', Rounding_Mode::Down, '58199113088596660127381090812371918'],
+            ['3387136764299263076201461182231668509909087521737501460409373154998724', Rounding_Mode::Up, '58199113088596660127381090812371918'],
+            ['3387136764299263076201461182231668509909087521737501460409373154998724', Rounding_Mode::HalfUp, '58199113088596660127381090812371918'],
+
+            ['3387136764299263076201461182231668626307313698930821715171554779742560', Rounding_Mode::Unnecessary, null],
+            ['3387136764299263076201461182231668626307313698930821715171554779742560', Rounding_Mode::Down, '58199113088596660127381090812371918'],
+            ['3387136764299263076201461182231668626307313698930821715171554779742560', Rounding_Mode::Up, '58199113088596660127381090812371919'],
+            ['3387136764299263076201461182231668626307313698930821715171554779742560', Rounding_Mode::HalfUp, '58199113088596660127381090812371919'],
+
+            ['3387136764299263076201461182231668626307313698930821715171554779742561', Rounding_Mode::Unnecessary, '58199113088596660127381090812371919'],
+            ['3387136764299263076201461182231668626307313698930821715171554779742561', Rounding_Mode::Down, '58199113088596660127381090812371919'],
+            ['3387136764299263076201461182231668626307313698930821715171554779742561', Rounding_Mode::Up, '58199113088596660127381090812371919'],
+            ['3387136764299263076201461182231668626307313698930821715171554779742561', Rounding_Mode::HalfUp, '58199113088596660127381090812371919'],
+
+            ['598571098379632349988804996185789284322923089459844190238738309900665041', Rounding_Mode::Unnecessary, '773673767410807557353849214204230071'],
+            ['598571098379632349988804996185789284322923089459844190238738309900665041', Rounding_Mode::Down, '773673767410807557353849214204230071'],
+            ['598571098379632349988804996185789284322923089459844190238738309900665041', Rounding_Mode::Up, '773673767410807557353849214204230071'],
+            ['598571098379632349988804996185789284322923089459844190238738309900665041', Rounding_Mode::HalfUp, '773673767410807557353849214204230071'],
+
+            ['598571098379632349988804996185789285096596856870651747592587524104895112', Rounding_Mode::Unnecessary, null],
+            ['598571098379632349988804996185789285096596856870651747592587524104895112', Rounding_Mode::Down, '773673767410807557353849214204230071'],
+            ['598571098379632349988804996185789285096596856870651747592587524104895112', Rounding_Mode::Up, '773673767410807557353849214204230072'],
+            ['598571098379632349988804996185789285096596856870651747592587524104895112', Rounding_Mode::HalfUp, '773673767410807557353849214204230071'],
+
+            ['598571098379632349988804996185789285870270624281459304946436738309125184', Rounding_Mode::Unnecessary, '773673767410807557353849214204230072'],
+            ['598571098379632349988804996185789285870270624281459304946436738309125184', Rounding_Mode::Down, '773673767410807557353849214204230072'],
+            ['598571098379632349988804996185789285870270624281459304946436738309125184', Rounding_Mode::Up, '773673767410807557353849214204230072'],
+            ['598571098379632349988804996185789285870270624281459304946436738309125184', Rounding_Mode::HalfUp, '773673767410807557353849214204230072'],
+
+            ['520654040364073618548858305514718008281370888178241149423087536697602769', Rounding_Mode::Unnecessary, '721563607982050061031165602524215113'],
+            ['520654040364073618548858305514718008281370888178241149423087536697602769', Rounding_Mode::Down, '721563607982050061031165602524215113'],
+            ['520654040364073618548858305514718008281370888178241149423087536697602769', Rounding_Mode::Up, '721563607982050061031165602524215113'],
+            ['520654040364073618548858305514718008281370888178241149423087536697602769', Rounding_Mode::HalfUp, '721563607982050061031165602524215113'],
+
+            ['520654040364073618548858305514718009724498104142341271485418741746032995', Rounding_Mode::Unnecessary, null],
+            ['520654040364073618548858305514718009724498104142341271485418741746032995', Rounding_Mode::Down, '721563607982050061031165602524215113'],
+            ['520654040364073618548858305514718009724498104142341271485418741746032995', Rounding_Mode::Up, '721563607982050061031165602524215114'],
+            ['520654040364073618548858305514718009724498104142341271485418741746032995', Rounding_Mode::HalfUp, '721563607982050061031165602524215114'],
+
+            ['520654040364073618548858305514718009724498104142341271485418741746032996', Rounding_Mode::Unnecessary, '721563607982050061031165602524215114'],
+            ['520654040364073618548858305514718009724498104142341271485418741746032996', Rounding_Mode::Down, '721563607982050061031165602524215114'],
+            ['520654040364073618548858305514718009724498104142341271485418741746032996', Rounding_Mode::Up, '721563607982050061031165602524215114'],
+            ['520654040364073618548858305514718009724498104142341271485418741746032996', Rounding_Mode::HalfUp, '721563607982050061031165602524215114'],
+
+            ['49468236740249321869413367805106481368010073927095236023233757323825636', Rounding_Mode::Unnecessary, '222414560540107899360763128216988694'],
+            ['49468236740249321869413367805106481368010073927095236023233757323825636', Rounding_Mode::Down, '222414560540107899360763128216988694'],
+            ['49468236740249321869413367805106481368010073927095236023233757323825636', Rounding_Mode::Up, '222414560540107899360763128216988694'],
+            ['49468236740249321869413367805106481368010073927095236023233757323825636', Rounding_Mode::HalfUp, '222414560540107899360763128216988694'],
+
+            ['49468236740249321869413367805106481590424634467203135383996885540814330', Rounding_Mode::Unnecessary, null],
+            ['49468236740249321869413367805106481590424634467203135383996885540814330', Rounding_Mode::Down, '222414560540107899360763128216988694'],
+            ['49468236740249321869413367805106481590424634467203135383996885540814330', Rounding_Mode::Up, '222414560540107899360763128216988695'],
+            ['49468236740249321869413367805106481590424634467203135383996885540814330', Rounding_Mode::HalfUp, '222414560540107899360763128216988694'],
+
+            ['49468236740249321869413367805106481812839195007311034744760013757803025', Rounding_Mode::Unnecessary, '222414560540107899360763128216988695'],
+            ['49468236740249321869413367805106481812839195007311034744760013757803025', Rounding_Mode::Down, '222414560540107899360763128216988695'],
+            ['49468236740249321869413367805106481812839195007311034744760013757803025', Rounding_Mode::Up, '222414560540107899360763128216988695'],
+            ['49468236740249321869413367805106481812839195007311034744760013757803025', Rounding_Mode::HalfUp, '222414560540107899360763128216988695'],
+
+            ['752985146631183783668626620327136132189678265369154785125113211857131025', Rounding_Mode::Unnecessary, '867747167457885617308484616342840855'],
+            ['752985146631183783668626620327136132189678265369154785125113211857131025', Rounding_Mode::Down, '867747167457885617308484616342840855'],
+            ['752985146631183783668626620327136132189678265369154785125113211857131025', Rounding_Mode::Up, '867747167457885617308484616342840855'],
+            ['752985146631183783668626620327136132189678265369154785125113211857131025', Rounding_Mode::HalfUp, '867747167457885617308484616342840855'],
+
+            ['752985146631183783668626620327136133925172600284926019742082444542812735', Rounding_Mode::Unnecessary, null],
+            ['752985146631183783668626620327136133925172600284926019742082444542812735', Rounding_Mode::Down, '867747167457885617308484616342840855'],
+            ['752985146631183783668626620327136133925172600284926019742082444542812735', Rounding_Mode::Up, '867747167457885617308484616342840856'],
+            ['752985146631183783668626620327136133925172600284926019742082444542812735', Rounding_Mode::HalfUp, '867747167457885617308484616342840856'],
+
+            ['752985146631183783668626620327136133925172600284926019742082444542812736', Rounding_Mode::Unnecessary, '867747167457885617308484616342840856'],
+            ['752985146631183783668626620327136133925172600284926019742082444542812736', Rounding_Mode::Down, '867747167457885617308484616342840856'],
+            ['752985146631183783668626620327136133925172600284926019742082444542812736', Rounding_Mode::Up, '867747167457885617308484616342840856'],
+            ['752985146631183783668626620327136133925172600284926019742082444542812736', Rounding_Mode::HalfUp, '867747167457885617308484616342840856'],
+
+            ['4964939306071472434861762119449573856931127119323966160723135793312400', Rounding_Mode::Unnecessary, '70462325437580276008386497095248180'],
+            ['4964939306071472434861762119449573856931127119323966160723135793312400', Rounding_Mode::Down, '70462325437580276008386497095248180'],
+            ['4964939306071472434861762119449573856931127119323966160723135793312400', Rounding_Mode::Up, '70462325437580276008386497095248180'],
+            ['4964939306071472434861762119449573856931127119323966160723135793312400', Rounding_Mode::HalfUp, '70462325437580276008386497095248180'],
+
+            ['4964939306071472434861762119449573927393452556904242169109632888560580', Rounding_Mode::Unnecessary, null],
+            ['4964939306071472434861762119449573927393452556904242169109632888560580', Rounding_Mode::Down, '70462325437580276008386497095248180'],
+            ['4964939306071472434861762119449573927393452556904242169109632888560580', Rounding_Mode::Up, '70462325437580276008386497095248181'],
+            ['4964939306071472434861762119449573927393452556904242169109632888560580', Rounding_Mode::HalfUp, '70462325437580276008386497095248180'],
+
+            ['4964939306071472434861762119449573997855777994484518177496129983808761', Rounding_Mode::Unnecessary, '70462325437580276008386497095248181'],
+            ['4964939306071472434861762119449573997855777994484518177496129983808761', Rounding_Mode::Down, '70462325437580276008386497095248181'],
+            ['4964939306071472434861762119449573997855777994484518177496129983808761', Rounding_Mode::Up, '70462325437580276008386497095248181'],
+            ['4964939306071472434861762119449573997855777994484518177496129983808761', Rounding_Mode::HalfUp, '70462325437580276008386497095248181'],
+
+            ['6793060375719308872947059218122494900670395578602098991588961245675868921', Rounding_Mode::Unnecessary, '2606350010209547598885835947629243339'],
+            ['6793060375719308872947059218122494900670395578602098991588961245675868921', Rounding_Mode::Down, '2606350010209547598885835947629243339'],
+            ['6793060375719308872947059218122494900670395578602098991588961245675868921', Rounding_Mode::Up, '2606350010209547598885835947629243339'],
+            ['6793060375719308872947059218122494900670395578602098991588961245675868921', Rounding_Mode::HalfUp, '2606350010209547598885835947629243339'],
+
+            ['6793060375719308872947059218122494905883095599021194189360633140934355599', Rounding_Mode::Unnecessary, null],
+            ['6793060375719308872947059218122494905883095599021194189360633140934355599', Rounding_Mode::Down, '2606350010209547598885835947629243339'],
+            ['6793060375719308872947059218122494905883095599021194189360633140934355599', Rounding_Mode::Up, '2606350010209547598885835947629243340'],
+            ['6793060375719308872947059218122494905883095599021194189360633140934355599', Rounding_Mode::HalfUp, '2606350010209547598885835947629243340'],
+
+            ['6793060375719308872947059218122494905883095599021194189360633140934355600', Rounding_Mode::Unnecessary, '2606350010209547598885835947629243340'],
+            ['6793060375719308872947059218122494905883095599021194189360633140934355600', Rounding_Mode::Down, '2606350010209547598885835947629243340'],
+            ['6793060375719308872947059218122494905883095599021194189360633140934355600', Rounding_Mode::Up, '2606350010209547598885835947629243340'],
+            ['6793060375719308872947059218122494905883095599021194189360633140934355600', Rounding_Mode::HalfUp, '2606350010209547598885835947629243340'],
+
+            ['72434023187588979108181351955877408189952248642066292273939239044048882404', Rounding_Mode::Unnecessary, '8510818009309620944867597322534681898'],
+            ['72434023187588979108181351955877408189952248642066292273939239044048882404', Rounding_Mode::Down, '8510818009309620944867597322534681898'],
+            ['72434023187588979108181351955877408189952248642066292273939239044048882404', Rounding_Mode::Up, '8510818009309620944867597322534681898'],
+            ['72434023187588979108181351955877408189952248642066292273939239044048882404', Rounding_Mode::HalfUp, '8510818009309620944867597322534681898'],
+
+            ['72434023187588979108181351955877408198463066651375913218806836366583564302', Rounding_Mode::Unnecessary, null],
+            ['72434023187588979108181351955877408198463066651375913218806836366583564302', Rounding_Mode::Down, '8510818009309620944867597322534681898'],
+            ['72434023187588979108181351955877408198463066651375913218806836366583564302', Rounding_Mode::Up, '8510818009309620944867597322534681899'],
+            ['72434023187588979108181351955877408198463066651375913218806836366583564302', Rounding_Mode::HalfUp, '8510818009309620944867597322534681898'],
+
+            ['72434023187588979108181351955877408206973884660685534163674433689118246201', Rounding_Mode::Unnecessary, '8510818009309620944867597322534681899'],
+            ['72434023187588979108181351955877408206973884660685534163674433689118246201', Rounding_Mode::Down, '8510818009309620944867597322534681899'],
+            ['72434023187588979108181351955877408206973884660685534163674433689118246201', Rounding_Mode::Up, '8510818009309620944867597322534681899'],
+            ['72434023187588979108181351955877408206973884660685534163674433689118246201', Rounding_Mode::HalfUp, '8510818009309620944867597322534681899'],
+
+            ['11820228792957342809567646506028581034714829445539021053517615632467438404', Rounding_Mode::Unnecessary, '3438055961289365459878259691983242898'],
+            ['11820228792957342809567646506028581034714829445539021053517615632467438404', Rounding_Mode::Down, '3438055961289365459878259691983242898'],
+            ['11820228792957342809567646506028581034714829445539021053517615632467438404', Rounding_Mode::Up, '3438055961289365459878259691983242898'],
+            ['11820228792957342809567646506028581034714829445539021053517615632467438404', Rounding_Mode::HalfUp, '3438055961289365459878259691983242898'],
+
+            ['11820228792957342809567646506028581041590941368117751973274135016433924200', Rounding_Mode::Unnecessary, null],
+            ['11820228792957342809567646506028581041590941368117751973274135016433924200', Rounding_Mode::Down, '3438055961289365459878259691983242898'],
+            ['11820228792957342809567646506028581041590941368117751973274135016433924200', Rounding_Mode::Up, '3438055961289365459878259691983242899'],
+            ['11820228792957342809567646506028581041590941368117751973274135016433924200', Rounding_Mode::HalfUp, '3438055961289365459878259691983242899'],
+
+            ['11820228792957342809567646506028581041590941368117751973274135016433924201', Rounding_Mode::Unnecessary, '3438055961289365459878259691983242899'],
+            ['11820228792957342809567646506028581041590941368117751973274135016433924201', Rounding_Mode::Down, '3438055961289365459878259691983242899'],
+            ['11820228792957342809567646506028581041590941368117751973274135016433924201', Rounding_Mode::Up, '3438055961289365459878259691983242899'],
+            ['11820228792957342809567646506028581041590941368117751973274135016433924201', Rounding_Mode::HalfUp, '3438055961289365459878259691983242899'],
+
+            ['6386392982997549868964551665256601064299977946311952729197080155224215225', Rounding_Mode::Unnecessary, '2527131374305172498893486771925871765'],
+            ['6386392982997549868964551665256601064299977946311952729197080155224215225', Rounding_Mode::Down, '2527131374305172498893486771925871765'],
+            ['6386392982997549868964551665256601064299977946311952729197080155224215225', Rounding_Mode::Up, '2527131374305172498893486771925871765'],
+            ['6386392982997549868964551665256601064299977946311952729197080155224215225', Rounding_Mode::HalfUp, '2527131374305172498893486771925871765'],
+
+            ['6386392982997549868964551665256601066827109320617125228090566927150086990', Rounding_Mode::Unnecessary, null],
+            ['6386392982997549868964551665256601066827109320617125228090566927150086990', Rounding_Mode::Down, '2527131374305172498893486771925871765'],
+            ['6386392982997549868964551665256601066827109320617125228090566927150086990', Rounding_Mode::Up, '2527131374305172498893486771925871766'],
+            ['6386392982997549868964551665256601066827109320617125228090566927150086990', Rounding_Mode::HalfUp, '2527131374305172498893486771925871765'],
+
+            ['6386392982997549868964551665256601069354240694922297726984053699075958756', Rounding_Mode::Unnecessary, '2527131374305172498893486771925871766'],
+            ['6386392982997549868964551665256601069354240694922297726984053699075958756', Rounding_Mode::Down, '2527131374305172498893486771925871766'],
+            ['6386392982997549868964551665256601069354240694922297726984053699075958756', Rounding_Mode::Up, '2527131374305172498893486771925871766'],
+            ['6386392982997549868964551665256601069354240694922297726984053699075958756', Rounding_Mode::HalfUp, '2527131374305172498893486771925871766'],
+
+            ['241100595746204845568053694673173646954637963055159189070656778312291856', Rounding_Mode::Unnecessary, '491019954529553559943132903540543684'],
+            ['241100595746204845568053694673173646954637963055159189070656778312291856', Rounding_Mode::Down, '491019954529553559943132903540543684'],
+            ['241100595746204845568053694673173646954637963055159189070656778312291856', Rounding_Mode::Up, '491019954529553559943132903540543684'],
+            ['241100595746204845568053694673173646954637963055159189070656778312291856', Rounding_Mode::HalfUp, '491019954529553559943132903540543684'],
+
+            ['241100595746204845568053694673173647936677872114266308956922585393379224', Rounding_Mode::Unnecessary, null],
+            ['241100595746204845568053694673173647936677872114266308956922585393379224', Rounding_Mode::Down, '491019954529553559943132903540543684'],
+            ['241100595746204845568053694673173647936677872114266308956922585393379224', Rounding_Mode::Up, '491019954529553559943132903540543685'],
+            ['241100595746204845568053694673173647936677872114266308956922585393379224', Rounding_Mode::HalfUp, '491019954529553559943132903540543685'],
+
+            ['241100595746204845568053694673173647936677872114266308956922585393379225', Rounding_Mode::Unnecessary, '491019954529553559943132903540543685'],
+            ['241100595746204845568053694673173647936677872114266308956922585393379225', Rounding_Mode::Down, '491019954529553559943132903540543685'],
+            ['241100595746204845568053694673173647936677872114266308956922585393379225', Rounding_Mode::Up, '491019954529553559943132903540543685'],
+            ['241100595746204845568053694673173647936677872114266308956922585393379225', Rounding_Mode::HalfUp, '491019954529553559943132903540543685'],
+
+            ['9443978332159357501114101827797274207266380117275222876917889364528773973136', Rounding_Mode::Unnecessary, '97180133423243238008221615153136002444'],
+            ['9443978332159357501114101827797274207266380117275222876917889364528773973136', Rounding_Mode::Down, '97180133423243238008221615153136002444'],
+            ['9443978332159357501114101827797274207266380117275222876917889364528773973136', Rounding_Mode::Up, '97180133423243238008221615153136002444'],
+            ['9443978332159357501114101827797274207266380117275222876917889364528773973136', Rounding_Mode::HalfUp, '97180133423243238008221615153136002444'],
+
+            ['9443978332159357501114101827797274207363560250698466114926110979681909975580', Rounding_Mode::Unnecessary, null],
+            ['9443978332159357501114101827797274207363560250698466114926110979681909975580', Rounding_Mode::Down, '97180133423243238008221615153136002444'],
+            ['9443978332159357501114101827797274207363560250698466114926110979681909975580', Rounding_Mode::Up, '97180133423243238008221615153136002445'],
+            ['9443978332159357501114101827797274207363560250698466114926110979681909975580', Rounding_Mode::HalfUp, '97180133423243238008221615153136002444'],
+
+            ['9443978332159357501114101827797274207460740384121709352934332594835045978025', Rounding_Mode::Unnecessary, '97180133423243238008221615153136002445'],
+            ['9443978332159357501114101827797274207460740384121709352934332594835045978025', Rounding_Mode::Down, '97180133423243238008221615153136002445'],
+            ['9443978332159357501114101827797274207460740384121709352934332594835045978025', Rounding_Mode::Up, '97180133423243238008221615153136002445'],
+            ['9443978332159357501114101827797274207460740384121709352934332594835045978025', Rounding_Mode::HalfUp, '97180133423243238008221615153136002445'],
+
+            ['313018699256618409001992020847417266900442089718999098874457999889859130596', Rounding_Mode::Unnecessary, '17692334477298873658720698607769718186'],
+            ['313018699256618409001992020847417266900442089718999098874457999889859130596', Rounding_Mode::Down, '17692334477298873658720698607769718186'],
+            ['313018699256618409001992020847417266900442089718999098874457999889859130596', Rounding_Mode::Up, '17692334477298873658720698607769718186'],
+            ['313018699256618409001992020847417266900442089718999098874457999889859130596', Rounding_Mode::HalfUp, '17692334477298873658720698607769718186'],
+
+            ['313018699256618409001992020847417266935826758673596846191899397105398566968', Rounding_Mode::Unnecessary, null],
+            ['313018699256618409001992020847417266935826758673596846191899397105398566968', Rounding_Mode::Down, '17692334477298873658720698607769718186'],
+            ['313018699256618409001992020847417266935826758673596846191899397105398566968', Rounding_Mode::Up, '17692334477298873658720698607769718187'],
+            ['313018699256618409001992020847417266935826758673596846191899397105398566968', Rounding_Mode::HalfUp, '17692334477298873658720698607769718187'],
+
+            ['313018699256618409001992020847417266935826758673596846191899397105398566969', Rounding_Mode::Unnecessary, '17692334477298873658720698607769718187'],
+            ['313018699256618409001992020847417266935826758673596846191899397105398566969', Rounding_Mode::Down, '17692334477298873658720698607769718187'],
+            ['313018699256618409001992020847417266935826758673596846191899397105398566969', Rounding_Mode::Up, '17692334477298873658720698607769718187'],
+            ['313018699256618409001992020847417266935826758673596846191899397105398566969', Rounding_Mode::HalfUp, '17692334477298873658720698607769718187'],
+
+            ['6933071107478585245042253386666659991142755133413332931821052899578751610000', Rounding_Mode::Unnecessary, '83265065348431602879537003312633461900'],
+            ['6933071107478585245042253386666659991142755133413332931821052899578751610000', Rounding_Mode::Down, '83265065348431602879537003312633461900'],
+            ['6933071107478585245042253386666659991142755133413332931821052899578751610000', Rounding_Mode::Up, '83265065348431602879537003312633461900'],
+            ['6933071107478585245042253386666659991142755133413332931821052899578751610000', Rounding_Mode::HalfUp, '83265065348431602879537003312633461900'],
+
+            ['6933071107478585245042253386666659991226020198761764534700589902891385071900', Rounding_Mode::Unnecessary, null],
+            ['6933071107478585245042253386666659991226020198761764534700589902891385071900', Rounding_Mode::Down, '83265065348431602879537003312633461900'],
+            ['6933071107478585245042253386666659991226020198761764534700589902891385071900', Rounding_Mode::Up, '83265065348431602879537003312633461901'],
+            ['6933071107478585245042253386666659991226020198761764534700589902891385071900', Rounding_Mode::HalfUp, '83265065348431602879537003312633461900'],
+
+            ['6933071107478585245042253386666659991309285264110196137580126906204018533801', Rounding_Mode::Unnecessary, '83265065348431602879537003312633461901'],
+            ['6933071107478585245042253386666659991309285264110196137580126906204018533801', Rounding_Mode::Down, '83265065348431602879537003312633461901'],
+            ['6933071107478585245042253386666659991309285264110196137580126906204018533801', Rounding_Mode::Up, '83265065348431602879537003312633461901'],
+            ['6933071107478585245042253386666659991309285264110196137580126906204018533801', Rounding_Mode::HalfUp, '83265065348431602879537003312633461901'],
+
+            ['1579670801917993723309858041679990418433600770326208765934116379197768903056', Rounding_Mode::Unnecessary, '39745072674710178762237903560835952916'],
+            ['1579670801917993723309858041679990418433600770326208765934116379197768903056', Rounding_Mode::Down, '39745072674710178762237903560835952916'],
+            ['1579670801917993723309858041679990418433600770326208765934116379197768903056', Rounding_Mode::Up, '39745072674710178762237903560835952916'],
+            ['1579670801917993723309858041679990418433600770326208765934116379197768903056', Rounding_Mode::HalfUp, '39745072674710178762237903560835952916'],
+
+            ['1579670801917993723309858041679990418513090915675629123458592186319440808888', Rounding_Mode::Unnecessary, null],
+            ['1579670801917993723309858041679990418513090915675629123458592186319440808888', Rounding_Mode::Down, '39745072674710178762237903560835952916'],
+            ['1579670801917993723309858041679990418513090915675629123458592186319440808888', Rounding_Mode::Up, '39745072674710178762237903560835952917'],
+            ['1579670801917993723309858041679990418513090915675629123458592186319440808888', Rounding_Mode::HalfUp, '39745072674710178762237903560835952917'],
+
+            ['1579670801917993723309858041679990418513090915675629123458592186319440808889', Rounding_Mode::Unnecessary, '39745072674710178762237903560835952917'],
+            ['1579670801917993723309858041679990418513090915675629123458592186319440808889', Rounding_Mode::Down, '39745072674710178762237903560835952917'],
+            ['1579670801917993723309858041679990418513090915675629123458592186319440808889', Rounding_Mode::Up, '39745072674710178762237903560835952917'],
+            ['1579670801917993723309858041679990418513090915675629123458592186319440808889', Rounding_Mode::HalfUp, '39745072674710178762237903560835952917'],
+
+            ['681867337215944596936584982759400170727379727957999719338051977506244355625', Rounding_Mode::Unnecessary, '26112589630596667363860934899092645325'],
+            ['681867337215944596936584982759400170727379727957999719338051977506244355625', Rounding_Mode::Down, '26112589630596667363860934899092645325'],
+            ['681867337215944596936584982759400170727379727957999719338051977506244355625', Rounding_Mode::Up, '26112589630596667363860934899092645325'],
+            ['681867337215944596936584982759400170727379727957999719338051977506244355625', Rounding_Mode::HalfUp, '26112589630596667363860934899092645325'],
+
+            ['681867337215944596936584982759400170753492317588596386701912912405337000950', Rounding_Mode::Unnecessary, null],
+            ['681867337215944596936584982759400170753492317588596386701912912405337000950', Rounding_Mode::Down, '26112589630596667363860934899092645325'],
+            ['681867337215944596936584982759400170753492317588596386701912912405337000950', Rounding_Mode::Up, '26112589630596667363860934899092645326'],
+            ['681867337215944596936584982759400170753492317588596386701912912405337000950', Rounding_Mode::HalfUp, '26112589630596667363860934899092645325'],
+
+            ['681867337215944596936584982759400170779604907219193054065773847304429646276', Rounding_Mode::Unnecessary, '26112589630596667363860934899092645326'],
+            ['681867337215944596936584982759400170779604907219193054065773847304429646276', Rounding_Mode::Down, '26112589630596667363860934899092645326'],
+            ['681867337215944596936584982759400170779604907219193054065773847304429646276', Rounding_Mode::Up, '26112589630596667363860934899092645326'],
+            ['681867337215944596936584982759400170779604907219193054065773847304429646276', Rounding_Mode::HalfUp, '26112589630596667363860934899092645326'],
+
+            ['288453689043393924123357086972242613663177706471101442929325163584978377458225', Rounding_Mode::Unnecessary, '537078848069251303040109060485183727865'],
+            ['288453689043393924123357086972242613663177706471101442929325163584978377458225', Rounding_Mode::Down, '537078848069251303040109060485183727865'],
+            ['288453689043393924123357086972242613663177706471101442929325163584978377458225', Rounding_Mode::Up, '537078848069251303040109060485183727865'],
+            ['288453689043393924123357086972242613663177706471101442929325163584978377458225', Rounding_Mode::HalfUp, '537078848069251303040109060485183727865'],
+
+            ['288453689043393924123357086972242613664251864167239945535405381705948744913955', Rounding_Mode::Unnecessary, null],
+            ['288453689043393924123357086972242613664251864167239945535405381705948744913955', Rounding_Mode::Down, '537078848069251303040109060485183727865'],
+            ['288453689043393924123357086972242613664251864167239945535405381705948744913955', Rounding_Mode::Up, '537078848069251303040109060485183727866'],
+            ['288453689043393924123357086972242613664251864167239945535405381705948744913955', Rounding_Mode::HalfUp, '537078848069251303040109060485183727866'],
+
+            ['288453689043393924123357086972242613664251864167239945535405381705948744913956', Rounding_Mode::Unnecessary, '537078848069251303040109060485183727866'],
+            ['288453689043393924123357086972242613664251864167239945535405381705948744913956', Rounding_Mode::Down, '537078848069251303040109060485183727866'],
+            ['288453689043393924123357086972242613664251864167239945535405381705948744913956', Rounding_Mode::Up, '537078848069251303040109060485183727866'],
+            ['288453689043393924123357086972242613664251864167239945535405381705948744913956', Rounding_Mode::HalfUp, '537078848069251303040109060485183727866'],
+
+            ['195356853506305520718626478206756382507801939519785697420547945042825319176129', Rounding_Mode::Unnecessary, '441991915657182038371378633304634321377'],
+            ['195356853506305520718626478206756382507801939519785697420547945042825319176129', Rounding_Mode::Down, '441991915657182038371378633304634321377'],
+            ['195356853506305520718626478206756382507801939519785697420547945042825319176129', Rounding_Mode::Up, '441991915657182038371378633304634321377'],
+            ['195356853506305520718626478206756382507801939519785697420547945042825319176129', Rounding_Mode::HalfUp, '441991915657182038371378633304634321377'],
+
+            ['195356853506305520718626478206756382508243931435442879458919323676129953497506', Rounding_Mode::Unnecessary, null],
+            ['195356853506305520718626478206756382508243931435442879458919323676129953497506', Rounding_Mode::Down, '441991915657182038371378633304634321377'],
+            ['195356853506305520718626478206756382508243931435442879458919323676129953497506', Rounding_Mode::Up, '441991915657182038371378633304634321378'],
+            ['195356853506305520718626478206756382508243931435442879458919323676129953497506', Rounding_Mode::HalfUp, '441991915657182038371378633304634321377'],
+
+            ['195356853506305520718626478206756382508685923351100061497290702309434587818884', Rounding_Mode::Unnecessary, '441991915657182038371378633304634321378'],
+            ['195356853506305520718626478206756382508685923351100061497290702309434587818884', Rounding_Mode::Down, '441991915657182038371378633304634321378'],
+            ['195356853506305520718626478206756382508685923351100061497290702309434587818884', Rounding_Mode::Up, '441991915657182038371378633304634321378'],
+            ['195356853506305520718626478206756382508685923351100061497290702309434587818884', Rounding_Mode::HalfUp, '441991915657182038371378633304634321378'],
+
+            ['171318600916753697429051575925878633930439101417068058777561592608661184180625', Rounding_Mode::Unnecessary, '413906512290823587410087929387066009175'],
+            ['171318600916753697429051575925878633930439101417068058777561592608661184180625', Rounding_Mode::Down, '413906512290823587410087929387066009175'],
+            ['171318600916753697429051575925878633930439101417068058777561592608661184180625', Rounding_Mode::Up, '413906512290823587410087929387066009175'],
+            ['171318600916753697429051575925878633930439101417068058777561592608661184180625', Rounding_Mode::HalfUp, '413906512290823587410087929387066009175'],
+
+            ['171318600916753697429051575925878633931266914441649705952381768467435316198975', Rounding_Mode::Unnecessary, null],
+            ['171318600916753697429051575925878633931266914441649705952381768467435316198975', Rounding_Mode::Down, '413906512290823587410087929387066009175'],
+            ['171318600916753697429051575925878633931266914441649705952381768467435316198975', Rounding_Mode::Up, '413906512290823587410087929387066009176'],
+            ['171318600916753697429051575925878633931266914441649705952381768467435316198975', Rounding_Mode::HalfUp, '413906512290823587410087929387066009176'],
+
+            ['171318600916753697429051575925878633931266914441649705952381768467435316198976', Rounding_Mode::Unnecessary, '413906512290823587410087929387066009176'],
+            ['171318600916753697429051575925878633931266914441649705952381768467435316198976', Rounding_Mode::Down, '413906512290823587410087929387066009176'],
+            ['171318600916753697429051575925878633931266914441649705952381768467435316198976', Rounding_Mode::Up, '413906512290823587410087929387066009176'],
+            ['171318600916753697429051575925878633931266914441649705952381768467435316198976', Rounding_Mode::HalfUp, '413906512290823587410087929387066009176'],
+
+            ['921093761539400396463886664522151015280465523566321840991339256462222570006049', Rounding_Mode::Unnecessary, '959736297916985317802888407093394929007'],
+            ['921093761539400396463886664522151015280465523566321840991339256462222570006049', Rounding_Mode::Down, '959736297916985317802888407093394929007'],
+            ['921093761539400396463886664522151015280465523566321840991339256462222570006049', Rounding_Mode::Up, '959736297916985317802888407093394929007'],
+            ['921093761539400396463886664522151015280465523566321840991339256462222570006049', Rounding_Mode::HalfUp, '959736297916985317802888407093394929007'],
+
+            ['921093761539400396463886664522151015281425259864238826309142144869315964935056', Rounding_Mode::Unnecessary, null],
+            ['921093761539400396463886664522151015281425259864238826309142144869315964935056', Rounding_Mode::Down, '959736297916985317802888407093394929007'],
+            ['921093761539400396463886664522151015281425259864238826309142144869315964935056', Rounding_Mode::Up, '959736297916985317802888407093394929008'],
+            ['921093761539400396463886664522151015281425259864238826309142144869315964935056', Rounding_Mode::HalfUp, '959736297916985317802888407093394929007'],
+
+            ['921093761539400396463886664522151015282384996162155811626945033276409359864064', Rounding_Mode::Unnecessary, '959736297916985317802888407093394929008'],
+            ['921093761539400396463886664522151015282384996162155811626945033276409359864064', Rounding_Mode::Down, '959736297916985317802888407093394929008'],
+            ['921093761539400396463886664522151015282384996162155811626945033276409359864064', Rounding_Mode::Up, '959736297916985317802888407093394929008'],
+            ['921093761539400396463886664522151015282384996162155811626945033276409359864064', Rounding_Mode::HalfUp, '959736297916985317802888407093394929008'],
+
+            ['95109948153362184845030342755869423838311917496546178503410149505934962822401', Rounding_Mode::Unnecessary, '308399008029147501090828356257276909951'],
+            ['95109948153362184845030342755869423838311917496546178503410149505934962822401', Rounding_Mode::Down, '308399008029147501090828356257276909951'],
+            ['95109948153362184845030342755869423838311917496546178503410149505934962822401', Rounding_Mode::Up, '308399008029147501090828356257276909951'],
+            ['95109948153362184845030342755869423838311917496546178503410149505934962822401', Rounding_Mode::HalfUp, '308399008029147501090828356257276909951'],
+
+            ['95109948153362184845030342755869423838928715512604473505591806218449516642303', Rounding_Mode::Unnecessary, null],
+            ['95109948153362184845030342755869423838928715512604473505591806218449516642303', Rounding_Mode::Down, '308399008029147501090828356257276909951'],
+            ['95109948153362184845030342755869423838928715512604473505591806218449516642303', Rounding_Mode::Up, '308399008029147501090828356257276909952'],
+            ['95109948153362184845030342755869423838928715512604473505591806218449516642303', Rounding_Mode::HalfUp, '308399008029147501090828356257276909952'],
+
+            ['95109948153362184845030342755869423838928715512604473505591806218449516642304', Rounding_Mode::Unnecessary, '308399008029147501090828356257276909952'],
+            ['95109948153362184845030342755869423838928715512604473505591806218449516642304', Rounding_Mode::Down, '308399008029147501090828356257276909952'],
+            ['95109948153362184845030342755869423838928715512604473505591806218449516642304', Rounding_Mode::Up, '308399008029147501090828356257276909952'],
+            ['95109948153362184845030342755869423838928715512604473505591806218449516642304', Rounding_Mode::HalfUp, '308399008029147501090828356257276909952'],
+
+            ['19331455316972407468074740850649574350712359000359926791488814669406316705438096', Rounding_Mode::Unnecessary, '4396755089491841080442863075541933084436'],
+            ['19331455316972407468074740850649574350712359000359926791488814669406316705438096', Rounding_Mode::Down, '4396755089491841080442863075541933084436'],
+            ['19331455316972407468074740850649574350712359000359926791488814669406316705438096', Rounding_Mode::Up, '4396755089491841080442863075541933084436'],
+            ['19331455316972407468074740850649574350712359000359926791488814669406316705438096', Rounding_Mode::HalfUp, '4396755089491841080442863075541933084436'],
+
+            ['19331455316972407468074740850649574350716755755449418632569257532481858638522532', Rounding_Mode::Unnecessary, null],
+            ['19331455316972407468074740850649574350716755755449418632569257532481858638522532', Rounding_Mode::Down, '4396755089491841080442863075541933084436'],
+            ['19331455316972407468074740850649574350716755755449418632569257532481858638522532', Rounding_Mode::Up, '4396755089491841080442863075541933084437'],
+            ['19331455316972407468074740850649574350716755755449418632569257532481858638522532', Rounding_Mode::HalfUp, '4396755089491841080442863075541933084436'],
+
+            ['19331455316972407468074740850649574350721152510538910473649700395557400571606969', Rounding_Mode::Unnecessary, '4396755089491841080442863075541933084437'],
+            ['19331455316972407468074740850649574350721152510538910473649700395557400571606969', Rounding_Mode::Down, '4396755089491841080442863075541933084437'],
+            ['19331455316972407468074740850649574350721152510538910473649700395557400571606969', Rounding_Mode::Up, '4396755089491841080442863075541933084437'],
+            ['19331455316972407468074740850649574350721152510538910473649700395557400571606969', Rounding_Mode::HalfUp, '4396755089491841080442863075541933084437'],
+
+            ['79265978575272061761010812898504289157311811916595218347414644480274502855387716', Rounding_Mode::Unnecessary, '8903144308348150197415041401715992316846'],
+            ['79265978575272061761010812898504289157311811916595218347414644480274502855387716', Rounding_Mode::Down, '8903144308348150197415041401715992316846'],
+            ['79265978575272061761010812898504289157311811916595218347414644480274502855387716', Rounding_Mode::Up, '8903144308348150197415041401715992316846'],
+            ['79265978575272061761010812898504289157311811916595218347414644480274502855387716', Rounding_Mode::HalfUp, '8903144308348150197415041401715992316846'],
+
+            ['79265978575272061761010812898504289157329618205211914647809474563077934840021408', Rounding_Mode::Unnecessary, null],
+            ['79265978575272061761010812898504289157329618205211914647809474563077934840021408', Rounding_Mode::Down, '8903144308348150197415041401715992316846'],
+            ['79265978575272061761010812898504289157329618205211914647809474563077934840021408', Rounding_Mode::Up, '8903144308348150197415041401715992316847'],
+            ['79265978575272061761010812898504289157329618205211914647809474563077934840021408', Rounding_Mode::HalfUp, '8903144308348150197415041401715992316847'],
+
+            ['79265978575272061761010812898504289157329618205211914647809474563077934840021409', Rounding_Mode::Unnecessary, '8903144308348150197415041401715992316847'],
+            ['79265978575272061761010812898504289157329618205211914647809474563077934840021409', Rounding_Mode::Down, '8903144308348150197415041401715992316847'],
+            ['79265978575272061761010812898504289157329618205211914647809474563077934840021409', Rounding_Mode::Up, '8903144308348150197415041401715992316847'],
+            ['79265978575272061761010812898504289157329618205211914647809474563077934840021409', Rounding_Mode::HalfUp, '8903144308348150197415041401715992316847'],
+
+            ['18253381792846313534444974681107507939609666705140666138048641067680220712870544', Rounding_Mode::Unnecessary, '4272397663238560654482324050372517154612'],
+            ['18253381792846313534444974681107507939609666705140666138048641067680220712870544', Rounding_Mode::Down, '4272397663238560654482324050372517154612'],
+            ['18253381792846313534444974681107507939609666705140666138048641067680220712870544', Rounding_Mode::Up, '4272397663238560654482324050372517154612'],
+            ['18253381792846313534444974681107507939609666705140666138048641067680220712870544', Rounding_Mode::HalfUp, '4272397663238560654482324050372517154612'],
+
+            ['18253381792846313534444974681107507939613939102803904698703123391730593230025156', Rounding_Mode::Unnecessary, null],
+            ['18253381792846313534444974681107507939613939102803904698703123391730593230025156', Rounding_Mode::Down, '4272397663238560654482324050372517154612'],
+            ['18253381792846313534444974681107507939613939102803904698703123391730593230025156', Rounding_Mode::Up, '4272397663238560654482324050372517154613'],
+            ['18253381792846313534444974681107507939613939102803904698703123391730593230025156', Rounding_Mode::HalfUp, '4272397663238560654482324050372517154612'],
+
+            ['18253381792846313534444974681107507939618211500467143259357605715780965747179769', Rounding_Mode::Unnecessary, '4272397663238560654482324050372517154613'],
+            ['18253381792846313534444974681107507939618211500467143259357605715780965747179769', Rounding_Mode::Down, '4272397663238560654482324050372517154613'],
+            ['18253381792846313534444974681107507939618211500467143259357605715780965747179769', Rounding_Mode::Up, '4272397663238560654482324050372517154613'],
+            ['18253381792846313534444974681107507939618211500467143259357605715780965747179769', Rounding_Mode::HalfUp, '4272397663238560654482324050372517154613'],
+
+            ['34902249932301330884717409262136201131799911786648110181019008640668850248149889', Rounding_Mode::Unnecessary, '5907812618245549169232055936851452816833'],
+            ['34902249932301330884717409262136201131799911786648110181019008640668850248149889', Rounding_Mode::Down, '5907812618245549169232055936851452816833'],
+            ['34902249932301330884717409262136201131799911786648110181019008640668850248149889', Rounding_Mode::Up, '5907812618245549169232055936851452816833'],
+            ['34902249932301330884717409262136201131799911786648110181019008640668850248149889', Rounding_Mode::HalfUp, '5907812618245549169232055936851452816833'],
+
+            ['34902249932301330884717409262136201131811727411884601279357472752542553153783555', Rounding_Mode::Unnecessary, null],
+            ['34902249932301330884717409262136201131811727411884601279357472752542553153783555', Rounding_Mode::Down, '5907812618245549169232055936851452816833'],
+            ['34902249932301330884717409262136201131811727411884601279357472752542553153783555', Rounding_Mode::Up, '5907812618245549169232055936851452816834'],
+            ['34902249932301330884717409262136201131811727411884601279357472752542553153783555', Rounding_Mode::HalfUp, '5907812618245549169232055936851452816834'],
+
+            ['34902249932301330884717409262136201131811727411884601279357472752542553153783556', Rounding_Mode::Unnecessary, '5907812618245549169232055936851452816834'],
+            ['34902249932301330884717409262136201131811727411884601279357472752542553153783556', Rounding_Mode::Down, '5907812618245549169232055936851452816834'],
+            ['34902249932301330884717409262136201131811727411884601279357472752542553153783556', Rounding_Mode::Up, '5907812618245549169232055936851452816834'],
+            ['34902249932301330884717409262136201131811727411884601279357472752542553153783556', Rounding_Mode::HalfUp, '5907812618245549169232055936851452816834'],
+
+            ['2599345980007138866704208379685556534258757776044753601160948822029798157394521', Rounding_Mode::Unnecessary, '1612248733913951277041847563008484168539'],
+            ['2599345980007138866704208379685556534258757776044753601160948822029798157394521', Rounding_Mode::Down, '1612248733913951277041847563008484168539'],
+            ['2599345980007138866704208379685556534258757776044753601160948822029798157394521', Rounding_Mode::Up, '1612248733913951277041847563008484168539'],
+            ['2599345980007138866704208379685556534258757776044753601160948822029798157394521', Rounding_Mode::HalfUp, '1612248733913951277041847563008484168539'],
+
+            ['2599345980007138866704208379685556534260370024778667552437990669592806641563060', Rounding_Mode::Unnecessary, null],
+            ['2599345980007138866704208379685556534260370024778667552437990669592806641563060', Rounding_Mode::Down, '1612248733913951277041847563008484168539'],
+            ['2599345980007138866704208379685556534260370024778667552437990669592806641563060', Rounding_Mode::Up, '1612248733913951277041847563008484168540'],
+            ['2599345980007138866704208379685556534260370024778667552437990669592806641563060', Rounding_Mode::HalfUp, '1612248733913951277041847563008484168539'],
+
+            ['2599345980007138866704208379685556534261982273512581503715032517155815125731600', Rounding_Mode::Unnecessary, '1612248733913951277041847563008484168540'],
+            ['2599345980007138866704208379685556534261982273512581503715032517155815125731600', Rounding_Mode::Down, '1612248733913951277041847563008484168540'],
+            ['2599345980007138866704208379685556534261982273512581503715032517155815125731600', Rounding_Mode::Up, '1612248733913951277041847563008484168540'],
+            ['2599345980007138866704208379685556534261982273512581503715032517155815125731600', Rounding_Mode::HalfUp, '1612248733913951277041847563008484168540'],
+
+            ['5316322030460586450936871958946919636668068288991234947266697538297768830115066084', Rounding_Mode::Unnecessary, '72913112884175960485473057702832007114922'],
+            ['5316322030460586450936871958946919636668068288991234947266697538297768830115066084', Rounding_Mode::Down, '72913112884175960485473057702832007114922'],
+            ['5316322030460586450936871958946919636668068288991234947266697538297768830115066084', Rounding_Mode::Up, '72913112884175960485473057702832007114922'],
+            ['5316322030460586450936871958946919636668068288991234947266697538297768830115066084', Rounding_Mode::HalfUp, '72913112884175960485473057702832007114922'],
+
+            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295928', Rounding_Mode::Unnecessary, null],
+            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295928', Rounding_Mode::Down, '72913112884175960485473057702832007114922'],
+            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295928', Rounding_Mode::Up, '72913112884175960485473057702832007114923'],
+            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295928', Rounding_Mode::HalfUp, '72913112884175960485473057702832007114923'],
+
+            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295929', Rounding_Mode::Unnecessary, '72913112884175960485473057702832007114923'],
+            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295929', Rounding_Mode::Down, '72913112884175960485473057702832007114923'],
+            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295929', Rounding_Mode::Up, '72913112884175960485473057702832007114923'],
+            ['5316322030460586450936871958946919636668214115217003299187668484413174494129295929', Rounding_Mode::HalfUp, '72913112884175960485473057702832007114923'],
+
+            ['8002778973791813108451518291518896929427763054970205412144571951733372499281017601', Rounding_Mode::Unnecessary, '89458252686891962949549637560732937788801'],
+            ['8002778973791813108451518291518896929427763054970205412144571951733372499281017601', Rounding_Mode::Down, '89458252686891962949549637560732937788801'],
+            ['8002778973791813108451518291518896929427763054970205412144571951733372499281017601', Rounding_Mode::Up, '89458252686891962949549637560732937788801'],
+            ['8002778973791813108451518291518896929427763054970205412144571951733372499281017601', Rounding_Mode::HalfUp, '89458252686891962949549637560732937788801'],
+
+            ['8002778973791813108451518291518896929427852513222892304107521501370933232218806402', Rounding_Mode::Unnecessary, null],
+            ['8002778973791813108451518291518896929427852513222892304107521501370933232218806402', Rounding_Mode::Down, '89458252686891962949549637560732937788801'],
+            ['8002778973791813108451518291518896929427852513222892304107521501370933232218806402', Rounding_Mode::Up, '89458252686891962949549637560732937788802'],
+            ['8002778973791813108451518291518896929427852513222892304107521501370933232218806402', Rounding_Mode::HalfUp, '89458252686891962949549637560732937788801'],
+
+            ['8002778973791813108451518291518896929427941971475579196070471051008493965156595204', Rounding_Mode::Unnecessary, '89458252686891962949549637560732937788802'],
+            ['8002778973791813108451518291518896929427941971475579196070471051008493965156595204', Rounding_Mode::Down, '89458252686891962949549637560732937788802'],
+            ['8002778973791813108451518291518896929427941971475579196070471051008493965156595204', Rounding_Mode::Up, '89458252686891962949549637560732937788802'],
+            ['8002778973791813108451518291518896929427941971475579196070471051008493965156595204', Rounding_Mode::HalfUp, '89458252686891962949549637560732937788802'],
+
+            ['204434819803436425073091821729105629106597079412374857081154364351611450036288004', Rounding_Mode::Unnecessary, '14298070492322956269314619104943213072002'],
+            ['204434819803436425073091821729105629106597079412374857081154364351611450036288004', Rounding_Mode::Down, '14298070492322956269314619104943213072002'],
+            ['204434819803436425073091821729105629106597079412374857081154364351611450036288004', Rounding_Mode::Up, '14298070492322956269314619104943213072002'],
+            ['204434819803436425073091821729105629106597079412374857081154364351611450036288004', Rounding_Mode::HalfUp, '14298070492322956269314619104943213072002'],
+
+            ['204434819803436425073091821729105629106625675553359502993692993589821336462432008', Rounding_Mode::Unnecessary, null],
+            ['204434819803436425073091821729105629106625675553359502993692993589821336462432008', Rounding_Mode::Down, '14298070492322956269314619104943213072002'],
+            ['204434819803436425073091821729105629106625675553359502993692993589821336462432008', Rounding_Mode::Up, '14298070492322956269314619104943213072003'],
+            ['204434819803436425073091821729105629106625675553359502993692993589821336462432008', Rounding_Mode::HalfUp, '14298070492322956269314619104943213072003'],
+
+            ['204434819803436425073091821729105629106625675553359502993692993589821336462432009', Rounding_Mode::Unnecessary, '14298070492322956269314619104943213072003'],
+            ['204434819803436425073091821729105629106625675553359502993692993589821336462432009', Rounding_Mode::Down, '14298070492322956269314619104943213072003'],
+            ['204434819803436425073091821729105629106625675553359502993692993589821336462432009', Rounding_Mode::Up, '14298070492322956269314619104943213072003'],
+            ['204434819803436425073091821729105629106625675553359502993692993589821336462432009', Rounding_Mode::HalfUp, '14298070492322956269314619104943213072003'],
+
+            ['248985683905018963214400101508836326950598468017331056913175271121208335269369616', Rounding_Mode::Unnecessary, '15779280208711009616855603241137879133796'],
+            ['248985683905018963214400101508836326950598468017331056913175271121208335269369616', Rounding_Mode::Down, '15779280208711009616855603241137879133796'],
+            ['248985683905018963214400101508836326950598468017331056913175271121208335269369616', Rounding_Mode::Up, '15779280208711009616855603241137879133796'],
+            ['248985683905018963214400101508836326950598468017331056913175271121208335269369616', Rounding_Mode::HalfUp, '15779280208711009616855603241137879133796'],
+
+            ['248985683905018963214400101508836326950614247297539767922792126724449473148503412', Rounding_Mode::Unnecessary, null],
+            ['248985683905018963214400101508836326950614247297539767922792126724449473148503412', Rounding_Mode::Down, '15779280208711009616855603241137879133796'],
+            ['248985683905018963214400101508836326950614247297539767922792126724449473148503412', Rounding_Mode::Up, '15779280208711009616855603241137879133797'],
+            ['248985683905018963214400101508836326950614247297539767922792126724449473148503412', Rounding_Mode::HalfUp, '15779280208711009616855603241137879133796'],
+
+            ['248985683905018963214400101508836326950630026577748478932408982327690611027637209', Rounding_Mode::Unnecessary, '15779280208711009616855603241137879133797'],
+            ['248985683905018963214400101508836326950630026577748478932408982327690611027637209', Rounding_Mode::Down, '15779280208711009616855603241137879133797'],
+            ['248985683905018963214400101508836326950630026577748478932408982327690611027637209', Rounding_Mode::Up, '15779280208711009616855603241137879133797'],
+            ['248985683905018963214400101508836326950630026577748478932408982327690611027637209', Rounding_Mode::HalfUp, '15779280208711009616855603241137879133797'],
+
+            ['9931466785180918581453369553241893953494729509958339130768488436428313616867737664', Rounding_Mode::Unnecessary, '99656744805261016419561454808199789423608'],
+            ['9931466785180918581453369553241893953494729509958339130768488436428313616867737664', Rounding_Mode::Down, '99656744805261016419561454808199789423608'],
+            ['9931466785180918581453369553241893953494729509958339130768488436428313616867737664', Rounding_Mode::Up, '99656744805261016419561454808199789423608'],
+            ['9931466785180918581453369553241893953494729509958339130768488436428313616867737664', Rounding_Mode::HalfUp, '99656744805261016419561454808199789423608'],
+
+            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584880', Rounding_Mode::Unnecessary, null],
+            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584880', Rounding_Mode::Down, '99656744805261016419561454808199789423608'],
+            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584880', Rounding_Mode::Up, '99656744805261016419561454808199789423609'],
+            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584880', Rounding_Mode::HalfUp, '99656744805261016419561454808199789423609'],
+
+            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584881', Rounding_Mode::Unnecessary, '99656744805261016419561454808199789423609'],
+            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584881', Rounding_Mode::Down, '99656744805261016419561454808199789423609'],
+            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584881', Rounding_Mode::Up, '99656744805261016419561454808199789423609'],
+            ['9931466785180918581453369553241893953494928823447949652801327559337930016446584881', Rounding_Mode::HalfUp, '99656744805261016419561454808199789423609'],
+
+            ['571034337207963083686644289650754887712756826847796234542618077049856839883774610496', Rounding_Mode::Unnecessary, '755668139600951472909394170487042707063864'],
+            ['571034337207963083686644289650754887712756826847796234542618077049856839883774610496', Rounding_Mode::Down, '755668139600951472909394170487042707063864'],
+            ['571034337207963083686644289650754887712756826847796234542618077049856839883774610496', Rounding_Mode::Up, '755668139600951472909394170487042707063864'],
+            ['571034337207963083686644289650754887712756826847796234542618077049856839883774610496', Rounding_Mode::HalfUp, '755668139600951472909394170487042707063864'],
+
+            ['571034337207963083686644289650754887712757582515935835494090986444027326926481674360', Rounding_Mode::Unnecessary, null],
+            ['571034337207963083686644289650754887712757582515935835494090986444027326926481674360', Rounding_Mode::Down, '755668139600951472909394170487042707063864'],
+            ['571034337207963083686644289650754887712757582515935835494090986444027326926481674360', Rounding_Mode::Up, '755668139600951472909394170487042707063865'],
+            ['571034337207963083686644289650754887712757582515935835494090986444027326926481674360', Rounding_Mode::HalfUp, '755668139600951472909394170487042707063864'],
+
+            ['571034337207963083686644289650754887712758338184075436445563895838197813969188738225', Rounding_Mode::Unnecessary, '755668139600951472909394170487042707063865'],
+            ['571034337207963083686644289650754887712758338184075436445563895838197813969188738225', Rounding_Mode::Down, '755668139600951472909394170487042707063865'],
+            ['571034337207963083686644289650754887712758338184075436445563895838197813969188738225', Rounding_Mode::Up, '755668139600951472909394170487042707063865'],
+            ['571034337207963083686644289650754887712758338184075436445563895838197813969188738225', Rounding_Mode::HalfUp, '755668139600951472909394170487042707063865'],
+
+            ['43282087429518774838368965030190873132157640943271155661308846536619714287766015625', Rounding_Mode::Unnecessary, '208043474854461068334845359605621664088125'],
+            ['43282087429518774838368965030190873132157640943271155661308846536619714287766015625', Rounding_Mode::Down, '208043474854461068334845359605621664088125'],
+            ['43282087429518774838368965030190873132157640943271155661308846536619714287766015625', Rounding_Mode::Up, '208043474854461068334845359605621664088125'],
+            ['43282087429518774838368965030190873132157640943271155661308846536619714287766015625', Rounding_Mode::HalfUp, '208043474854461068334845359605621664088125'],
+
+            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191875', Rounding_Mode::Unnecessary, null],
+            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191875', Rounding_Mode::Down, '208043474854461068334845359605621664088125'],
+            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191875', Rounding_Mode::Up, '208043474854461068334845359605621664088126'],
+            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191875', Rounding_Mode::HalfUp, '208043474854461068334845359605621664088126'],
+
+            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191876', Rounding_Mode::Unnecessary, '208043474854461068334845359605621664088126'],
+            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191876', Rounding_Mode::Down, '208043474854461068334845359605621664088126'],
+            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191876', Rounding_Mode::Up, '208043474854461068334845359605621664088126'],
+            ['43282087429518774838368965030190873132158057030220864583445516227338925531094191876', Rounding_Mode::HalfUp, '208043474854461068334845359605621664088126'],
+
+            ['417927142998078702077756962900654390278806646288750249869048008644489266148390976576', Rounding_Mode::Unnecessary, '646472847842876307508176358984831821937976'],
+            ['417927142998078702077756962900654390278806646288750249869048008644489266148390976576', Rounding_Mode::Down, '646472847842876307508176358984831821937976'],
+            ['417927142998078702077756962900654390278806646288750249869048008644489266148390976576', Rounding_Mode::Up, '646472847842876307508176358984831821937976'],
+            ['417927142998078702077756962900654390278806646288750249869048008644489266148390976576', Rounding_Mode::HalfUp, '646472847842876307508176358984831821937976'],
+
+            ['417927142998078702077756962900654390278807292761598092745355516820848250980212914552', Rounding_Mode::Unnecessary, null],
+            ['417927142998078702077756962900654390278807292761598092745355516820848250980212914552', Rounding_Mode::Down, '646472847842876307508176358984831821937976'],
+            ['417927142998078702077756962900654390278807292761598092745355516820848250980212914552', Rounding_Mode::Up, '646472847842876307508176358984831821937977'],
+            ['417927142998078702077756962900654390278807292761598092745355516820848250980212914552', Rounding_Mode::HalfUp, '646472847842876307508176358984831821937976'],
+
+            ['417927142998078702077756962900654390278807939234445935621663024997207235812034852529', Rounding_Mode::Unnecessary, '646472847842876307508176358984831821937977'],
+            ['417927142998078702077756962900654390278807939234445935621663024997207235812034852529', Rounding_Mode::Down, '646472847842876307508176358984831821937977'],
+            ['417927142998078702077756962900654390278807939234445935621663024997207235812034852529', Rounding_Mode::Up, '646472847842876307508176358984831821937977'],
+            ['417927142998078702077756962900654390278807939234445935621663024997207235812034852529', Rounding_Mode::HalfUp, '646472847842876307508176358984831821937977'],
+
+            ['57289022864599235425935956369596297021969148801199969985249642058425056660901854081', Rounding_Mode::Unnecessary, '239351254152969157626674463098033150396991'],
+            ['57289022864599235425935956369596297021969148801199969985249642058425056660901854081', Rounding_Mode::Down, '239351254152969157626674463098033150396991'],
+            ['57289022864599235425935956369596297021969148801199969985249642058425056660901854081', Rounding_Mode::Up, '239351254152969157626674463098033150396991'],
+            ['57289022864599235425935956369596297021969148801199969985249642058425056660901854081', Rounding_Mode::HalfUp, '239351254152969157626674463098033150396991'],
+
+            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648063', Rounding_Mode::Unnecessary, null],
+            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648063', Rounding_Mode::Down, '239351254152969157626674463098033150396991'],
+            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648063', Rounding_Mode::Up, '239351254152969157626674463098033150396992'],
+            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648063', Rounding_Mode::HalfUp, '239351254152969157626674463098033150396992'],
+
+            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648064', Rounding_Mode::Unnecessary, '239351254152969157626674463098033150396992'],
+            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648064', Rounding_Mode::Down, '239351254152969157626674463098033150396992'],
+            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648064', Rounding_Mode::Up, '239351254152969157626674463098033150396992'],
+            ['57289022864599235425935956369596297021969627503708275923564895407351252727202648064', Rounding_Mode::HalfUp, '239351254152969157626674463098033150396992'],
+
+            ['388204130919598896854532928319816854683262176908475545926963148518011088548336100', Rounding_Mode::Unnecessary, '19702896510909224609070086389295007347690'],
+            ['388204130919598896854532928319816854683262176908475545926963148518011088548336100', Rounding_Mode::Down, '19702896510909224609070086389295007347690'],
+            ['388204130919598896854532928319816854683262176908475545926963148518011088548336100', Rounding_Mode::Up, '19702896510909224609070086389295007347690'],
+            ['388204130919598896854532928319816854683262176908475545926963148518011088548336100', Rounding_Mode::HalfUp, '19702896510909224609070086389295007347690'],
+
+            ['388204130919598896854532928319816854683281879804986455151572218604400383555683790', Rounding_Mode::Unnecessary, null],
+            ['388204130919598896854532928319816854683281879804986455151572218604400383555683790', Rounding_Mode::Down, '19702896510909224609070086389295007347690'],
+            ['388204130919598896854532928319816854683281879804986455151572218604400383555683790', Rounding_Mode::Up, '19702896510909224609070086389295007347691'],
+            ['388204130919598896854532928319816854683281879804986455151572218604400383555683790', Rounding_Mode::HalfUp, '19702896510909224609070086389295007347690'],
+
+            ['388204130919598896854532928319816854683301582701497364376181288690789678563031481', Rounding_Mode::Unnecessary, '19702896510909224609070086389295007347691'],
+            ['388204130919598896854532928319816854683301582701497364376181288690789678563031481', Rounding_Mode::Down, '19702896510909224609070086389295007347691'],
+            ['388204130919598896854532928319816854683301582701497364376181288690789678563031481', Rounding_Mode::Up, '19702896510909224609070086389295007347691'],
+            ['388204130919598896854532928319816854683301582701497364376181288690789678563031481', Rounding_Mode::HalfUp, '19702896510909224609070086389295007347691'],
+
+            ['17641213493582550358331598783756045983107635305125558424245083335221980342711574945924', Rounding_Mode::Unnecessary, '4200144461037328458609200843143798139299618'],
+            ['17641213493582550358331598783756045983107635305125558424245083335221980342711574945924', Rounding_Mode::Down, '4200144461037328458609200843143798139299618'],
+            ['17641213493582550358331598783756045983107635305125558424245083335221980342711574945924', Rounding_Mode::Up, '4200144461037328458609200843143798139299618'],
+            ['17641213493582550358331598783756045983107635305125558424245083335221980342711574945924', Rounding_Mode::HalfUp, '4200144461037328458609200843143798139299618'],
+
+            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545160', Rounding_Mode::Unnecessary, null],
+            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545160', Rounding_Mode::Down, '4200144461037328458609200843143798139299618'],
+            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545160', Rounding_Mode::Up, '4200144461037328458609200843143798139299619'],
+            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545160', Rounding_Mode::HalfUp, '4200144461037328458609200843143798139299619'],
+
+            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545161', Rounding_Mode::Unnecessary, '4200144461037328458609200843143798139299619'],
+            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545161', Rounding_Mode::Down, '4200144461037328458609200843143798139299619'],
+            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545161', Rounding_Mode::Up, '4200144461037328458609200843143798139299619'],
+            ['17641213493582550358331598783756045983107643705414480498902000553623666630307853545161', Rounding_Mode::HalfUp, '4200144461037328458609200843143798139299619'],
+
+            ['10480850478210993041934376751763741537950365795671072307889437499081947766082767900625', Rounding_Mode::Unnecessary, '3237414165381221816392010300367379458321975'],
+            ['10480850478210993041934376751763741537950365795671072307889437499081947766082767900625', Rounding_Mode::Down, '3237414165381221816392010300367379458321975'],
+            ['10480850478210993041934376751763741537950365795671072307889437499081947766082767900625', Rounding_Mode::Up, '3237414165381221816392010300367379458321975'],
+            ['10480850478210993041934376751763741537950365795671072307889437499081947766082767900625', Rounding_Mode::HalfUp, '3237414165381221816392010300367379458321975'],
+
+            ['10480850478210993041934376751763741537950369033085237689111253891092248133462226222600', Rounding_Mode::Unnecessary, null],
+            ['10480850478210993041934376751763741537950369033085237689111253891092248133462226222600', Rounding_Mode::Down, '3237414165381221816392010300367379458321975'],
+            ['10480850478210993041934376751763741537950369033085237689111253891092248133462226222600', Rounding_Mode::Up, '3237414165381221816392010300367379458321976'],
+            ['10480850478210993041934376751763741537950369033085237689111253891092248133462226222600', Rounding_Mode::HalfUp, '3237414165381221816392010300367379458321975'],
+
+            ['10480850478210993041934376751763741537950372270499403070333070283102548500841684544576', Rounding_Mode::Unnecessary, '3237414165381221816392010300367379458321976'],
+            ['10480850478210993041934376751763741537950372270499403070333070283102548500841684544576', Rounding_Mode::Down, '3237414165381221816392010300367379458321976'],
+            ['10480850478210993041934376751763741537950372270499403070333070283102548500841684544576', Rounding_Mode::Up, '3237414165381221816392010300367379458321976'],
+            ['10480850478210993041934376751763741537950372270499403070333070283102548500841684544576', Rounding_Mode::HalfUp, '3237414165381221816392010300367379458321976'],
+
+            ['18912401257760832817656385679644608795185415305426367246326490097108178277089565964900', Rounding_Mode::Unnecessary, '4348839070115245459938703154127996458785930'],
+            ['18912401257760832817656385679644608795185415305426367246326490097108178277089565964900', Rounding_Mode::Down, '4348839070115245459938703154127996458785930'],
+            ['18912401257760832817656385679644608795185415305426367246326490097108178277089565964900', Rounding_Mode::Up, '4348839070115245459938703154127996458785930'],
+            ['18912401257760832817656385679644608795185415305426367246326490097108178277089565964900', Rounding_Mode::HalfUp, '4348839070115245459938703154127996458785930'],
+
+            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536760', Rounding_Mode::Unnecessary, null],
+            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536760', Rounding_Mode::Down, '4348839070115245459938703154127996458785930'],
+            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536760', Rounding_Mode::Up, '4348839070115245459938703154127996458785931'],
+            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536760', Rounding_Mode::HalfUp, '4348839070115245459938703154127996458785931'],
+
+            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536761', Rounding_Mode::Unnecessary, '4348839070115245459938703154127996458785931'],
+            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536761', Rounding_Mode::Down, '4348839070115245459938703154127996458785931'],
+            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536761', Rounding_Mode::Up, '4348839070115245459938703154127996458785931'],
+            ['18912401257760832817656385679644608795185424003104507476817409974514486533082483536761', Rounding_Mode::HalfUp, '4348839070115245459938703154127996458785931'],
+
+            ['4058130180100830389999063645300769577286055319083847709319631222394835048000563913616', Rounding_Mode::Unnecessary, '2014480126509276434961389427500807039909204'],
+            ['4058130180100830389999063645300769577286055319083847709319631222394835048000563913616', Rounding_Mode::Down, '2014480126509276434961389427500807039909204'],
+            ['4058130180100830389999063645300769577286055319083847709319631222394835048000563913616', Rounding_Mode::Up, '2014480126509276434961389427500807039909204'],
+            ['4058130180100830389999063645300769577286055319083847709319631222394835048000563913616', Rounding_Mode::HalfUp, '2014480126509276434961389427500807039909204'],
+
+            ['4058130180100830389999063645300769577286057333563974218596066183784262548807603822820', Rounding_Mode::Unnecessary, null],
+            ['4058130180100830389999063645300769577286057333563974218596066183784262548807603822820', Rounding_Mode::Down, '2014480126509276434961389427500807039909204'],
+            ['4058130180100830389999063645300769577286057333563974218596066183784262548807603822820', Rounding_Mode::Up, '2014480126509276434961389427500807039909205'],
+            ['4058130180100830389999063645300769577286057333563974218596066183784262548807603822820', Rounding_Mode::HalfUp, '2014480126509276434961389427500807039909204'],
+
+            ['4058130180100830389999063645300769577286059348044100727872501145173690049614643732025', Rounding_Mode::Unnecessary, '2014480126509276434961389427500807039909205'],
+            ['4058130180100830389999063645300769577286059348044100727872501145173690049614643732025', Rounding_Mode::Down, '2014480126509276434961389427500807039909205'],
+            ['4058130180100830389999063645300769577286059348044100727872501145173690049614643732025', Rounding_Mode::Up, '2014480126509276434961389427500807039909205'],
+            ['4058130180100830389999063645300769577286059348044100727872501145173690049614643732025', Rounding_Mode::HalfUp, '2014480126509276434961389427500807039909205'],
+
+            ['33468184484233190391618513143907824051569626629768396502905028100863488827541016357225', Rounding_Mode::Unnecessary, '5785169356573166941812342062118994545501165'],
+            ['33468184484233190391618513143907824051569626629768396502905028100863488827541016357225', Rounding_Mode::Down, '5785169356573166941812342062118994545501165'],
+            ['33468184484233190391618513143907824051569626629768396502905028100863488827541016357225', Rounding_Mode::Up, '5785169356573166941812342062118994545501165'],
+            ['33468184484233190391618513143907824051569626629768396502905028100863488827541016357225', Rounding_Mode::HalfUp, '5785169356573166941812342062118994545501165'],
+
+            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359555', Rounding_Mode::Unnecessary, null],
+            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359555', Rounding_Mode::Down, '5785169356573166941812342062118994545501165'],
+            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359555', Rounding_Mode::Up, '5785169356573166941812342062118994545501166'],
+            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359555', Rounding_Mode::HalfUp, '5785169356573166941812342062118994545501166'],
+
+            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359556', Rounding_Mode::Unnecessary, '5785169356573166941812342062118994545501166'],
+            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359556', Rounding_Mode::Down, '5785169356573166941812342062118994545501166'],
+            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359556', Rounding_Mode::Up, '5785169356573166941812342062118994545501166'],
+            ['33468184484233190391618513143907824051569638200107109649238911725547613065530107359556', Rounding_Mode::HalfUp, '5785169356573166941812342062118994545501166'],
+
+            ['1186174880095419715607318419843788127322568925641042677386667373975880777802263411393536', Rounding_Mode::Unnecessary, '34440889653076903576703209294470985379444256'],
+            ['1186174880095419715607318419843788127322568925641042677386667373975880777802263411393536', Rounding_Mode::Down, '34440889653076903576703209294470985379444256'],
+            ['1186174880095419715607318419843788127322568925641042677386667373975880777802263411393536', Rounding_Mode::Up, '34440889653076903576703209294470985379444256'],
+            ['1186174880095419715607318419843788127322568925641042677386667373975880777802263411393536', Rounding_Mode::HalfUp, '34440889653076903576703209294470985379444256'],
+
+            ['1186174880095419715607318419843788127322568960081932330463570950679090072273248790837792', Rounding_Mode::Unnecessary, null],
+            ['1186174880095419715607318419843788127322568960081932330463570950679090072273248790837792', Rounding_Mode::Down, '34440889653076903576703209294470985379444256'],
+            ['1186174880095419715607318419843788127322568960081932330463570950679090072273248790837792', Rounding_Mode::Up, '34440889653076903576703209294470985379444257'],
+            ['1186174880095419715607318419843788127322568960081932330463570950679090072273248790837792', Rounding_Mode::HalfUp, '34440889653076903576703209294470985379444256'],
+
+            ['1186174880095419715607318419843788127322568994522821983540474527382299366744234170282049', Rounding_Mode::Unnecessary, '34440889653076903576703209294470985379444257'],
+            ['1186174880095419715607318419843788127322568994522821983540474527382299366744234170282049', Rounding_Mode::Down, '34440889653076903576703209294470985379444257'],
+            ['1186174880095419715607318419843788127322568994522821983540474527382299366744234170282049', Rounding_Mode::Up, '34440889653076903576703209294470985379444257'],
+            ['1186174880095419715607318419843788127322568994522821983540474527382299366744234170282049', Rounding_Mode::HalfUp, '34440889653076903576703209294470985379444257'],
+
+            ['1869407664810972914760141576011747496493758522541997263089274909609818581502013012539601', Rounding_Mode::Unnecessary, '43236647242946265649799966945038223493750199'],
+            ['1869407664810972914760141576011747496493758522541997263089274909609818581502013012539601', Rounding_Mode::Down, '43236647242946265649799966945038223493750199'],
+            ['1869407664810972914760141576011747496493758522541997263089274909609818581502013012539601', Rounding_Mode::Up, '43236647242946265649799966945038223493750199'],
+            ['1869407664810972914760141576011747496493758522541997263089274909609818581502013012539601', Rounding_Mode::HalfUp, '43236647242946265649799966945038223493750199'],
+
+            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000039999', Rounding_Mode::Unnecessary, null],
+            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000039999', Rounding_Mode::Down, '43236647242946265649799966945038223493750199'],
+            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000039999', Rounding_Mode::Up, '43236647242946265649799966945038223493750200'],
+            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000039999', Rounding_Mode::HalfUp, '43236647242946265649799966945038223493750200'],
+
+            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000040000', Rounding_Mode::Unnecessary, '43236647242946265649799966945038223493750200'],
+            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000040000', Rounding_Mode::Down, '43236647242946265649799966945038223493750200'],
+            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000040000', Rounding_Mode::Up, '43236647242946265649799966945038223493750200'],
+            ['1869407664810972914760141576011747496493758609015291748981806209209752471578460000040000', Rounding_Mode::HalfUp, '43236647242946265649799966945038223493750200'],
+
+            ['4306248093986950964567669268958861794743230041121457387922204677053975232405051053143025', Rounding_Mode::Unnecessary, '65622009219369007099774314994059599547494695'],
+            ['4306248093986950964567669268958861794743230041121457387922204677053975232405051053143025', Rounding_Mode::Down, '65622009219369007099774314994059599547494695'],
+            ['4306248093986950964567669268958861794743230041121457387922204677053975232405051053143025', Rounding_Mode::Up, '65622009219369007099774314994059599547494695'],
+            ['4306248093986950964567669268958861794743230041121457387922204677053975232405051053143025', Rounding_Mode::HalfUp, '65622009219369007099774314994059599547494695'],
+
+            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132415', Rounding_Mode::Unnecessary, null],
+            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132415', Rounding_Mode::Down, '65622009219369007099774314994059599547494695'],
+            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132415', Rounding_Mode::Up, '65622009219369007099774314994059599547494696'],
+            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132415', Rounding_Mode::HalfUp, '65622009219369007099774314994059599547494696'],
+
+            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132416', Rounding_Mode::Unnecessary, '65622009219369007099774314994059599547494696'],
+            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132416', Rounding_Mode::Down, '65622009219369007099774314994059599547494696'],
+            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132416', Rounding_Mode::Up, '65622009219369007099774314994059599547494696'],
+            ['4306248093986950964567669268958861794743230172365475826660218876602605220524250148132416', Rounding_Mode::HalfUp, '65622009219369007099774314994059599547494696'],
+
+            ['142958974763379486489798376541073126699563800627039429166077132824711226669748693162209', Rounding_Mode::Unnecessary, '11956545268737934506570289899105912433421297'],
+            ['142958974763379486489798376541073126699563800627039429166077132824711226669748693162209', Rounding_Mode::Down, '11956545268737934506570289899105912433421297'],
+            ['142958974763379486489798376541073126699563800627039429166077132824711226669748693162209', Rounding_Mode::Up, '11956545268737934506570289899105912433421297'],
+            ['142958974763379486489798376541073126699563800627039429166077132824711226669748693162209', Rounding_Mode::HalfUp, '11956545268737934506570289899105912433421297'],
+
+            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004803', Rounding_Mode::Unnecessary, null],
+            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004803', Rounding_Mode::Down, '11956545268737934506570289899105912433421297'],
+            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004803', Rounding_Mode::Up, '11956545268737934506570289899105912433421298'],
+            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004803', Rounding_Mode::HalfUp, '11956545268737934506570289899105912433421298'],
+
+            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004804', Rounding_Mode::Unnecessary, '11956545268737934506570289899105912433421298'],
+            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004804', Rounding_Mode::Down, '11956545268737934506570289899105912433421298'],
+            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004804', Rounding_Mode::Up, '11956545268737934506570289899105912433421298'],
+            ['142958974763379486489798376541073126699563824540129966641946145965291024881573560004804', Rounding_Mode::HalfUp, '11956545268737934506570289899105912433421298'],
+
+            ['5924043074304444391210747851995027637083074459394928466831722415634829619104396893068176', Rounding_Mode::Unnecessary, '76967805440355673370818024381288105628528724'],
+            ['5924043074304444391210747851995027637083074459394928466831722415634829619104396893068176', Rounding_Mode::Down, '76967805440355673370818024381288105628528724'],
+            ['5924043074304444391210747851995027637083074459394928466831722415634829619104396893068176', Rounding_Mode::Up, '76967805440355673370818024381288105628528724'],
+            ['5924043074304444391210747851995027637083074459394928466831722415634829619104396893068176', Rounding_Mode::HalfUp, '76967805440355673370818024381288105628528724'],
+
+            ['5924043074304444391210747851995027637083074536362733907187395786452854000392502521596900', Rounding_Mode::Unnecessary, null],
+            ['5924043074304444391210747851995027637083074536362733907187395786452854000392502521596900', Rounding_Mode::Down, '76967805440355673370818024381288105628528724'],
+            ['5924043074304444391210747851995027637083074536362733907187395786452854000392502521596900', Rounding_Mode::Up, '76967805440355673370818024381288105628528725'],
+            ['5924043074304444391210747851995027637083074536362733907187395786452854000392502521596900', Rounding_Mode::HalfUp, '76967805440355673370818024381288105628528724'],
+
+            ['5924043074304444391210747851995027637083074613330539347543069157270878381680608150125625', Rounding_Mode::Unnecessary, '76967805440355673370818024381288105628528725'],
+            ['5924043074304444391210747851995027637083074613330539347543069157270878381680608150125625', Rounding_Mode::Down, '76967805440355673370818024381288105628528725'],
+            ['5924043074304444391210747851995027637083074613330539347543069157270878381680608150125625', Rounding_Mode::Up, '76967805440355673370818024381288105628528725'],
+            ['5924043074304444391210747851995027637083074613330539347543069157270878381680608150125625', Rounding_Mode::HalfUp, '76967805440355673370818024381288105628528725'],
+
+            ['692647042392925303434391597094843086706651167173473530228926147229989661906443247661192976', Rounding_Mode::Unnecessary, '832254193376594110047678950757920520714968676'],
+            ['692647042392925303434391597094843086706651167173473530228926147229989661906443247661192976', Rounding_Mode::Down, '832254193376594110047678950757920520714968676'],
+            ['692647042392925303434391597094843086706651167173473530228926147229989661906443247661192976', Rounding_Mode::Up, '832254193376594110047678950757920520714968676'],
+            ['692647042392925303434391597094843086706651167173473530228926147229989661906443247661192976', Rounding_Mode::HalfUp, '832254193376594110047678950757920520714968676'],
+
+            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130328', Rounding_Mode::Unnecessary, null],
+            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130328', Rounding_Mode::Down, '832254193376594110047678950757920520714968676'],
+            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130328', Rounding_Mode::Up, '832254193376594110047678950757920520714968677'],
+            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130328', Rounding_Mode::HalfUp, '832254193376594110047678950757920520714968677'],
+
+            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130329', Rounding_Mode::Unnecessary, '832254193376594110047678950757920520714968677'],
+            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130329', Rounding_Mode::Down, '832254193376594110047678950757920520714968677'],
+            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130329', Rounding_Mode::Up, '832254193376594110047678950757920520714968677'],
+            ['692647042392925303434391597094843086706651168837981916982114367325347563422284289091130329', Rounding_Mode::HalfUp, '832254193376594110047678950757920520714968677'],
+
+            ['63418927703603396384251230391169377358870766926264966118026529953350707524741421056456161', Rounding_Mode::Unnecessary, '251831149192476577524577782662609731668640369'],
+            ['63418927703603396384251230391169377358870766926264966118026529953350707524741421056456161', Rounding_Mode::Down, '251831149192476577524577782662609731668640369'],
+            ['63418927703603396384251230391169377358870766926264966118026529953350707524741421056456161', Rounding_Mode::Up, '251831149192476577524577782662609731668640369'],
+            ['63418927703603396384251230391169377358870766926264966118026529953350707524741421056456161', Rounding_Mode::HalfUp, '251831149192476577524577782662609731668640369'],
+
+            ['63418927703603396384251230391169377358870767178096115310503107477928490187351152725096530', Rounding_Mode::Unnecessary, null],
+            ['63418927703603396384251230391169377358870767178096115310503107477928490187351152725096530', Rounding_Mode::Down, '251831149192476577524577782662609731668640369'],
+            ['63418927703603396384251230391169377358870767178096115310503107477928490187351152725096530', Rounding_Mode::Up, '251831149192476577524577782662609731668640370'],
+            ['63418927703603396384251230391169377358870767178096115310503107477928490187351152725096530', Rounding_Mode::HalfUp, '251831149192476577524577782662609731668640369'],
+
+            ['63418927703603396384251230391169377358870767429927264502979685002506272849960884393736900', Rounding_Mode::Unnecessary, '251831149192476577524577782662609731668640370'],
+            ['63418927703603396384251230391169377358870767429927264502979685002506272849960884393736900', Rounding_Mode::Down, '251831149192476577524577782662609731668640370'],
+            ['63418927703603396384251230391169377358870767429927264502979685002506272849960884393736900', Rounding_Mode::Up, '251831149192476577524577782662609731668640370'],
+            ['63418927703603396384251230391169377358870767429927264502979685002506272849960884393736900', Rounding_Mode::HalfUp, '251831149192476577524577782662609731668640370'],
+
+            ['84173934762470484045776658803140625724430904400114977656227228331290197573900111299728676', Rounding_Mode::Unnecessary, '290127445724237685478628941387635987912451526'],
+            ['84173934762470484045776658803140625724430904400114977656227228331290197573900111299728676', Rounding_Mode::Down, '290127445724237685478628941387635987912451526'],
+            ['84173934762470484045776658803140625724430904400114977656227228331290197573900111299728676', Rounding_Mode::Up, '290127445724237685478628941387635987912451526'],
+            ['84173934762470484045776658803140625724430904400114977656227228331290197573900111299728676', Rounding_Mode::HalfUp, '290127445724237685478628941387635987912451526'],
+
+            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631728', Rounding_Mode::Unnecessary, null],
+            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631728', Rounding_Mode::Down, '290127445724237685478628941387635987912451526'],
+            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631728', Rounding_Mode::Up, '290127445724237685478628941387635987912451527'],
+            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631728', Rounding_Mode::HalfUp, '290127445724237685478628941387635987912451527'],
+
+            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631729', Rounding_Mode::Unnecessary, '290127445724237685478628941387635987912451527'],
+            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631729', Rounding_Mode::Down, '290127445724237685478628941387635987912451527'],
+            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631729', Rounding_Mode::Up, '290127445724237685478628941387635987912451527'],
+            ['84173934762470484045776658803140625724430904980369869104702599288548080349172087124631729', Rounding_Mode::HalfUp, '290127445724237685478628941387635987912451527'],
+
+            ['241361038321369463167942286580817659556660094711530196521279493146351719422610472610272609', Rounding_Mode::Unnecessary, '491285088641380874516359084346407133019022897'],
+            ['241361038321369463167942286580817659556660094711530196521279493146351719422610472610272609', Rounding_Mode::Down, '491285088641380874516359084346407133019022897'],
+            ['241361038321369463167942286580817659556660094711530196521279493146351719422610472610272609', Rounding_Mode::Up, '491285088641380874516359084346407133019022897'],
+            ['241361038321369463167942286580817659556660094711530196521279493146351719422610472610272609', Rounding_Mode::HalfUp, '491285088641380874516359084346407133019022897'],
+
+            ['241361038321369463167942286580817659556660095202815285162660367662710803769017605629295506', Rounding_Mode::Unnecessary, null],
+            ['241361038321369463167942286580817659556660095202815285162660367662710803769017605629295506', Rounding_Mode::Down, '491285088641380874516359084346407133019022897'],
+            ['241361038321369463167942286580817659556660095202815285162660367662710803769017605629295506', Rounding_Mode::Up, '491285088641380874516359084346407133019022898'],
+            ['241361038321369463167942286580817659556660095202815285162660367662710803769017605629295506', Rounding_Mode::HalfUp, '491285088641380874516359084346407133019022897'],
+
+            ['241361038321369463167942286580817659556660095694100373804041242179069888115424738648318404', Rounding_Mode::Unnecessary, '491285088641380874516359084346407133019022898'],
+            ['241361038321369463167942286580817659556660095694100373804041242179069888115424738648318404', Rounding_Mode::Down, '491285088641380874516359084346407133019022898'],
+            ['241361038321369463167942286580817659556660095694100373804041242179069888115424738648318404', Rounding_Mode::Up, '491285088641380874516359084346407133019022898'],
+            ['241361038321369463167942286580817659556660095694100373804041242179069888115424738648318404', Rounding_Mode::HalfUp, '491285088641380874516359084346407133019022898'],
+
+            ['517176462045529989620702018222975120090314182384304448758922583345467659488721121496429225', Rounding_Mode::Unnecessary, '719149818915036638988212861879727351601847565'],
+            ['517176462045529989620702018222975120090314182384304448758922583345467659488721121496429225', Rounding_Mode::Down, '719149818915036638988212861879727351601847565'],
+            ['517176462045529989620702018222975120090314182384304448758922583345467659488721121496429225', Rounding_Mode::Up, '719149818915036638988212861879727351601847565'],
+            ['517176462045529989620702018222975120090314182384304448758922583345467659488721121496429225', Rounding_Mode::HalfUp, '719149818915036638988212861879727351601847565'],
+
+            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124355', Rounding_Mode::Unnecessary, null],
+            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124355', Rounding_Mode::Down, '719149818915036638988212861879727351601847565'],
+            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124355', Rounding_Mode::Up, '719149818915036638988212861879727351601847566'],
+            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124355', Rounding_Mode::HalfUp, '719149818915036638988212861879727351601847566'],
+
+            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124356', Rounding_Mode::Unnecessary, '719149818915036638988212861879727351601847566'],
+            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124356', Rounding_Mode::Down, '719149818915036638988212861879727351601847566'],
+            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124356', Rounding_Mode::Up, '719149818915036638988212861879727351601847566'],
+            ['517176462045529989620702018222975120090314183822604086588995861321893383248175824700124356', Rounding_Mode::HalfUp, '719149818915036638988212861879727351601847566'],
+
+            ['77611022182569680065221018033132479141166512436949302435927867888665269025756976722964990841', Rounding_Mode::Unnecessary, '8809711810415235147462139161930461303380344971'],
+            ['77611022182569680065221018033132479141166512436949302435927867888665269025756976722964990841', Rounding_Mode::Down, '8809711810415235147462139161930461303380344971'],
+            ['77611022182569680065221018033132479141166512436949302435927867888665269025756976722964990841', Rounding_Mode::Up, '8809711810415235147462139161930461303380344971'],
+            ['77611022182569680065221018033132479141166512436949302435927867888665269025756976722964990841', Rounding_Mode::HalfUp, '8809711810415235147462139161930461303380344971'],
+
+            ['77611022182569680065221018033132479141166512445759014246343103036127408187687438026345335812', Rounding_Mode::Unnecessary, null],
+            ['77611022182569680065221018033132479141166512445759014246343103036127408187687438026345335812', Rounding_Mode::Down, '8809711810415235147462139161930461303380344971'],
+            ['77611022182569680065221018033132479141166512445759014246343103036127408187687438026345335812', Rounding_Mode::Up, '8809711810415235147462139161930461303380344972'],
+            ['77611022182569680065221018033132479141166512445759014246343103036127408187687438026345335812', Rounding_Mode::HalfUp, '8809711810415235147462139161930461303380344971'],
+
+            ['77611022182569680065221018033132479141166512454568726056758338183589547349617899329725680784', Rounding_Mode::Unnecessary, '8809711810415235147462139161930461303380344972'],
+            ['77611022182569680065221018033132479141166512454568726056758338183589547349617899329725680784', Rounding_Mode::Down, '8809711810415235147462139161930461303380344972'],
+            ['77611022182569680065221018033132479141166512454568726056758338183589547349617899329725680784', Rounding_Mode::Up, '8809711810415235147462139161930461303380344972'],
+            ['77611022182569680065221018033132479141166512454568726056758338183589547349617899329725680784', Rounding_Mode::HalfUp, '8809711810415235147462139161930461303380344972'],
+
+            ['6105408765553994361209114516342314667656879868595988990330444228342133209919341402497612900', Rounding_Mode::Unnecessary, '2470912537010161831197388767291893513920213770'],
+            ['6105408765553994361209114516342314667656879868595988990330444228342133209919341402497612900', Rounding_Mode::Down, '2470912537010161831197388767291893513920213770'],
+            ['6105408765553994361209114516342314667656879868595988990330444228342133209919341402497612900', Rounding_Mode::Up, '2470912537010161831197388767291893513920213770'],
+            ['6105408765553994361209114516342314667656879868595988990330444228342133209919341402497612900', Rounding_Mode::HalfUp, '2470912537010161831197388767291893513920213770'],
+
+            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040440', Rounding_Mode::Unnecessary, null],
+            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040440', Rounding_Mode::Down, '2470912537010161831197388767291893513920213770'],
+            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040440', Rounding_Mode::Up, '2470912537010161831197388767291893513920213771'],
+            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040440', Rounding_Mode::HalfUp, '2470912537010161831197388767291893513920213771'],
+
+            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040441', Rounding_Mode::Unnecessary, '2470912537010161831197388767291893513920213771'],
+            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040441', Rounding_Mode::Down, '2470912537010161831197388767291893513920213771'],
+            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040441', Rounding_Mode::Up, '2470912537010161831197388767291893513920213771'],
+            ['6105408765553994361209114516342314667656879873537814064350767890736910744503128430338040441', Rounding_Mode::HalfUp, '2470912537010161831197388767291893513920213771'],
+
+            ['90701786360131891675282105453602007239665462813393298839266200083003999684896009231900541761', Rounding_Mode::Unnecessary, '9523748545616473366260116123335442806957838431'],
+            ['90701786360131891675282105453602007239665462813393298839266200083003999684896009231900541761', Rounding_Mode::Down, '9523748545616473366260116123335442806957838431'],
+            ['90701786360131891675282105453602007239665462813393298839266200083003999684896009231900541761', Rounding_Mode::Up, '9523748545616473366260116123335442806957838431'],
+            ['90701786360131891675282105453602007239665462813393298839266200083003999684896009231900541761', Rounding_Mode::HalfUp, '9523748545616473366260116123335442806957838431'],
+
+            ['90701786360131891675282105453602007239665462822917047384882673449264115808231452038858380192', Rounding_Mode::Unnecessary, null],
+            ['90701786360131891675282105453602007239665462822917047384882673449264115808231452038858380192', Rounding_Mode::Down, '9523748545616473366260116123335442806957838431'],
+            ['90701786360131891675282105453602007239665462822917047384882673449264115808231452038858380192', Rounding_Mode::Up, '9523748545616473366260116123335442806957838432'],
+            ['90701786360131891675282105453602007239665462822917047384882673449264115808231452038858380192', Rounding_Mode::HalfUp, '9523748545616473366260116123335442806957838431'],
+
+            ['90701786360131891675282105453602007239665462832440795930499146815524231931566894845816218624', Rounding_Mode::Unnecessary, '9523748545616473366260116123335442806957838432'],
+            ['90701786360131891675282105453602007239665462832440795930499146815524231931566894845816218624', Rounding_Mode::Down, '9523748545616473366260116123335442806957838432'],
+            ['90701786360131891675282105453602007239665462832440795930499146815524231931566894845816218624', Rounding_Mode::Up, '9523748545616473366260116123335442806957838432'],
+            ['90701786360131891675282105453602007239665462832440795930499146815524231931566894845816218624', Rounding_Mode::HalfUp, '9523748545616473366260116123335442806957838432'],
+
+            ['65323751401133593272677920818977066639472955689716002480072016807758009911894964398074221636', Rounding_Mode::Unnecessary, '8082311018584572712389536725132408571687355694'],
+            ['65323751401133593272677920818977066639472955689716002480072016807758009911894964398074221636', Rounding_Mode::Down, '8082311018584572712389536725132408571687355694'],
+            ['65323751401133593272677920818977066639472955689716002480072016807758009911894964398074221636', Rounding_Mode::Up, '8082311018584572712389536725132408571687355694'],
+            ['65323751401133593272677920818977066639472955689716002480072016807758009911894964398074221636', Rounding_Mode::HalfUp, '8082311018584572712389536725132408571687355694'],
+
+            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933024', Rounding_Mode::Unnecessary, null],
+            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933024', Rounding_Mode::Down, '8082311018584572712389536725132408571687355694'],
+            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933024', Rounding_Mode::Up, '8082311018584572712389536725132408571687355695'],
+            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933024', Rounding_Mode::HalfUp, '8082311018584572712389536725132408571687355695'],
+
+            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933025', Rounding_Mode::Unnecessary, '8082311018584572712389536725132408571687355695'],
+            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933025', Rounding_Mode::Down, '8082311018584572712389536725132408571687355695'],
+            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933025', Rounding_Mode::Up, '8082311018584572712389536725132408571687355695'],
+            ['65323751401133593272677920818977066639472955705880624517241162232537083362159781541448933025', Rounding_Mode::HalfUp, '8082311018584572712389536725132408571687355695'],
+
+            ['54888850556449896314370999310468417973690137670860368033970930193923337744682096321526909321', Rounding_Mode::Unnecessary, '7408701003310222419788126612344084182212588611'],
+            ['54888850556449896314370999310468417973690137670860368033970930193923337744682096321526909321', Rounding_Mode::Down, '7408701003310222419788126612344084182212588611'],
+            ['54888850556449896314370999310468417973690137670860368033970930193923337744682096321526909321', Rounding_Mode::Up, '7408701003310222419788126612344084182212588611'],
+            ['54888850556449896314370999310468417973690137670860368033970930193923337744682096321526909321', Rounding_Mode::HalfUp, '7408701003310222419788126612344084182212588611'],
+
+            ['54888850556449896314370999310468417973690137678269069037281152613711464357026180503739497932', Rounding_Mode::Unnecessary, null],
+            ['54888850556449896314370999310468417973690137678269069037281152613711464357026180503739497932', Rounding_Mode::Down, '7408701003310222419788126612344084182212588611'],
+            ['54888850556449896314370999310468417973690137678269069037281152613711464357026180503739497932', Rounding_Mode::Up, '7408701003310222419788126612344084182212588612'],
+            ['54888850556449896314370999310468417973690137678269069037281152613711464357026180503739497932', Rounding_Mode::HalfUp, '7408701003310222419788126612344084182212588611'],
+
+            ['54888850556449896314370999310468417973690137685677770040591375033499590969370264685952086544', Rounding_Mode::Unnecessary, '7408701003310222419788126612344084182212588612'],
+            ['54888850556449896314370999310468417973690137685677770040591375033499590969370264685952086544', Rounding_Mode::Down, '7408701003310222419788126612344084182212588612'],
+            ['54888850556449896314370999310468417973690137685677770040591375033499590969370264685952086544', Rounding_Mode::Up, '7408701003310222419788126612344084182212588612'],
+            ['54888850556449896314370999310468417973690137685677770040591375033499590969370264685952086544', Rounding_Mode::HalfUp, '7408701003310222419788126612344084182212588612'],
+
+            ['2805085217054754253789444062542634634800093806651719072914037849606695181828139974525774321216', Rounding_Mode::Unnecessary, '52963055208841136620374558431841622364185138904'],
+            ['2805085217054754253789444062542634634800093806651719072914037849606695181828139974525774321216', Rounding_Mode::Down, '52963055208841136620374558431841622364185138904'],
+            ['2805085217054754253789444062542634634800093806651719072914037849606695181828139974525774321216', Rounding_Mode::Up, '52963055208841136620374558431841622364185138904'],
+            ['2805085217054754253789444062542634634800093806651719072914037849606695181828139974525774321216', Rounding_Mode::HalfUp, '52963055208841136620374558431841622364185138904'],
+
+            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599024', Rounding_Mode::Unnecessary, null],
+            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599024', Rounding_Mode::Down, '52963055208841136620374558431841622364185138904'],
+            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599024', Rounding_Mode::Up, '52963055208841136620374558431841622364185138905'],
+            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599024', Rounding_Mode::HalfUp, '52963055208841136620374558431841622364185138905'],
+
+            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599025', Rounding_Mode::Unnecessary, '52963055208841136620374558431841622364185138905'],
+            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599025', Rounding_Mode::Down, '52963055208841136620374558431841622364185138905'],
+            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599025', Rounding_Mode::Up, '52963055208841136620374558431841622364185138905'],
+            ['2805085217054754253789444062542634634800093806757645183331720122847444298691823219254144599025', Rounding_Mode::HalfUp, '52963055208841136620374558431841622364185138905'],
+
+            ['1160568960830598642226220064123168954080961712013862945053127684556984147281594628487247009409', Rounding_Mode::Unnecessary, '34067124340492824200405891794016084650299718847'],
+            ['1160568960830598642226220064123168954080961712013862945053127684556984147281594628487247009409', Rounding_Mode::Down, '34067124340492824200405891794016084650299718847'],
+            ['1160568960830598642226220064123168954080961712013862945053127684556984147281594628487247009409', Rounding_Mode::Up, '34067124340492824200405891794016084650299718847'],
+            ['1160568960830598642226220064123168954080961712013862945053127684556984147281594628487247009409', Rounding_Mode::HalfUp, '34067124340492824200405891794016084650299718847'],
+
+            ['1160568960830598642226220064123168954080961712047930069393620508757390039075610713137546728256', Rounding_Mode::Unnecessary, null],
+            ['1160568960830598642226220064123168954080961712047930069393620508757390039075610713137546728256', Rounding_Mode::Down, '34067124340492824200405891794016084650299718847'],
+            ['1160568960830598642226220064123168954080961712047930069393620508757390039075610713137546728256', Rounding_Mode::Up, '34067124340492824200405891794016084650299718848'],
+            ['1160568960830598642226220064123168954080961712047930069393620508757390039075610713137546728256', Rounding_Mode::HalfUp, '34067124340492824200405891794016084650299718847'],
+
+            ['1160568960830598642226220064123168954080961712081997193734113332957795930869626797787846447104', Rounding_Mode::Unnecessary, '34067124340492824200405891794016084650299718848'],
+            ['1160568960830598642226220064123168954080961712081997193734113332957795930869626797787846447104', Rounding_Mode::Down, '34067124340492824200405891794016084650299718848'],
+            ['1160568960830598642226220064123168954080961712081997193734113332957795930869626797787846447104', Rounding_Mode::Up, '34067124340492824200405891794016084650299718848'],
+            ['1160568960830598642226220064123168954080961712081997193734113332957795930869626797787846447104', Rounding_Mode::HalfUp, '34067124340492824200405891794016084650299718848'],
+
+            ['124505361771365706389189800193135630498052202514496166178932088454657696893428061453489005584', Rounding_Mode::Unnecessary, '11158197066343904036990752059839856835208279172'],
+            ['124505361771365706389189800193135630498052202514496166178932088454657696893428061453489005584', Rounding_Mode::Down, '11158197066343904036990752059839856835208279172'],
+            ['124505361771365706389189800193135630498052202514496166178932088454657696893428061453489005584', Rounding_Mode::Up, '11158197066343904036990752059839856835208279172'],
+            ['124505361771365706389189800193135630498052202514496166178932088454657696893428061453489005584', Rounding_Mode::HalfUp, '11158197066343904036990752059839856835208279172'],
+
+            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563928', Rounding_Mode::Unnecessary, null],
+            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563928', Rounding_Mode::Down, '11158197066343904036990752059839856835208279172'],
+            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563928', Rounding_Mode::Up, '11158197066343904036990752059839856835208279173'],
+            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563928', Rounding_Mode::HalfUp, '11158197066343904036990752059839856835208279173'],
+
+            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563929', Rounding_Mode::Unnecessary, '11158197066343904036990752059839856835208279173'],
+            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563929', Rounding_Mode::Down, '11158197066343904036990752059839856835208279173'],
+            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563929', Rounding_Mode::Up, '11158197066343904036990752059839856835208279173'],
+            ['124505361771365706389189800193135630498052202536812560311619896528639201013107775123905563929', Rounding_Mode::HalfUp, '11158197066343904036990752059839856835208279173'],
+
+            ['8304391676065346969717869193750447720841513935376871747395147291005945252957072474745223924900', Rounding_Mode::Unnecessary, '91128435057699454436963842029258931771642571930'],
+            ['8304391676065346969717869193750447720841513935376871747395147291005945252957072474745223924900', Rounding_Mode::Down, '91128435057699454436963842029258931771642571930'],
+            ['8304391676065346969717869193750447720841513935376871747395147291005945252957072474745223924900', Rounding_Mode::Up, '91128435057699454436963842029258931771642571930'],
+            ['8304391676065346969717869193750447720841513935376871747395147291005945252957072474745223924900', Rounding_Mode::HalfUp, '91128435057699454436963842029258931771642571930'],
+
+            ['8304391676065346969717869193750447720841513935468000182452846745442909094986331406516866496830', Rounding_Mode::Unnecessary, null],
+            ['8304391676065346969717869193750447720841513935468000182452846745442909094986331406516866496830', Rounding_Mode::Down, '91128435057699454436963842029258931771642571930'],
+            ['8304391676065346969717869193750447720841513935468000182452846745442909094986331406516866496830', Rounding_Mode::Up, '91128435057699454436963842029258931771642571931'],
+            ['8304391676065346969717869193750447720841513935468000182452846745442909094986331406516866496830', Rounding_Mode::HalfUp, '91128435057699454436963842029258931771642571930'],
+
+            ['8304391676065346969717869193750447720841513935559128617510546199879872937015590338288509068761', Rounding_Mode::Unnecessary, '91128435057699454436963842029258931771642571931'],
+            ['8304391676065346969717869193750447720841513935559128617510546199879872937015590338288509068761', Rounding_Mode::Down, '91128435057699454436963842029258931771642571931'],
+            ['8304391676065346969717869193750447720841513935559128617510546199879872937015590338288509068761', Rounding_Mode::Up, '91128435057699454436963842029258931771642571931'],
+            ['8304391676065346969717869193750447720841513935559128617510546199879872937015590338288509068761', Rounding_Mode::HalfUp, '91128435057699454436963842029258931771642571931'],
+
+            ['3902633675982472936031277376575750479219313797204897526330941750565757566042240677294833640976', Rounding_Mode::Unnecessary, '62471062708925265536995715391198772286875632324'],
+            ['3902633675982472936031277376575750479219313797204897526330941750565757566042240677294833640976', Rounding_Mode::Down, '62471062708925265536995715391198772286875632324'],
+            ['3902633675982472936031277376575750479219313797204897526330941750565757566042240677294833640976', Rounding_Mode::Up, '62471062708925265536995715391198772286875632324'],
+            ['3902633675982472936031277376575750479219313797204897526330941750565757566042240677294833640976', Rounding_Mode::HalfUp, '62471062708925265536995715391198772286875632324'],
+
+            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905624', Rounding_Mode::Unnecessary, null],
+            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905624', Rounding_Mode::Down, '62471062708925265536995715391198772286875632324'],
+            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905624', Rounding_Mode::Up, '62471062708925265536995715391198772286875632325'],
+            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905624', Rounding_Mode::HalfUp, '62471062708925265536995715391198772286875632325'],
+
+            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905625', Rounding_Mode::Unnecessary, '62471062708925265536995715391198772286875632325'],
+            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905625', Rounding_Mode::Down, '62471062708925265536995715391198772286875632325'],
+            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905625', Rounding_Mode::Up, '62471062708925265536995715391198772286875632325'],
+            ['3902633675982472936031277376575750479219313797329839651748792281639748996824638221868584905625', Rounding_Mode::HalfUp, '62471062708925265536995715391198772286875632325'],
+
+            ['21803189113281615247645689642554433787955300436727779524987566434496560052640713833839771848809', Rounding_Mode::Unnecessary, '147659029907695165135263001196567750660989708947'],
+            ['21803189113281615247645689642554433787955300436727779524987566434496560052640713833839771848809', Rounding_Mode::Down, '147659029907695165135263001196567750660989708947'],
+            ['21803189113281615247645689642554433787955300436727779524987566434496560052640713833839771848809', Rounding_Mode::Up, '147659029907695165135263001196567750660989708947'],
+            ['21803189113281615247645689642554433787955300436727779524987566434496560052640713833839771848809', Rounding_Mode::HalfUp, '147659029907695165135263001196567750660989708947'],
+
+            ['21803189113281615247645689642554433787955300436875438554895261599631823053837281584500761557756', Rounding_Mode::Unnecessary, null],
+            ['21803189113281615247645689642554433787955300436875438554895261599631823053837281584500761557756', Rounding_Mode::Down, '147659029907695165135263001196567750660989708947'],
+            ['21803189113281615247645689642554433787955300436875438554895261599631823053837281584500761557756', Rounding_Mode::Up, '147659029907695165135263001196567750660989708948'],
+            ['21803189113281615247645689642554433787955300436875438554895261599631823053837281584500761557756', Rounding_Mode::HalfUp, '147659029907695165135263001196567750660989708947'],
+
+            ['21803189113281615247645689642554433787955300437023097584802956764767086055033849335161751266704', Rounding_Mode::Unnecessary, '147659029907695165135263001196567750660989708948'],
+            ['21803189113281615247645689642554433787955300437023097584802956764767086055033849335161751266704', Rounding_Mode::Down, '147659029907695165135263001196567750660989708948'],
+            ['21803189113281615247645689642554433787955300437023097584802956764767086055033849335161751266704', Rounding_Mode::Up, '147659029907695165135263001196567750660989708948'],
+            ['21803189113281615247645689642554433787955300437023097584802956764767086055033849335161751266704', Rounding_Mode::HalfUp, '147659029907695165135263001196567750660989708948'],
+
+            ['765773631185413773891853587035522811215936001201156164967993252197672361266093168217637840800625', Rounding_Mode::Unnecessary, '875084927984372139644261680745245536779196496025'],
+            ['765773631185413773891853587035522811215936001201156164967993252197672361266093168217637840800625', Rounding_Mode::Down, '875084927984372139644261680745245536779196496025'],
+            ['765773631185413773891853587035522811215936001201156164967993252197672361266093168217637840800625', Rounding_Mode::Up, '875084927984372139644261680745245536779196496025'],
+            ['765773631185413773891853587035522811215936001201156164967993252197672361266093168217637840800625', Rounding_Mode::HalfUp, '875084927984372139644261680745245536779196496025'],
+
+            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792675', Rounding_Mode::Unnecessary, null],
+            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792675', Rounding_Mode::Down, '875084927984372139644261680745245536779196496025'],
+            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792675', Rounding_Mode::Up, '875084927984372139644261680745245536779196496026'],
+            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792675', Rounding_Mode::HalfUp, '875084927984372139644261680745245536779196496026'],
+
+            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792676', Rounding_Mode::Unnecessary, '875084927984372139644261680745245536779196496026'],
+            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792676', Rounding_Mode::Down, '875084927984372139644261680745245536779196496026'],
+            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792676', Rounding_Mode::Up, '875084927984372139644261680745245536779196496026'],
+            ['765773631185413773891853587035522811215936001202906334823961996476960884627583659291196233792676', Rounding_Mode::HalfUp, '875084927984372139644261680745245536779196496026'],
+
+            ['371531253548731146505174144638678761062942262073337722044484956271277190798021717224921126356624', Rounding_Mode::Unnecessary, '609533636109387441986227427959683991839011782068'],
+            ['371531253548731146505174144638678761062942262073337722044484956271277190798021717224921126356624', Rounding_Mode::Down, '609533636109387441986227427959683991839011782068'],
+            ['371531253548731146505174144638678761062942262073337722044484956271277190798021717224921126356624', Rounding_Mode::Up, '609533636109387441986227427959683991839011782068'],
+            ['371531253548731146505174144638678761062942262073337722044484956271277190798021717224921126356624', Rounding_Mode::HalfUp, '609533636109387441986227427959683991839011782068'],
+
+            ['371531253548731146505174144638678761062942262073947255680594343713263418225981401216760138138692', Rounding_Mode::Unnecessary, null],
+            ['371531253548731146505174144638678761062942262073947255680594343713263418225981401216760138138692', Rounding_Mode::Down, '609533636109387441986227427959683991839011782068'],
+            ['371531253548731146505174144638678761062942262073947255680594343713263418225981401216760138138692', Rounding_Mode::Up, '609533636109387441986227427959683991839011782069'],
+            ['371531253548731146505174144638678761062942262073947255680594343713263418225981401216760138138692', Rounding_Mode::HalfUp, '609533636109387441986227427959683991839011782068'],
+
+            ['371531253548731146505174144638678761062942262074556789316703731155249645653941085208599149920761', Rounding_Mode::Unnecessary, '609533636109387441986227427959683991839011782069'],
+            ['371531253548731146505174144638678761062942262074556789316703731155249645653941085208599149920761', Rounding_Mode::Down, '609533636109387441986227427959683991839011782069'],
+            ['371531253548731146505174144638678761062942262074556789316703731155249645653941085208599149920761', Rounding_Mode::Up, '609533636109387441986227427959683991839011782069'],
+            ['371531253548731146505174144638678761062942262074556789316703731155249645653941085208599149920761', Rounding_Mode::HalfUp, '609533636109387441986227427959683991839011782069'],
+
+            ['32639765347874160297815057000511241042881990523574135639577516269227137979270282014943162493161', Rounding_Mode::Unnecessary, '180664787238338617809927067472657959412705501869'],
+            ['32639765347874160297815057000511241042881990523574135639577516269227137979270282014943162493161', Rounding_Mode::Down, '180664787238338617809927067472657959412705501869'],
+            ['32639765347874160297815057000511241042881990523574135639577516269227137979270282014943162493161', Rounding_Mode::Up, '180664787238338617809927067472657959412705501869'],
+            ['32639765347874160297815057000511241042881990523574135639577516269227137979270282014943162493161', Rounding_Mode::HalfUp, '180664787238338617809927067472657959412705501869'],
+
+            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496899', Rounding_Mode::Unnecessary, null],
+            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496899', Rounding_Mode::Down, '180664787238338617809927067472657959412705501869'],
+            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496899', Rounding_Mode::Up, '180664787238338617809927067472657959412705501870'],
+            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496899', Rounding_Mode::HalfUp, '180664787238338617809927067472657959412705501870'],
+
+            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496900', Rounding_Mode::Unnecessary, '180664787238338617809927067472657959412705501870'],
+            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496900', Rounding_Mode::Down, '180664787238338617809927067472657959412705501870'],
+            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496900', Rounding_Mode::Up, '180664787238338617809927067472657959412705501870'],
+            ['32639765347874160297815057000511241042881990523935465214054193504846992114215597933768573496900', Rounding_Mode::HalfUp, '180664787238338617809927067472657959412705501870'],
+
+            ['23312804018277899268530151932487478598118645419296370443140824162402663914524726804469078709025', Rounding_Mode::Unnecessary, '152685310420740538469311655525476411276716730095'],
+            ['23312804018277899268530151932487478598118645419296370443140824162402663914524726804469078709025', Rounding_Mode::Down, '152685310420740538469311655525476411276716730095'],
+            ['23312804018277899268530151932487478598118645419296370443140824162402663914524726804469078709025', Rounding_Mode::Up, '152685310420740538469311655525476411276716730095'],
+            ['23312804018277899268530151932487478598118645419296370443140824162402663914524726804469078709025', Rounding_Mode::HalfUp, '152685310420740538469311655525476411276716730095'],
+
+            ['23312804018277899268530151932487478598118645419449055753561564700871975570050203215745795439120', Rounding_Mode::Unnecessary, null],
+            ['23312804018277899268530151932487478598118645419449055753561564700871975570050203215745795439120', Rounding_Mode::Down, '152685310420740538469311655525476411276716730095'],
+            ['23312804018277899268530151932487478598118645419449055753561564700871975570050203215745795439120', Rounding_Mode::Up, '152685310420740538469311655525476411276716730096'],
+            ['23312804018277899268530151932487478598118645419449055753561564700871975570050203215745795439120', Rounding_Mode::HalfUp, '152685310420740538469311655525476411276716730095'],
+
+            ['23312804018277899268530151932487478598118645419601741063982305239341287225575679627022512169216', Rounding_Mode::Unnecessary, '152685310420740538469311655525476411276716730096'],
+            ['23312804018277899268530151932487478598118645419601741063982305239341287225575679627022512169216', Rounding_Mode::Down, '152685310420740538469311655525476411276716730096'],
+            ['23312804018277899268530151932487478598118645419601741063982305239341287225575679627022512169216', Rounding_Mode::Up, '152685310420740538469311655525476411276716730096'],
+            ['23312804018277899268530151932487478598118645419601741063982305239341287225575679627022512169216', Rounding_Mode::HalfUp, '152685310420740538469311655525476411276716730096'],
+
+            ['69351939896058034711498082880502238045919014432567876454734811966028586293551025867711349695480441', Rounding_Mode::Unnecessary, '8327781210866315423454045118194686369495352533771'],
+            ['69351939896058034711498082880502238045919014432567876454734811966028586293551025867711349695480441', Rounding_Mode::Down, '8327781210866315423454045118194686369495352533771'],
+            ['69351939896058034711498082880502238045919014432567876454734811966028586293551025867711349695480441', Rounding_Mode::Up, '8327781210866315423454045118194686369495352533771'],
+            ['69351939896058034711498082880502238045919014432567876454734811966028586293551025867711349695480441', Rounding_Mode::HalfUp, '8327781210866315423454045118194686369495352533771'],
+
+            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547983', Rounding_Mode::Unnecessary, null],
+            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547983', Rounding_Mode::Down, '8327781210866315423454045118194686369495352533771'],
+            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547983', Rounding_Mode::Up, '8327781210866315423454045118194686369495352533772'],
+            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547983', Rounding_Mode::HalfUp, '8327781210866315423454045118194686369495352533772'],
+
+            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547984', Rounding_Mode::Unnecessary, '8327781210866315423454045118194686369495352533772'],
+            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547984', Rounding_Mode::Down, '8327781210866315423454045118194686369495352533772'],
+            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547984', Rounding_Mode::Up, '8327781210866315423454045118194686369495352533772'],
+            ['69351939896058034711498082880502238045919014432584532017156544596875494383787415240450340400547984', Rounding_Mode::HalfUp, '8327781210866315423454045118194686369495352533772'],
+
+            ['56907419683049340072215388152597682083224395922699571395667588185898365170014916921330096015050884', Rounding_Mode::Unnecessary, '7543700662344002371027341442602779762847104806622'],
+            ['56907419683049340072215388152597682083224395922699571395667588185898365170014916921330096015050884', Rounding_Mode::Down, '7543700662344002371027341442602779762847104806622'],
+            ['56907419683049340072215388152597682083224395922699571395667588185898365170014916921330096015050884', Rounding_Mode::Up, '7543700662344002371027341442602779762847104806622'],
+            ['56907419683049340072215388152597682083224395922699571395667588185898365170014916921330096015050884', Rounding_Mode::HalfUp, '7543700662344002371027341442602779762847104806622'],
+
+            ['56907419683049340072215388152597682083224395922707115096329932188269392511457519701092943119857506', Rounding_Mode::Unnecessary, null],
+            ['56907419683049340072215388152597682083224395922707115096329932188269392511457519701092943119857506', Rounding_Mode::Down, '7543700662344002371027341442602779762847104806622'],
+            ['56907419683049340072215388152597682083224395922707115096329932188269392511457519701092943119857506', Rounding_Mode::Up, '7543700662344002371027341442602779762847104806623'],
+            ['56907419683049340072215388152597682083224395922707115096329932188269392511457519701092943119857506', Rounding_Mode::HalfUp, '7543700662344002371027341442602779762847104806622'],
+
+            ['56907419683049340072215388152597682083224395922714658796992276190640419852900122480855790224664129', Rounding_Mode::Unnecessary, '7543700662344002371027341442602779762847104806623'],
+            ['56907419683049340072215388152597682083224395922714658796992276190640419852900122480855790224664129', Rounding_Mode::Down, '7543700662344002371027341442602779762847104806623'],
+            ['56907419683049340072215388152597682083224395922714658796992276190640419852900122480855790224664129', Rounding_Mode::Up, '7543700662344002371027341442602779762847104806623'],
+            ['56907419683049340072215388152597682083224395922714658796992276190640419852900122480855790224664129', Rounding_Mode::HalfUp, '7543700662344002371027341442602779762847104806623'],
+
+            ['1163525248981521754155547339230838194099208908132096593234853200207208035365529397606592383400336', Rounding_Mode::Unnecessary, '1078668275690687843154790865870705804593431876844'],
+            ['1163525248981521754155547339230838194099208908132096593234853200207208035365529397606592383400336', Rounding_Mode::Down, '1078668275690687843154790865870705804593431876844'],
+            ['1163525248981521754155547339230838194099208908132096593234853200207208035365529397606592383400336', Rounding_Mode::Up, '1078668275690687843154790865870705804593431876844'],
+            ['1163525248981521754155547339230838194099208908132096593234853200207208035365529397606592383400336', Rounding_Mode::HalfUp, '1078668275690687843154790865870705804593431876844'],
+
+            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154024', Rounding_Mode::Unnecessary, null],
+            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154024', Rounding_Mode::Down, '1078668275690687843154790865870705804593431876844'],
+            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154024', Rounding_Mode::Up, '1078668275690687843154790865870705804593431876845'],
+            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154024', Rounding_Mode::HalfUp, '1078668275690687843154790865870705804593431876845'],
+
+            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154025', Rounding_Mode::Unnecessary, '1078668275690687843154790865870705804593431876845'],
+            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154025', Rounding_Mode::Down, '1078668275690687843154790865870705804593431876845'],
+            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154025', Rounding_Mode::Up, '1078668275690687843154790865870705804593431876845'],
+            ['1163525248981521754155547339230838194099208908134253929786234575893517617097270809215779247154025', Rounding_Mode::HalfUp, '1078668275690687843154790865870705804593431876845'],
+
+            ['12630009931573082897907144855573901252532449094542217468986509301292277005832281659959934465254400', Rounding_Mode::Unnecessary, '3553872526072521203015975245855936611531238601120'],
+            ['12630009931573082897907144855573901252532449094542217468986509301292277005832281659959934465254400', Rounding_Mode::Down, '3553872526072521203015975245855936611531238601120'],
+            ['12630009931573082897907144855573901252532449094542217468986509301292277005832281659959934465254400', Rounding_Mode::Up, '3553872526072521203015975245855936611531238601120'],
+            ['12630009931573082897907144855573901252532449094542217468986509301292277005832281659959934465254400', Rounding_Mode::HalfUp, '3553872526072521203015975245855936611531238601120'],
+
+            ['12630009931573082897907144855573901252532449094545771341512581822495292981078137596571465703855520', Rounding_Mode::Unnecessary, null],
+            ['12630009931573082897907144855573901252532449094545771341512581822495292981078137596571465703855520', Rounding_Mode::Down, '3553872526072521203015975245855936611531238601120'],
+            ['12630009931573082897907144855573901252532449094545771341512581822495292981078137596571465703855520', Rounding_Mode::Up, '3553872526072521203015975245855936611531238601121'],
+            ['12630009931573082897907144855573901252532449094545771341512581822495292981078137596571465703855520', Rounding_Mode::HalfUp, '3553872526072521203015975245855936611531238601120'],
+
+            ['12630009931573082897907144855573901252532449094549325214038654343698308956323993533182996942456641', Rounding_Mode::Unnecessary, '3553872526072521203015975245855936611531238601121'],
+            ['12630009931573082897907144855573901252532449094549325214038654343698308956323993533182996942456641', Rounding_Mode::Down, '3553872526072521203015975245855936611531238601121'],
+            ['12630009931573082897907144855573901252532449094549325214038654343698308956323993533182996942456641', Rounding_Mode::Up, '3553872526072521203015975245855936611531238601121'],
+            ['12630009931573082897907144855573901252532449094549325214038654343698308956323993533182996942456641', Rounding_Mode::HalfUp, '3553872526072521203015975245855936611531238601121'],
+
+            ['31255308963169979605103962253255036593975285646828038303401111783018980508885388211539730531736976', Rounding_Mode::Unnecessary, '5590644771685103192691707139464277920149086765676'],
+            ['31255308963169979605103962253255036593975285646828038303401111783018980508885388211539730531736976', Rounding_Mode::Down, '5590644771685103192691707139464277920149086765676'],
+            ['31255308963169979605103962253255036593975285646828038303401111783018980508885388211539730531736976', Rounding_Mode::Up, '5590644771685103192691707139464277920149086765676'],
+            ['31255308963169979605103962253255036593975285646828038303401111783018980508885388211539730531736976', Rounding_Mode::HalfUp, '5590644771685103192691707139464277920149086765676'],
+
+            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268328', Rounding_Mode::Unnecessary, null],
+            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268328', Rounding_Mode::Down, '5590644771685103192691707139464277920149086765676'],
+            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268328', Rounding_Mode::Up, '5590644771685103192691707139464277920149086765677'],
+            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268328', Rounding_Mode::HalfUp, '5590644771685103192691707139464277920149086765677'],
+
+            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268329', Rounding_Mode::Unnecessary, '5590644771685103192691707139464277920149086765677'],
+            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268329', Rounding_Mode::Down, '5590644771685103192691707139464277920149086765677'],
+            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268329', Rounding_Mode::Up, '5590644771685103192691707139464277920149086765677'],
+            ['31255308963169979605103962253255036593975285646839219592944481989404363923164316767380028705268329', Rounding_Mode::HalfUp, '5590644771685103192691707139464277920149086765677'],
+
+            ['8628012985404686018689218847909668804260178206412486603741772756323555243760489710208140383228648196', Rounding_Mode::Unnecessary, '92887098056752133732654744820968248061511732728514'],
+            ['8628012985404686018689218847909668804260178206412486603741772756323555243760489710208140383228648196', Rounding_Mode::Down, '92887098056752133732654744820968248061511732728514'],
+            ['8628012985404686018689218847909668804260178206412486603741772756323555243760489710208140383228648196', Rounding_Mode::Up, '92887098056752133732654744820968248061511732728514'],
+            ['8628012985404686018689218847909668804260178206412486603741772756323555243760489710208140383228648196', Rounding_Mode::HalfUp, '92887098056752133732654744820968248061511732728514'],
+
+            ['8628012985404686018689218847909668804260178206412579490839829508457287898505310678456201894961376710', Rounding_Mode::Unnecessary, null],
+            ['8628012985404686018689218847909668804260178206412579490839829508457287898505310678456201894961376710', Rounding_Mode::Down, '92887098056752133732654744820968248061511732728514'],
+            ['8628012985404686018689218847909668804260178206412579490839829508457287898505310678456201894961376710', Rounding_Mode::Up, '92887098056752133732654744820968248061511732728515'],
+            ['8628012985404686018689218847909668804260178206412579490839829508457287898505310678456201894961376710', Rounding_Mode::HalfUp, '92887098056752133732654744820968248061511732728514'],
+
+            ['8628012985404686018689218847909668804260178206412672377937886260591020553250131646704263406694105225', Rounding_Mode::Unnecessary, '92887098056752133732654744820968248061511732728515'],
+            ['8628012985404686018689218847909668804260178206412672377937886260591020553250131646704263406694105225', Rounding_Mode::Down, '92887098056752133732654744820968248061511732728515'],
+            ['8628012985404686018689218847909668804260178206412672377937886260591020553250131646704263406694105225', Rounding_Mode::Up, '92887098056752133732654744820968248061511732728515'],
+            ['8628012985404686018689218847909668804260178206412672377937886260591020553250131646704263406694105225', Rounding_Mode::HalfUp, '92887098056752133732654744820968248061511732728515'],
+
+            ['9233511524782328316011754355906749687042442384057568340621550432564122836332981092655854023226646089', Rounding_Mode::Unnecessary, '96091162573788898435727389725088702432559537501283'],
+            ['9233511524782328316011754355906749687042442384057568340621550432564122836332981092655854023226646089', Rounding_Mode::Down, '96091162573788898435727389725088702432559537501283'],
+            ['9233511524782328316011754355906749687042442384057568340621550432564122836332981092655854023226646089', Rounding_Mode::Up, '96091162573788898435727389725088702432559537501283'],
+            ['9233511524782328316011754355906749687042442384057568340621550432564122836332981092655854023226646089', Rounding_Mode::HalfUp, '96091162573788898435727389725088702432559537501283'],
+
+            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648655', Rounding_Mode::Unnecessary, null],
+            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648655', Rounding_Mode::Down, '96091162573788898435727389725088702432559537501283'],
+            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648655', Rounding_Mode::Up, '96091162573788898435727389725088702432559537501284'],
+            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648655', Rounding_Mode::HalfUp, '96091162573788898435727389725088702432559537501284'],
+
+            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648656', Rounding_Mode::Unnecessary, '96091162573788898435727389725088702432559537501284'],
+            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648656', Rounding_Mode::Down, '96091162573788898435727389725088702432559537501284'],
+            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648656', Rounding_Mode::Up, '96091162573788898435727389725088702432559537501284'],
+            ['9233511524782328316011754355906749687042442384057760522946698010360994291112431270060719142301648656', Rounding_Mode::HalfUp, '96091162573788898435727389725088702432559537501284'],
+
+            ['453765858005120177768073445581083997020624166557446581526841386118834645505297210629607793706393856', Rounding_Mode::Unnecessary, '21301780629917306933323409392321012226117710104816'],
+            ['453765858005120177768073445581083997020624166557446581526841386118834645505297210629607793706393856', Rounding_Mode::Down, '21301780629917306933323409392321012226117710104816'],
+            ['453765858005120177768073445581083997020624166557446581526841386118834645505297210629607793706393856', Rounding_Mode::Up, '21301780629917306933323409392321012226117710104816'],
+            ['453765858005120177768073445581083997020624166557446581526841386118834645505297210629607793706393856', Rounding_Mode::HalfUp, '21301780629917306933323409392321012226117710104816'],
+
+            ['453765858005120177768073445581083997020624166557467883307471303425767968914689531641833911416498672', Rounding_Mode::Unnecessary, null],
+            ['453765858005120177768073445581083997020624166557467883307471303425767968914689531641833911416498672', Rounding_Mode::Down, '21301780629917306933323409392321012226117710104816'],
+            ['453765858005120177768073445581083997020624166557467883307471303425767968914689531641833911416498672', Rounding_Mode::Up, '21301780629917306933323409392321012226117710104817'],
+            ['453765858005120177768073445581083997020624166557467883307471303425767968914689531641833911416498672', Rounding_Mode::HalfUp, '21301780629917306933323409392321012226117710104816'],
+
+            ['453765858005120177768073445581083997020624166557489185088101220732701292324081852654060029126603489', Rounding_Mode::Unnecessary, '21301780629917306933323409392321012226117710104817'],
+            ['453765858005120177768073445581083997020624166557489185088101220732701292324081852654060029126603489', Rounding_Mode::Down, '21301780629917306933323409392321012226117710104817'],
+            ['453765858005120177768073445581083997020624166557489185088101220732701292324081852654060029126603489', Rounding_Mode::Up, '21301780629917306933323409392321012226117710104817'],
+            ['453765858005120177768073445581083997020624166557489185088101220732701292324081852654060029126603489', Rounding_Mode::HalfUp, '21301780629917306933323409392321012226117710104817'],
+
+            ['1371661154627246967424438399063581804666179749323634366508032096471110921410597239232159814550961124', Rounding_Mode::Unnecessary, '37035944089860149903963455856570016412483527052182'],
+            ['1371661154627246967424438399063581804666179749323634366508032096471110921410597239232159814550961124', Rounding_Mode::Down, '37035944089860149903963455856570016412483527052182'],
+            ['1371661154627246967424438399063581804666179749323634366508032096471110921410597239232159814550961124', Rounding_Mode::Up, '37035944089860149903963455856570016412483527052182'],
+            ['1371661154627246967424438399063581804666179749323634366508032096471110921410597239232159814550961124', Rounding_Mode::HalfUp, '37035944089860149903963455856570016412483527052182'],
+
+            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065488', Rounding_Mode::Unnecessary, null],
+            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065488', Rounding_Mode::Down, '37035944089860149903963455856570016412483527052182'],
+            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065488', Rounding_Mode::Up, '37035944089860149903963455856570016412483527052183'],
+            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065488', Rounding_Mode::HalfUp, '37035944089860149903963455856570016412483527052183'],
+
+            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065489', Rounding_Mode::Unnecessary, '37035944089860149903963455856570016412483527052183'],
+            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065489', Rounding_Mode::Down, '37035944089860149903963455856570016412483527052183'],
+            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065489', Rounding_Mode::Up, '37035944089860149903963455856570016412483527052183'],
+            ['1371661154627246967424438399063581804666179749323708438396211816770918848322310379264984781605065489', Rounding_Mode::HalfUp, '37035944089860149903963455856570016412483527052183'],
+
+            ['370256269805896436402015708175373292783056837812420632207201736440955067457713055190230384049843049', Rounding_Mode::Unnecessary, '19242044325016415375787142063732125294673656555757'],
+            ['370256269805896436402015708175373292783056837812420632207201736440955067457713055190230384049843049', Rounding_Mode::Down, '19242044325016415375787142063732125294673656555757'],
+            ['370256269805896436402015708175373292783056837812420632207201736440955067457713055190230384049843049', Rounding_Mode::Up, '19242044325016415375787142063732125294673656555757'],
+            ['370256269805896436402015708175373292783056837812420632207201736440955067457713055190230384049843049', Rounding_Mode::HalfUp, '19242044325016415375787142063732125294673656555757'],
+
+            ['370256269805896436402015708175373292783056837812439874251526752856330854599776787315525057706398806', Rounding_Mode::Unnecessary, null],
+            ['370256269805896436402015708175373292783056837812439874251526752856330854599776787315525057706398806', Rounding_Mode::Down, '19242044325016415375787142063732125294673656555757'],
+            ['370256269805896436402015708175373292783056837812439874251526752856330854599776787315525057706398806', Rounding_Mode::Up, '19242044325016415375787142063732125294673656555758'],
+            ['370256269805896436402015708175373292783056837812439874251526752856330854599776787315525057706398806', Rounding_Mode::HalfUp, '19242044325016415375787142063732125294673656555757'],
+
+            ['370256269805896436402015708175373292783056837812459116295851769271706641741840519440819731362954564', Rounding_Mode::Unnecessary, '19242044325016415375787142063732125294673656555758'],
+            ['370256269805896436402015708175373292783056837812459116295851769271706641741840519440819731362954564', Rounding_Mode::Down, '19242044325016415375787142063732125294673656555758'],
+            ['370256269805896436402015708175373292783056837812459116295851769271706641741840519440819731362954564', Rounding_Mode::Up, '19242044325016415375787142063732125294673656555758'],
+            ['370256269805896436402015708175373292783056837812459116295851769271706641741840519440819731362954564', Rounding_Mode::HalfUp, '19242044325016415375787142063732125294673656555758'],
         ];
 
         foreach ($tests as [$number, $roundingMode, $expected]) {
@@ -3650,14 +3650,14 @@ class BigIntegerTest extends AbstractTestCase
 
             $roundingModeEqs = match ($roundingMode) {
                 // Positive numbers make these rounding modes equivalent
-                RoundingMode::Up => [RoundingMode::Ceiling],
-                RoundingMode::Down => [RoundingMode::Floor],
+                Rounding_Mode::Up => [Rounding_Mode::Ceiling],
+                Rounding_Mode::Down => [Rounding_Mode::Floor],
                 // For integer sqrt, Half* modes never hit a tie, so they are equivalent
-                RoundingMode::HalfUp => [
-                    RoundingMode::HalfCeiling,
-                    RoundingMode::HalfDown,
-                    RoundingMode::HalfEven,
-                    RoundingMode::HalfFloor,
+                Rounding_Mode::HalfUp => [
+                    Rounding_Mode::HalfCeiling,
+                    Rounding_Mode::HalfDown,
+                    Rounding_Mode::HalfEven,
+                    Rounding_Mode::HalfFloor,
                 ],
                 default => [],
             };
@@ -3670,8 +3670,8 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testSqrtOfNegativeNumber(): void
     {
-        $number = BigInteger::of(-1);
-        $this->expectException(NegativeNumberException::class);
+        $number = Big_Integer::of(-1);
+        $this->expectException(Negative_Number_Exception::class);
         $this->expectExceptionMessageExact('Cannot calculate the square root of a negative number.');
 
         $number->sqrt();
@@ -3684,7 +3684,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerAbs')]
     public function testAbs(string $number, string $expected): void
     {
-        self::assertBigIntegerEquals($expected, BigInteger::of($number)->abs());
+        self::assertBigIntegerEquals($expected, Big_Integer::of($number)->abs());
     }
 
     public static function providerAbs(): array
@@ -3703,7 +3703,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerNegated')]
     public function testNegated(string $number, string $expected): void
     {
-        self::assertBigIntegerEquals($expected, BigInteger::of($number)->negated());
+        self::assertBigIntegerEquals($expected, Big_Integer::of($number)->negated());
     }
 
     public static function providerNegated(): array
@@ -3723,7 +3723,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerOr')]
     public function testOr(string $a, string $b, string $c): void
     {
-        self::assertBigIntegerEquals($c, BigInteger::of($a)->or($b));
+        self::assertBigIntegerEquals($c, Big_Integer::of($a)->or($b));
     }
 
     public static function providerOr(): array
@@ -3794,7 +3794,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerAnd')]
     public function testAnd(string $a, string $b, string $c): void
     {
-        self::assertBigIntegerEquals($c, BigInteger::of($a)->and($b));
+        self::assertBigIntegerEquals($c, Big_Integer::of($a)->and($b));
     }
 
     public static function providerAnd(): array
@@ -3870,7 +3870,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerXor')]
     public function testXor(string $a, string $b, string $c): void
     {
-        self::assertBigIntegerEquals($c, BigInteger::of($a)->xor($b));
+        self::assertBigIntegerEquals($c, Big_Integer::of($a)->xor($b));
     }
 
     public static function providerXor(): array
@@ -3938,7 +3938,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerNot')]
     public function testNot(string $number, string $expected): void
     {
-        self::assertBigIntegerEquals($expected, BigInteger::of($number)->not());
+        self::assertBigIntegerEquals($expected, Big_Integer::of($number)->not());
     }
 
     public static function providerNot(): array
@@ -3974,7 +3974,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerShiftedLeft')]
     public function testShiftedLeft(string $a, int $b, string $c): void
     {
-        self::assertBigIntegerEquals($c, BigInteger::of($a)->shiftedLeft($b));
+        self::assertBigIntegerEquals($c, Big_Integer::of($a)->shifted_left($b));
     }
 
     /**
@@ -3985,7 +3985,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerShiftedLeft')]
     public function testShiftedRight(string $a, int $b, string $c): void
     {
-        self::assertBigIntegerEquals($c, BigInteger::of($a)->shiftedRight(-$b));
+        self::assertBigIntegerEquals($c, Big_Integer::of($a)->shifted_right(-$b));
     }
 
     public static function providerShiftedLeft(): array
@@ -4140,7 +4140,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerGetBitLength')]
     public function testGetBitLength(string $number, int $bitLength): void
     {
-        self::assertSame($bitLength, BigInteger::of($number)->getBitLength());
+        self::assertSame($bitLength, Big_Integer::of($number)->get_bit_length());
     }
 
     public static function providerGetBitLength(): array
@@ -4216,7 +4216,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerGetLowestSetBit')]
     public function testGetLowestSetBit(string $number, ?int $lowestSetBit): void
     {
-        self::assertSame($lowestSetBit, BigInteger::of($number)->getLowestSetBit());
+        self::assertSame($lowestSetBit, Big_Integer::of($number)->get_lowest_set_bit());
     }
 
     public static function providerGetLowestSetBit(): array
@@ -4255,14 +4255,14 @@ class BigIntegerTest extends AbstractTestCase
     }
 
     /**
-     * @param BigInteger $number   The number in base 2.
+     * @param Big_Integer $number   The number in base 2.
      * @param int        $n        The bit to test.
      * @param bool       $expected The expected result.
      */
     #[DataProvider('providerIsBitSet')]
-    public function testIsBitSet(BigInteger $number, int $n, bool $expected): void
+    public function testIsBitSet(Big_Integer $number, int $n, bool $expected): void
     {
-        self::assertSame($expected, $number->isBitSet($n));
+        self::assertSame($expected, $number->is_bit_set($n));
     }
 
     public static function providerIsBitSet(): Generator
@@ -4281,7 +4281,7 @@ class BigIntegerTest extends AbstractTestCase
         ];
 
         foreach ($base2BitsSetTests as [$number, $bitsSet]) {
-            $number = BigInteger::fromBase($number, 2);
+            $number = Big_Integer::from_base($number, 2);
 
             // test up to 5 bits after the last bit set
             $testBitCount = ($bitsSet[count($bitsSet) - 1] ?? 0) + 5;
@@ -4306,7 +4306,7 @@ class BigIntegerTest extends AbstractTestCase
         ];
 
         foreach ($base10BitsUnsetTests as [$number, $bitsUnset]) {
-            $number = BigInteger::of($number);
+            $number = Big_Integer::of($number);
 
             // test up to 5 bits after the last bit set
             $testBitCount = ($bitsUnset[count($bitsUnset) - 1] ?? 0) + 5;
@@ -4320,32 +4320,32 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testIsBitSetWithNegativeBitThrowsException(): void
     {
-        $number = BigInteger::one();
+        $number = Big_Integer::one();
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact('The bit index must not be negative.');
 
-        $number->isBitSet(-1);
+        $number->is_bit_set(-1);
     }
 
     /**
      * @param string $number The number to test.
-     * @param bool   $isOdd  Whether the number is even.
+     * @param bool   $is_odd  Whether the number is even.
      */
     #[DataProvider('providerIsOdd')]
-    public function testIsEven(string $number, bool $isOdd): void
+    public function testIsEven(string $number, bool $is_odd): void
     {
-        self::assertSame(! $isOdd, BigInteger::of($number)->isEven());
+        self::assertSame(! $is_odd, Big_Integer::of($number)->is_even());
     }
 
     /**
      * @param string $number The number to test.
-     * @param bool   $isOdd  Whether the number is even.
+     * @param bool   $is_odd  Whether the number is even.
      */
     #[DataProvider('providerIsOdd')]
-    public function testIsOdd(string $number, bool $isOdd): void
+    public function testIsOdd(string $number, bool $is_odd): void
     {
-        self::assertSame($isOdd, BigInteger::of($number)->isOdd());
+        self::assertSame($is_odd, Big_Integer::of($number)->is_odd());
     }
 
     public static function providerIsOdd(): Generator
@@ -4363,16 +4363,16 @@ class BigIntegerTest extends AbstractTestCase
             ['123456789012345678909', true],
         ];
 
-        foreach ($tests as [$number, $isOdd]) {
-            yield [$number, $isOdd];
-            yield ['-' . $number, $isOdd];
+        foreach ($tests as [$number, $is_odd]) {
+            yield [$number, $is_odd];
+            yield ['-' . $number, $is_odd];
         }
     }
 
     #[DataProvider('providerModInverse')]
-    public function testModInverse(string $x, BigNumber|int|string $m, string $expectedResult): void
+    public function testModInverse(string $x, Big_Number|int|string $m, string $expectedResult): void
     {
-        self::assertBigIntegerEquals($expectedResult, BigInteger::of($x)->modInverse($m));
+        self::assertBigIntegerEquals($expectedResult, Big_Integer::of($x)->mod_inverse($m));
     }
 
     public static function providerModInverse(): array
@@ -4394,37 +4394,37 @@ class BigIntegerTest extends AbstractTestCase
             ['-18506109802501380149367860917982816833935316655779336003703143134999470532428', '115792089237316195423570985008687907853269984665640564039457584007908834671663', '19862993386313611598198759090154368179476598387279988052354006856378632964602'],
             ['3', 7, '5'],
             ['3', 11, '4'],
-            ['3', BigInteger::of(17), '6'],
+            ['3', Big_Integer::of(17), '6'],
         ];
     }
 
     #[DataProvider('providerModInverseThrows')]
     public function testModInverseThrows(string $x, string $m, string $expectedException): void
     {
-        $x = BigInteger::of($x);
-        $m = BigInteger::of($m);
+        $x = Big_Integer::of($x);
+        $m = Big_Integer::of($m);
 
         $this->expectException($expectedException);
         $this->expectExceptionMessageExact(match ($expectedException) {
-            DivisionByZeroException::class => 'The modulus must not be zero.',
-            InvalidArgumentException::class => 'The modulus must not be negative.',
-            NoInverseException::class => 'This number has no multiplicative inverse modulo the given modulus (they are not coprime).',
+            Division_By_Zero_Exception::class => 'The modulus must not be zero.',
+            Invalid_Argument_Exception::class => 'The modulus must not be negative.',
+            No_Inverse_Exception::class => 'This number has no multiplicative inverse modulo the given modulus (they are not coprime).',
         });
 
-        $x->modInverse($m);
+        $x->mod_inverse($m);
     }
 
     public static function providerModInverseThrows(): array
     {
         return [
-            ['0', '0', DivisionByZeroException::class],
-            ['1', '0', DivisionByZeroException::class],
-            ['-1234567890', '-19', InvalidArgumentException::class],
-            ['0', '1000000001', NoInverseException::class],
-            ['2', '4', NoInverseException::class],
-            ['99', '9', NoInverseException::class],
-            ['19', '1000000001', NoInverseException::class],
-            ['123456789012345678901234567890', '123456789012345678901234567899', NoInverseException::class],
+            ['0', '0', Division_By_Zero_Exception::class],
+            ['1', '0', Division_By_Zero_Exception::class],
+            ['-1234567890', '-19', Invalid_Argument_Exception::class],
+            ['0', '1000000001', No_Inverse_Exception::class],
+            ['2', '4', No_Inverse_Exception::class],
+            ['99', '9', No_Inverse_Exception::class],
+            ['19', '1000000001', No_Inverse_Exception::class],
+            ['123456789012345678901234567890', '123456789012345678901234567899', No_Inverse_Exception::class],
         ];
     }
 
@@ -4436,7 +4436,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerCompareTo')]
     public function testCompareTo(string $a, string $b, int $c): void
     {
-        self::assertSame($c, BigInteger::of($a)->compareTo($b));
+        self::assertSame($c, Big_Integer::of($a)->compare_to($b));
     }
 
     /**
@@ -4447,7 +4447,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerCompareTo')]
     public function testIsEqualTo(string $a, string $b, int $c): void
     {
-        self::assertSame($c === 0, BigInteger::of($a)->isEqualTo($b));
+        self::assertSame($c === 0, Big_Integer::of($a)->is_equal_to($b));
     }
 
     /**
@@ -4458,7 +4458,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerCompareTo')]
     public function testIsLessThan(string $a, string $b, int $c): void
     {
-        self::assertSame($c < 0, BigInteger::of($a)->isLessThan($b));
+        self::assertSame($c < 0, Big_Integer::of($a)->is_less_than($b));
     }
 
     /**
@@ -4469,7 +4469,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerCompareTo')]
     public function testIsLessThanOrEqualTo(string $a, string $b, int $c): void
     {
-        self::assertSame($c <= 0, BigInteger::of($a)->isLessThanOrEqualTo($b));
+        self::assertSame($c <= 0, Big_Integer::of($a)->is_less_than_or_equal_to($b));
     }
 
     /**
@@ -4480,7 +4480,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerCompareTo')]
     public function testIsGreaterThan(string $a, string $b, int $c): void
     {
-        self::assertSame($c > 0, BigInteger::of($a)->isGreaterThan($b));
+        self::assertSame($c > 0, Big_Integer::of($a)->is_greater_than($b));
     }
 
     /**
@@ -4491,7 +4491,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerCompareTo')]
     public function testIsGreaterThanOrEqualTo(string $a, string $b, int $c): void
     {
-        self::assertSame($c >= 0, BigInteger::of($a)->isGreaterThanOrEqualTo($b));
+        self::assertSame($c >= 0, Big_Integer::of($a)->is_greater_than_or_equal_to($b));
     }
 
     public static function providerCompareTo(): array
@@ -4544,7 +4544,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerSign')]
     public function testGetSign(int|string $number, int $sign): void
     {
-        self::assertSame($sign, BigInteger::of($number)->getSign());
+        self::assertSame($sign, Big_Integer::of($number)->get_sign());
     }
 
     /**
@@ -4554,7 +4554,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerSign')]
     public function testIsZero(int|string $number, int $sign): void
     {
-        self::assertSame($sign === 0, BigInteger::of($number)->isZero());
+        self::assertSame($sign === 0, Big_Integer::of($number)->is_zero());
     }
 
     /**
@@ -4564,7 +4564,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerSign')]
     public function testIsNegative(int|string $number, int $sign): void
     {
-        self::assertSame($sign < 0, BigInteger::of($number)->isNegative());
+        self::assertSame($sign < 0, Big_Integer::of($number)->is_negative());
     }
 
     /**
@@ -4574,7 +4574,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerSign')]
     public function testIsNegativeOrZero(int|string $number, int $sign): void
     {
-        self::assertSame($sign <= 0, BigInteger::of($number)->isNegativeOrZero());
+        self::assertSame($sign <= 0, Big_Integer::of($number)->is_negative_or_zero());
     }
 
     /**
@@ -4584,7 +4584,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerSign')]
     public function testIsPositive(int|string $number, int $sign): void
     {
-        self::assertSame($sign > 0, BigInteger::of($number)->isPositive());
+        self::assertSame($sign > 0, Big_Integer::of($number)->is_positive());
     }
 
     /**
@@ -4594,7 +4594,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerSign')]
     public function testIsPositiveOrZero(int|string $number, int $sign): void
     {
-        self::assertSame($sign >= 0, BigInteger::of($number)->isPositiveOrZero());
+        self::assertSame($sign >= 0, Big_Integer::of($number)->is_positive_or_zero());
     }
 
     public static function providerSign(): array
@@ -4616,7 +4616,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerToScale')]
     public function testToScale(string $number, int $scale, string $expected): void
     {
-        self::assertBigDecimalEquals($expected, BigInteger::of($number)->toScale($scale));
+        self::assertBigDecimalEquals($expected, Big_Integer::of($number)->to_scale($scale));
     }
 
     public static function providerToScale(): array
@@ -4630,18 +4630,18 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testToScaleWithNegativeScale(): void
     {
-        $number = BigInteger::one();
+        $number = Big_Integer::one();
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact('The scale must not be negative.');
 
-        $number->toScale(-1);
+        $number->to_scale(-1);
     }
 
     #[DataProvider('providerToInt')]
     public function testToInt(int $number): void
     {
-        self::assertSame($number, BigInteger::of((string) $number)->toInt());
+        self::assertSame($number, Big_Integer::of((string) $number)->to_int());
     }
 
     public static function providerToInt(): array
@@ -4659,22 +4659,22 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testToIntNegativeOverflowThrowsException(): void
     {
-        $number = BigInteger::of(PHP_INT_MIN)->minus(1);
+        $number = Big_Integer::of(PHP_INT_MIN)->minus(1);
 
-        $this->expectException(IntegerOverflowException::class);
+        $this->expectException(Integer_Overflow_Exception::class);
         $this->expectExceptionMessageMatches('/^\-[0-9]+ is out of range \[\-[0-9]+, [0-9]+\] and cannot be represented as an integer\.$/');
 
-        $number->toInt();
+        $number->to_int();
     }
 
     public function testToIntPositiveOverflowThrowsException(): void
     {
-        $number = BigInteger::of(PHP_INT_MAX)->plus(1);
+        $number = Big_Integer::of(PHP_INT_MAX)->plus(1);
 
-        $this->expectException(IntegerOverflowException::class);
+        $this->expectException(Integer_Overflow_Exception::class);
         $this->expectExceptionMessageMatches('/^[0-9]+ is out of range \[\-[0-9]+, [0-9]+\] and cannot be represented as an integer\.$/');
 
-        $number->toInt();
+        $number->to_int();
     }
 
     /**
@@ -4684,7 +4684,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerToFloat')]
     public function testToFloat(string $value, float $float): void
     {
-        self::assertSame($float, BigInteger::of($value)->toFloat());
+        self::assertSame($float, Big_Integer::of($value)->to_float());
     }
 
     public static function providerToFloat(): array
@@ -4708,7 +4708,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerToBase')]
     public function testToBase(string $number, int $base, string $expected): void
     {
-        self::assertSame($expected, BigInteger::of($number)->toBase($base));
+        self::assertSame($expected, Big_Integer::of($number)->to_base($base));
     }
 
     public static function providerToBase(): Generator
@@ -4805,12 +4805,12 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerToInvalidBaseThrowsException')]
     public function testToInvalidBaseThrowsException(int $base): void
     {
-        $zero = BigInteger::zero();
+        $zero = Big_Integer::zero();
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact(sprintf('Base %d is out of range [2, 36].', $base));
 
-        $zero->toBase($base);
+        $zero->to_base($base);
     }
 
     public static function providerToInvalidBaseThrowsException(): array
@@ -4827,7 +4827,7 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerFromArbitraryBase')]
     public function testFromArbitraryBase(string $base10, string $alphabet, string $baseN): void
     {
-        $number = BigInteger::fromArbitraryBase($baseN, $alphabet);
+        $number = Big_Integer::from_arbitrary_base($baseN, $alphabet);
 
         self::assertBigIntegerEquals($base10, $number);
     }
@@ -4846,8 +4846,8 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerArbitraryBase')]
     public function testToArbitraryBase(string $base10, string $alphabet, string $baseN): void
     {
-        $base10 = BigInteger::of($base10);
-        $actual = $base10->toArbitraryBase($alphabet);
+        $base10 = Big_Integer::of($base10);
+        $actual = $base10->to_arbitrary_base($alphabet);
 
         self::assertSame($baseN, $actual);
     }
@@ -4930,19 +4930,19 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerArbitraryBaseWithInvalidAlphabet')]
     public function testFromArbitraryBaseWithInvalidAlphabet(string $alphabet): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact('The alphabet must contain at least 2 characters.');
 
-        BigInteger::fromArbitraryBase('0', $alphabet);
+        Big_Integer::from_arbitrary_base('0', $alphabet);
     }
 
     #[DataProvider('providerFromArbitraryBaseWithInvalidNumber')]
     public function testFromArbitraryBaseWithInvalidNumber(string $number, string $alphabet, string $expectedMessage): void
     {
-        $this->expectException(NumberFormatException::class);
+        $this->expectException(Number_Format_Exception::class);
         $this->expectExceptionMessageExact($expectedMessage);
 
-        BigInteger::fromArbitraryBase($number, $alphabet);
+        Big_Integer::from_arbitrary_base($number, $alphabet);
     }
 
     public static function providerFromArbitraryBaseWithInvalidNumber(): array
@@ -4965,12 +4965,12 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerArbitraryBaseWithInvalidAlphabet')]
     public function testToArbitraryBaseWithInvalidAlphabet(string $alphabet): void
     {
-        $number = BigInteger::of(123);
+        $number = Big_Integer::of(123);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact('The alphabet must contain at least 2 characters.');
 
-        $number->toArbitraryBase($alphabet);
+        $number->to_arbitrary_base($alphabet);
     }
 
     public static function providerArbitraryBaseWithInvalidAlphabet(): array
@@ -4984,21 +4984,21 @@ class BigIntegerTest extends AbstractTestCase
     #[DataProvider('providerArbitraryBaseWithDuplicateChars')]
     public function testFromArbitraryBaseWithDuplicateCharsInAlphabet(string $alphabet): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact('The alphabet must not contain duplicate characters.');
 
-        BigInteger::fromArbitraryBase('0', $alphabet);
+        Big_Integer::from_arbitrary_base('0', $alphabet);
     }
 
     #[DataProvider('providerArbitraryBaseWithDuplicateChars')]
     public function testToArbitraryBaseWithDuplicateCharsInAlphabet(string $alphabet): void
     {
-        $number = BigInteger::of(123);
+        $number = Big_Integer::of(123);
 
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact('The alphabet must not contain duplicate characters.');
 
-        $number->toArbitraryBase($alphabet);
+        $number->to_arbitrary_base($alphabet);
     }
 
     public static function providerArbitraryBaseWithDuplicateChars(): array
@@ -5012,18 +5012,18 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testToArbitraryBaseOnNegativeNumber(): void
     {
-        $number = BigInteger::of(-123);
+        $number = Big_Integer::of(-123);
 
-        $this->expectException(NegativeNumberException::class);
+        $this->expectException(Negative_Number_Exception::class);
         $this->expectExceptionMessageExact('Cannot convert a negative number to an arbitrary base.');
 
-        $number->toArbitraryBase('01');
+        $number->to_arbitrary_base('01');
     }
 
     #[DataProvider('providerFromBytes')]
     public function testFromBytes(string $byteStringHex, bool $signed, string $expectedNumber): void
     {
-        $number = BigInteger::fromBytes(hex2bin($byteStringHex), $signed);
+        $number = Big_Integer::from_bytes(hex2bin($byteStringHex), $signed);
         self::assertBigIntegerEquals($expectedNumber, $number);
     }
 
@@ -5040,16 +5040,16 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testFromBytesWithEmptyString(): void
     {
-        $this->expectException(NumberFormatException::class);
+        $this->expectException(Number_Format_Exception::class);
         $this->expectExceptionMessageExact('The byte string must not be empty.');
 
-        BigInteger::fromBytes('');
+        Big_Integer::from_bytes('');
     }
 
     #[DataProvider('providerToBytes')]
     public function testToBytes(string $number, bool $signed, string $expectedByteStringHex): void
     {
-        $byteString = BigInteger::of($number)->toBytes($signed);
+        $byteString = Big_Integer::of($number)->to_bytes($signed);
         self::assertSame($expectedByteStringHex, strtoupper(bin2hex($byteString)));
     }
 
@@ -5243,31 +5243,31 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testToBytesNotSignedWithNegativeNumber(): void
     {
-        $number = BigInteger::of(-1);
-        $this->expectException(NegativeNumberException::class);
+        $number = Big_Integer::of(-1);
+        $this->expectException(Negative_Number_Exception::class);
         $this->expectExceptionMessageExact('Cannot convert a negative number to a byte string in unsigned mode.');
 
-        $number->toBytes(false);
+        $number->to_bytes(false);
     }
 
     #[DataProvider('providerRandomBits')]
     public function testRandomBits(int $numBits, string $randomBytesHex, string $expectedNumber): void
     {
         $randomBytesGenerator = function (int $numBytes) use ($randomBytesHex): string {
-            $randomBytes = hex2bin($randomBytesHex);
-            $randomBytesLength = strlen($randomBytes);
+            $random_bytes = hex2bin($randomBytesHex);
+            $randomBytesLength = strlen($random_bytes);
 
             if ($randomBytesLength !== $numBytes) {
                 self::fail(
-                    "randomBits() was expected to request $randomBytesLength bytes, " .
+                    "random_bits() was expected to request $randomBytesLength bytes, " .
                     "but requested $numBytes bytes instead.",
                 );
             }
 
-            return $randomBytes;
+            return $random_bytes;
         };
 
-        $actualNumber = BigInteger::randomBits($numBits, $randomBytesGenerator);
+        $actualNumber = Big_Integer::random_bits($numBits, $randomBytesGenerator);
 
         self::assertBigIntegerEquals($expectedNumber, $actualNumber);
     }
@@ -5307,15 +5307,15 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testRandomBitsWithNegativeBitCount(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact('The bit count must not be negative.');
 
-        BigInteger::randomBits(-1);
+        Big_Integer::random_bits(-1);
     }
 
     public function testRandomBitsWithZeroBits(): void
     {
-        $random = BigInteger::randomBits(0);
+        $random = Big_Integer::random_bits(0);
         self::assertBigIntegerEquals('0', $random);
     }
 
@@ -5324,9 +5324,9 @@ class BigIntegerTest extends AbstractTestCase
         $exception = new LogicException('RNG failed.');
 
         try {
-            BigInteger::randomBits(8, fn () => throw $exception);
-            self::fail('RandomSourceException was not thrown as expected.');
-        } catch (RandomSourceException $e) {
+            Big_Integer::random_bits(8, fn () => throw $exception);
+            self::fail('Random_Source_Exception was not thrown as expected.');
+        } catch (Random_Source_Exception $e) {
             self::assertSame('Random byte generation failed.', $e->getMessage());
             self::assertSame($exception, $e->getPrevious());
         }
@@ -5334,18 +5334,18 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testRandomBitsWithInvalidGeneratorReturnType(): void
     {
-        $this->expectException(RandomSourceException::class);
+        $this->expectException(Random_Source_Exception::class);
         $this->expectExceptionMessageExact('The random bytes generator must return a string, got int.');
 
-        BigInteger::randomBits(8, fn () => 123);
+        Big_Integer::random_bits(8, fn () => 123);
     }
 
     public function testRandomBitsWithInvalidGeneratorLength(): void
     {
-        $this->expectException(RandomSourceException::class);
+        $this->expectException(Random_Source_Exception::class);
         $this->expectExceptionMessageExact('The random bytes generator returned 0 byte(s), expected 1.');
 
-        BigInteger::randomBits(8, fn () => '');
+        Big_Integer::random_bits(8, fn () => '');
     }
 
     #[DataProvider('providerRandomRange')]
@@ -5355,7 +5355,7 @@ class BigIntegerTest extends AbstractTestCase
 
         $failCounter = function () use ($randomBytesHex, &$randomBytesCounter): void {
             self::fail(sprintf(
-                'randomRange() was expected to request random bytes %d time(s), but requested %d time(s) instead.',
+                'random_range() was expected to request random bytes %d time(s), but requested %d time(s) instead.',
                 count($randomBytesHex),
                 $randomBytesCounter,
             ));
@@ -5367,22 +5367,22 @@ class BigIntegerTest extends AbstractTestCase
                 $failCounter();
             }
 
-            $randomBytes = hex2bin($randomBytesHex[$randomBytesCounter]);
-            $randomBytesLength = strlen($randomBytes);
+            $random_bytes = hex2bin($randomBytesHex[$randomBytesCounter]);
+            $randomBytesLength = strlen($random_bytes);
 
             if ($randomBytesLength !== $numBytes) {
                 self::fail(
-                    "randomRange() was expected to request $randomBytesLength bytes, " .
+                    "random_range() was expected to request $randomBytesLength bytes, " .
                     "but requested $numBytes bytes instead.",
                 );
             }
 
             $randomBytesCounter++;
 
-            return $randomBytes;
+            return $random_bytes;
         };
 
-        $actualNumber = BigInteger::randomRange($min, $max, $randomBytesGenerator);
+        $actualNumber = Big_Integer::random_range($min, $max, $randomBytesGenerator);
 
         if ($randomBytesCounter !== count($randomBytesHex)) {
             $failCounter();
@@ -5429,16 +5429,16 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testRandomRangeWithMinGreaterThanMax(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(Invalid_Argument_Exception::class);
         $this->expectExceptionMessageExact('The minimum value must be less than or equal to the maximum value.');
 
-        BigInteger::randomRange(3, 2);
+        Big_Integer::random_range(3, 2);
     }
 
     public function testRandomRangeWithSingleValue(): void
     {
         $value = '123456789123456789123456789123456789';
-        $random = BigInteger::randomRange($value, $value);
+        $random = Big_Integer::random_range($value, $value);
         self::assertBigIntegerEquals($value, $random);
     }
 
@@ -5447,9 +5447,9 @@ class BigIntegerTest extends AbstractTestCase
         $exception = new LogicException('RNG failed.');
 
         try {
-            BigInteger::randomRange(0, 1, fn () => throw $exception);
-            self::fail('RandomSourceException was not thrown as expected.');
-        } catch (RandomSourceException $e) {
+            Big_Integer::random_range(0, 1, fn () => throw $exception);
+            self::fail('Random_Source_Exception was not thrown as expected.');
+        } catch (Random_Source_Exception $e) {
             self::assertSame('Random byte generation failed.', $e->getMessage());
             self::assertSame($exception, $e->getPrevious());
         }
@@ -5457,25 +5457,25 @@ class BigIntegerTest extends AbstractTestCase
 
     public function testRandomRangeWithInvalidGeneratorReturnType(): void
     {
-        $this->expectException(RandomSourceException::class);
+        $this->expectException(Random_Source_Exception::class);
         $this->expectExceptionMessageExact('The random bytes generator must return a string, got int.');
 
-        BigInteger::randomRange(0, 1, fn () => 123);
+        Big_Integer::random_range(0, 1, fn () => 123);
     }
 
     public function testRandomRangeWithInvalidGeneratorLength(): void
     {
-        $this->expectException(RandomSourceException::class);
+        $this->expectException(Random_Source_Exception::class);
         $this->expectExceptionMessageExact('The random bytes generator returned 0 byte(s), expected 1.');
 
-        BigInteger::randomRange(0, 1, fn () => '');
+        Big_Integer::random_range(0, 1, fn () => '');
     }
 
     #[DataProvider('providerToString')]
     public function testToString(int|string $value, string $expected): void
     {
-        $bigInteger = BigInteger::of($value);
-        self::assertSame($expected, $bigInteger->toString());
+        $bigInteger = Big_Integer::of($value);
+        self::assertSame($expected, $bigInteger->to_string());
         self::assertSame($expected, (string) $bigInteger);
     }
 
@@ -5496,14 +5496,14 @@ class BigIntegerTest extends AbstractTestCase
     {
         $value = '-1234567890987654321012345678909876543210123456789';
 
-        $number = BigInteger::of($value);
+        $number = Big_Integer::of($value);
 
         self::assertBigIntegerEquals($value, unserialize(serialize($number)));
     }
 
     public function testDirectCallToUnserialize(): void
     {
-        $zero = BigInteger::zero();
+        $zero = Big_Integer::zero();
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessageExact('__unserialize() is an internal function, it must not be called directly.');
@@ -5515,30 +5515,30 @@ class BigIntegerTest extends AbstractTestCase
     {
         $value = '-1234567890987654321012345678909876543210123456789';
 
-        $number = BigInteger::of($value);
+        $number = Big_Integer::of($value);
 
         self::assertSame($value, $number->jsonSerialize());
     }
 
     /**
-     * @param RoundingMode $roundingMode The rounding mode.
-     * @param BigInteger   $number       The number to round.
+     * @param Rounding_Mode $roundingMode The rounding mode.
+     * @param Big_Integer   $number       The number to round.
      * @param string       $divisor      The divisor.
      * @param string|null  $ten          The expected rounding to a scale of two, or null if an exception is expected.
      * @param string|null  $hundred      The expected rounding to a scale of one, or null if an exception is expected.
      * @param string|null  $thousand     The expected rounding to a scale of zero, or null if an exception is expected.
      */
-    private function doTestDividedByWithRoundingMode(RoundingMode $roundingMode, BigInteger $number, string $divisor, ?string $ten, ?string $hundred, ?string $thousand): void
+    private function doTestDividedByWithRoundingMode(Rounding_Mode $roundingMode, Big_Integer $number, string $divisor, ?string $ten, ?string $hundred, ?string $thousand): void
     {
         foreach ([$ten, $hundred, $thousand] as $expected) {
             $divisor .= '0';
 
             if ($expected === null) {
-                $this->expectException(RoundingNecessaryException::class);
+                $this->expectException(Rounding_Necessary_Exception::class);
                 $this->expectExceptionMessageExact('The division has a non-zero remainder and cannot be represented as an integer without rounding.');
             }
 
-            $actual = $number->dividedBy($divisor, $roundingMode);
+            $actual = $number->divided_by($divisor, $roundingMode);
 
             if ($expected !== null) {
                 self::assertBigIntegerEquals($expected, $actual);

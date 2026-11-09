@@ -7,7 +7,7 @@ use function sprintf;
 /**
  * Exception thrown when an invalid argument is provided.
  */
-final class InvalidArgumentException extends \InvalidArgumentException implements Math_Exception
+final class Invalid_Argument_Exception extends \InvalidArgumentException implements Math_Exception
 {
     /**
      * @internal
@@ -79,7 +79,7 @@ final class InvalidArgumentException extends \InvalidArgumentException implement
      */
     public static function cannot_convert_float(string $type): self
     {
-        return new self(sprintf('Cannot convert %s to a BigDecimal.', $type));
+        return new self(sprintf('Cannot convert %s to a Big_Decimal.', $type));
     }
     /**
      * @internal

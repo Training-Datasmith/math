@@ -24,11 +24,11 @@ if ($maxDigits < 1) {
 }
 
 (new class ($maxDigits) {
-    private readonly Calculator\GmpCalculator $gmp;
+    private readonly Calculator\Gmp_Calculator $gmp;
 
-    private readonly Calculator\BcMathCalculator $bcmath;
+    private readonly Calculator\Bc_Math_Calculator $bcmath;
 
-    private readonly Calculator\NativeCalculator $native;
+    private readonly Calculator\Native_Calculator $native;
 
     private int $testCounter = 0;
 
@@ -43,9 +43,9 @@ if ($maxDigits < 1) {
     public function __construct(
         private readonly int $maxDigits,
     ) {
-        $this->gmp = new Calculator\GmpCalculator();
-        $this->bcmath = new Calculator\BcMathCalculator();
-        $this->native = new Calculator\NativeCalculator();
+        $this->gmp = new Calculator\Gmp_Calculator();
+        $this->bcmath = new Calculator\Bc_Math_Calculator();
+        $this->native = new Calculator\Native_Calculator();
     }
 
     public function __invoke(): void
@@ -74,8 +74,8 @@ if ($maxDigits < 1) {
             }
 
             if ($c !== '0') {
-                $this->test("$a POW $b MOD $c", fn (Calculator $calc) => $calc->modPow($a, $b, $c));
-                $this->test("-$a POW $b MOD $c", fn (Calculator $calc) => $calc->modPow("-$a", $b, $c));
+                $this->test("$a POW $b MOD $c", fn (Calculator $calc) => $calc->mod_pow($a, $b, $c));
+                $this->test("-$a POW $b MOD $c", fn (Calculator $calc) => $calc->mod_pow("-$a", $b, $c));
             }
 
             foreach ([$a, $b] as $n) {
@@ -103,12 +103,12 @@ if ($maxDigits < 1) {
         $this->test("$a * $b", fn (Calculator $c) => $c->mul($a, $b));
 
         if ($b !== '0') {
-            $this->test("$a / $b", fn (Calculator $c) => $c->divQR($a, $b));
+            $this->test("$a / $b", fn (Calculator $c) => $c->div_qr($a, $b));
             $this->test("$a MOD $b", fn (Calculator $c) => $c->mod($a, $b));
         }
 
         if ($b !== '0' && $b[0] !== '-') {
-            $this->test("INV $a MOD $b", fn (Calculator $c) => $c->modInverse($a, $b));
+            $this->test("INV $a MOD $b", fn (Calculator $c) => $c->mod_inverse($a, $b));
         }
 
         $this->test("GCD $a, $b", fn (Calculator $c) => $c->gcd($a, $b));

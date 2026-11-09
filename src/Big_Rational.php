@@ -4,7 +4,7 @@ declare (strict_types=1);
 namespace Brick\Math;
 
 use Brick\Math\Exception\Division_By_Zero_Exception;
-use Brick\Math\Exception\InvalidArgumentException;
+use Brick\Math\Exception\Invalid_Argument_Exception;
 use Brick\Math\Exception\Math_Exception;
 use Brick\Math\Exception\Rounding_Necessary_Exception;
 use Brick\Math\Internal\Decimal_Helper;
@@ -37,11 +37,11 @@ final readonly class Big_Rational extends Big_Number
     /**
      * Protected constructor. Use a factory method to obtain an instance.
      *
-     * @param BigInteger $numerator        The numerator.
-     * @param BigInteger $denominator      The denominator.
-     * @param bool       $checkDenominator Whether to check the denominator for negative and zero.
+     * @param Big_Integer $numerator        The numerator.
+     * @param Big_Integer $denominator      The denominator.
+     * @param bool       $check_denominator Whether to check the denominator for negative and zero.
      *
-     * @throws DivisionByZeroException If the denominator is zero.
+     * @throws Division_By_Zero_Exception If the denominator is zero.
      *
      * @pure
      */
@@ -65,16 +65,16 @@ final readonly class Big_Rational extends Big_Number
         $this->denominator = $denominator;
     }
     /**
-     * Creates a BigRational out of a numerator and a denominator.
+     * Creates a Big_Rational out of a numerator and a denominator.
      *
      * If the denominator is negative, the signs of both the numerator and the denominator
      * will be inverted to ensure that the denominator is always positive.
      *
-     * @param BigNumber|int|string $numerator   The numerator. Must be convertible to a BigInteger.
-     * @param BigNumber|int|string $denominator The denominator. Must be convertible to a BigInteger.
+     * @param Big_Number|int|string $numerator   The numerator. Must be convertible to a Big_Integer.
+     * @param Big_Number|int|string $denominator The denominator. Must be convertible to a Big_Integer.
      *
-     * @throws MathException           If an argument is not valid, or is not convertible to a BigInteger.
-     * @throws DivisionByZeroException If the denominator is zero.
+     * @throws Math_Exception           If an argument is not valid, or is not convertible to a Big_Integer.
+     * @throws Division_By_Zero_Exception If the denominator is zero.
      *
      * @pure
      */
@@ -85,13 +85,13 @@ final readonly class Big_Rational extends Big_Number
         return new Big_Rational($numerator, $denominator, true, true);
     }
     /**
-     * Returns a BigRational representing zero.
+     * Returns a Big_Rational representing zero.
      *
      * @pure
      */
     public static function zero(): Big_Rational
     {
-        /** @var BigRational|null $zero */
+        /** @var Big_Rational|null $zero */
         static $zero;
         if ($zero === null) {
             $zero = new Big_Rational(Big_Integer::zero(), Big_Integer::one(), false, false);
@@ -99,13 +99,13 @@ final readonly class Big_Rational extends Big_Number
         return $zero;
     }
     /**
-     * Returns a BigRational representing one.
+     * Returns a Big_Rational representing one.
      *
      * @pure
      */
     public static function one(): Big_Rational
     {
-        /** @var BigRational|null $one */
+        /** @var Big_Rational|null $one */
         static $one;
         if ($one === null) {
             $one = new Big_Rational(Big_Integer::one(), Big_Integer::one(), false, false);
@@ -113,13 +113,13 @@ final readonly class Big_Rational extends Big_Number
         return $one;
     }
     /**
-     * Returns a BigRational representing ten.
+     * Returns a Big_Rational representing ten.
      *
      * @pure
      */
     public static function ten(): Big_Rational
     {
-        /** @var BigRational|null $ten */
+        /** @var Big_Rational|null $ten */
         static $ten;
         if ($ten === null) {
             $ten = new Big_Rational(Big_Integer::ten(), Big_Integer::one(), false, false);
@@ -154,7 +154,7 @@ final readonly class Big_Rational extends Big_Number
      * - `7/3` returns `2` (since 7/3 = 2 + 1/3)
      * - `-7/3` returns `-2` (since -7/3 = -2 + (-1/3))
      *
-     * The following identity holds: `$r->isEqualTo($r->getFractionalPart()->plus($r->getIntegralPart()))`. Note that in
+     * The following identity holds: `$r->is_equal_to($r->get_fractional_part()->plus($r->get_integral_part()))`. Note that in
      * this identity, the operand order is significant: the reversed form throws when the fractional part is non-zero.
      *
      * @pure
@@ -171,7 +171,7 @@ final readonly class Big_Rational extends Big_Number
      * - `7/3` returns `1/3` (since 7/3 = 2 + 1/3)
      * - `-7/3` returns `-1/3` (since -7/3 = -2 + (-1/3))
      *
-     * The following identity holds: `$r->isEqualTo($r->getFractionalPart()->plus($r->getIntegralPart()))`. Note that in
+     * The following identity holds: `$r->is_equal_to($r->get_fractional_part()->plus($r->get_integral_part()))`. Note that in
      * this identity, the operand order is significant: the reversed form throws when the fractional part is non-zero.
      *
      * @pure
@@ -183,9 +183,9 @@ final readonly class Big_Rational extends Big_Number
     /**
      * Returns the sum of this number and the given one.
      *
-     * @param BigNumber|int|string $that The number to add.
+     * @param Big_Number|int|string $that The number to add.
      *
-     * @throws MathException If the number is not valid.
+     * @throws Math_Exception If the number is not valid.
      *
      * @pure
      */
@@ -206,9 +206,9 @@ final readonly class Big_Rational extends Big_Number
     /**
      * Returns the difference of this number and the given one.
      *
-     * @param BigNumber|int|string $that The number to subtract.
+     * @param Big_Number|int|string $that The number to subtract.
      *
-     * @throws MathException If the number is not valid.
+     * @throws Math_Exception If the number is not valid.
      *
      * @pure
      */
@@ -229,9 +229,9 @@ final readonly class Big_Rational extends Big_Number
     /**
      * Returns the product of this number and the given one.
      *
-     * @param BigNumber|int|string $that The multiplier.
+     * @param Big_Number|int|string $that The multiplier.
      *
-     * @throws MathException If the multiplier is not valid.
+     * @throws Math_Exception If the multiplier is not valid.
      *
      * @pure
      */
@@ -248,10 +248,10 @@ final readonly class Big_Rational extends Big_Number
     /**
      * Returns the result of the division of this number by the given one.
      *
-     * @param BigNumber|int|string $that The divisor.
+     * @param Big_Number|int|string $that The divisor.
      *
-     * @throws MathException           If the divisor is not valid.
-     * @throws DivisionByZeroException If the divisor is zero.
+     * @throws Math_Exception           If the divisor is not valid.
+     * @throws Division_By_Zero_Exception If the divisor is zero.
      *
      * @pure
      */
@@ -268,10 +268,10 @@ final readonly class Big_Rational extends Big_Number
     /**
      * Returns this number exponentiated to the given value.
      *
-     * Unlike BigInteger and BigDecimal, BigRational supports negative exponents:
+     * Unlike Big_Integer and Big_Decimal, Big_Rational supports negative exponents:
      * the result is the reciprocal raised to the absolute value of the exponent.
      *
-     * @throws DivisionByZeroException If the exponent is negative and this number is zero.
+     * @throws Division_By_Zero_Exception If the exponent is negative and this number is zero.
      *
      * @pure
      */
@@ -292,11 +292,11 @@ final readonly class Big_Rational extends Big_Number
         return new Big_Rational($this->numerator->power($exponent), $this->denominator->power($exponent), false, false);
     }
     /**
-     * Returns the reciprocal of this BigRational.
+     * Returns the reciprocal of this Big_Rational.
      *
      * The reciprocal has the numerator and denominator swapped.
      *
-     * @throws DivisionByZeroException If this number is zero.
+     * @throws Division_By_Zero_Exception If this number is zero.
      *
      * @pure
      */
@@ -351,9 +351,8 @@ final readonly class Big_Rational extends Big_Number
     #[Override]
     public function to_scale(int $scale, Rounding_Mode $rounding_mode = Rounding_Mode::Unnecessary): Big_Decimal
     {
-        if ($scale < 0) {
-            // @phpstan-ignore smaller.alwaysFalse
-            throw InvalidArgumentException::negative_scale();
+        if ($scale < 0) { // @phpstan-ignore smaller.alwaysFalse
+            throw Invalid_Argument_Exception::negative_scale();
         }
         if ($rounding_mode === Rounding_Mode::Unnecessary) {
             $required_scale = Decimal_Helper::compute_scale_from_reduced_fraction_denominator($this->denominator->to_string());
@@ -452,7 +451,7 @@ final readonly class Big_Rational extends Big_Number
      *
      * @internal
      *
-     * @return array{numerator: BigInteger, denominator: BigInteger}
+     * @return array{numerator: Big_Integer, denominator: Big_Integer}
      */
     public function __serialize(): array
     {
@@ -463,7 +462,7 @@ final readonly class Big_Rational extends Big_Number
      *
      * @internal
      *
-     * @param array{numerator: BigInteger, denominator: BigInteger} $data
+     * @param array{numerator: Big_Integer, denominator: Big_Integer} $data
      *
      * @throws LogicException
      */

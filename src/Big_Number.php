@@ -6,7 +6,7 @@ namespace Brick\Math;
 use function assert;
 use Brick\Math\Exception\Division_By_Zero_Exception;
 use Brick\Math\Exception\Integer_Overflow_Exception;
-use Brick\Math\Exception\InvalidArgumentException;
+use Brick\Math\Exception\Invalid_Argument_Exception;
 use Brick\Math\Exception\Math_Exception;
 use Brick\Math\Exception\Number_Format_Exception;
 use Brick\Math\Exception\Rounding_Necessary_Exception;
@@ -31,7 +31,7 @@ use function substr;
  * This class is sealed: it is part of the public API but should not be subclassed in userland.
  * Protected methods may change in any version.
  *
- * @phpstan-sealed BigInteger|BigDecimal|BigRational
+ * @phpstan-sealed Big_Integer|Big_Decimal|Big_Rational
  */
 abstract readonly class Big_Number implements JsonSerializable, Stringable
 {
@@ -44,23 +44,23 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
      */
     private const PARSE_REGEXP_RATIONAL = '/^' . '(?<sign>[\-\+])?' . '(?<numerator>[0-9]+)' . '\/' . '(?<denominator>[0-9]+)' . '$/';
     /**
-     * Creates a BigNumber of the given value.
+     * Creates a Big_Number of the given value.
      *
-     * When of() is called on BigNumber, the concrete return type is dependent on the given value, with the following
+     * When of() is called on Big_Number, the concrete return type is dependent on the given value, with the following
      * rules:
      *
-     * - BigNumber instances are returned as is
-     * - integer numbers are returned as BigInteger
-     * - strings containing a `/` character are returned as BigRational
-     * - strings containing a `.` character or using an exponential notation are returned as BigDecimal
-     * - strings containing only digits with an optional leading `+` or `-` sign are returned as BigInteger
+     * - Big_Number instances are returned as is
+     * - integer numbers are returned as Big_Integer
+     * - strings containing a `/` character are returned as Big_Rational
+     * - strings containing a `.` character or using an exponential notation are returned as Big_Decimal
+     * - strings containing only digits with an optional leading `+` or `-` sign are returned as Big_Integer
      *
-     * When of() is called on BigInteger, BigDecimal, or BigRational, the resulting number is converted to an instance
-     * of the subclass when possible; otherwise a RoundingNecessaryException exception is thrown.
+     * When of() is called on Big_Integer, Big_Decimal, or Big_Rational, the resulting number is converted to an instance
+     * of the subclass when possible; otherwise a Rounding_Necessary_Exception exception is thrown.
      *
-     * @throws NumberFormatException      If the format of the number is not valid.
-     * @throws DivisionByZeroException    If the value represents a rational number with a denominator of zero.
-     * @throws RoundingNecessaryException If the value cannot be converted to an instance of the subclass without rounding.
+     * @throws Number_Format_Exception      If the format of the number is not valid.
+     * @throws Division_By_Zero_Exception    If the value represents a rational number with a denominator of zero.
+     * @throws Rounding_Necessary_Exception If the value cannot be converted to an instance of the subclass without rounding.
      *
      * @pure
      */
@@ -74,15 +74,15 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
         return static::from($value);
     }
     /**
-     * Creates a BigNumber of the given value, or returns null if the input is null.
+     * Creates a Big_Number of the given value, or returns null if the input is null.
      *
      * Behaves like of() for non-null values.
      *
-     * @see BigNumber::of()
+     * @see Big_Number::of()
      *
-     * @throws NumberFormatException      If the format of the number is not valid.
-     * @throws DivisionByZeroException    If the value represents a rational number with a denominator of zero.
-     * @throws RoundingNecessaryException If the value cannot be converted to an instance of the subclass without rounding.
+     * @throws Number_Format_Exception      If the format of the number is not valid.
+     * @throws Division_By_Zero_Exception    If the value represents a rational number with a denominator of zero.
+     * @throws Rounding_Necessary_Exception If the value cannot be converted to an instance of the subclass without rounding.
      *
      * @pure
      */
@@ -97,14 +97,14 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
      * Returns the minimum of the given values.
      *
      * If several values are equal and minimal, the first one is returned.
-     * This can affect the concrete return type when calling this method on BigNumber.
+     * This can affect the concrete return type when calling this method on Big_Number.
      *
-     * @param BigNumber|int|string $a    The first number. Must be convertible to an instance of the class this method
+     * @param Big_Number|int|string $a    The first number. Must be convertible to an instance of the class this method
      *                                   is called on.
-     * @param BigNumber|int|string ...$n The additional numbers. Each number must be convertible to an instance of the
+     * @param Big_Number|int|string ...$n The additional numbers. Each number must be convertible to an instance of the
      *                                   class this method is called on.
      *
-     * @throws MathException If a number is not valid, or is not convertible to an instance of the class this method is
+     * @throws Math_Exception If a number is not valid, or is not convertible to an instance of the class this method is
      *                       called on.
      *
      * @pure
@@ -124,14 +124,14 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
      * Returns the maximum of the given values.
      *
      * If several values are equal and maximal, the first one is returned.
-     * This can affect the concrete return type when calling this method on BigNumber.
+     * This can affect the concrete return type when calling this method on Big_Number.
      *
-     * @param BigNumber|int|string $a    The first number. Must be convertible to an instance of the class this method
+     * @param Big_Number|int|string $a    The first number. Must be convertible to an instance of the class this method
      *                                   is called on.
-     * @param BigNumber|int|string ...$n The additional numbers. Each number must be convertible to an instance of the
+     * @param Big_Number|int|string ...$n The additional numbers. Each number must be convertible to an instance of the
      *                                   class this method is called on.
      *
-     * @throws MathException If a number is not valid, or is not convertible to an instance of the class this method is
+     * @throws Math_Exception If a number is not valid, or is not convertible to an instance of the class this method is
      *                       called on.
      *
      * @pure
@@ -150,18 +150,18 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
     /**
      * Returns the sum of the given values.
      *
-     * When called on BigNumber, sum() accepts any supported type and returns a result whose type is the widest among
-     * the given values (BigInteger < BigDecimal < BigRational).
+     * When called on Big_Number, sum() accepts any supported type and returns a result whose type is the widest among
+     * the given values (Big_Integer < Big_Decimal < Big_Rational).
      *
-     * When called on BigInteger, BigDecimal, or BigRational, sum() requires that all values can be converted to that
+     * When called on Big_Integer, Big_Decimal, or Big_Rational, sum() requires that all values can be converted to that
      * specific subclass, and returns a result of the same type.
      *
-     * @param BigNumber|int|string $a    The first number. Must be convertible to an instance of the class this method
+     * @param Big_Number|int|string $a    The first number. Must be convertible to an instance of the class this method
      *                                   is called on.
-     * @param BigNumber|int|string ...$n The additional numbers. Each number must be convertible to an instance of the
+     * @param Big_Number|int|string ...$n The additional numbers. Each number must be convertible to an instance of the
      *                                   class this method is called on.
      *
-     * @throws MathException If a number is not valid, or is not convertible to an instance of the class this method is
+     * @throws Math_Exception If a number is not valid, or is not convertible to an instance of the class this method is
      *                       called on.
      *
      * @pure
@@ -178,7 +178,7 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
     /**
      * Checks if this number is equal to the given one.
      *
-     * @throws MathException If the given number is not valid.
+     * @throws Math_Exception If the given number is not valid.
      *
      * @pure
      */
@@ -189,7 +189,7 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
     /**
      * Checks if this number is strictly less than the given one.
      *
-     * @throws MathException If the given number is not valid.
+     * @throws Math_Exception If the given number is not valid.
      *
      * @pure
      */
@@ -200,7 +200,7 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
     /**
      * Checks if this number is less than or equal to the given one.
      *
-     * @throws MathException If the given number is not valid.
+     * @throws Math_Exception If the given number is not valid.
      *
      * @pure
      */
@@ -211,7 +211,7 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
     /**
      * Checks if this number is strictly greater than the given one.
      *
-     * @throws MathException If the given number is not valid.
+     * @throws Math_Exception If the given number is not valid.
      *
      * @pure
      */
@@ -222,7 +222,7 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
     /**
      * Checks if this number is greater than or equal to the given one.
      *
-     * @throws MathException If the given number is not valid.
+     * @throws Math_Exception If the given number is not valid.
      *
      * @pure
      */
@@ -307,7 +307,7 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
      *
      * @return -1|0|1
      *
-     * @throws MathException If the number is not valid.
+     * @throws Math_Exception If the number is not valid.
      *
      * @pure
      */
@@ -319,11 +319,11 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
      * If the number is greater than $max, returns $max.
      * Otherwise, returns this number unchanged.
      *
-     * @param BigNumber|int|string $min The minimum. Must be convertible to an instance of the class this method is called on.
-     * @param BigNumber|int|string $max The maximum. Must be convertible to an instance of the class this method is called on.
+     * @param Big_Number|int|string $min The minimum. Must be convertible to an instance of the class this method is called on.
+     * @param Big_Number|int|string $max The maximum. Must be convertible to an instance of the class this method is called on.
      *
-     * @throws MathException            If min/max are not convertible to an instance of the class this method is called on.
-     * @throws InvalidArgumentException If min is greater than max.
+     * @throws Math_Exception            If min/max are not convertible to an instance of the class this method is called on.
+     * @throws Invalid_Argument_Exception If min is greater than max.
      *
      * @pure
      */
@@ -332,7 +332,7 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
         $min = static::of($min);
         $max = static::of($max);
         if ($min->is_greater_than($max)) {
-            throw InvalidArgumentException::min_greater_than_max();
+            throw Invalid_Argument_Exception::min_greater_than_max();
         }
         if ($this->is_less_than($min)) {
             return $min;
@@ -343,35 +343,35 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
         return $this;
     }
     /**
-     * Converts this number to a BigInteger.
+     * Converts this number to a Big_Integer.
      *
-     * @throws RoundingNecessaryException If this number cannot be converted to a BigInteger without rounding.
+     * @throws Rounding_Necessary_Exception If this number cannot be converted to a Big_Integer without rounding.
      *
      * @pure
      */
     abstract public function to_big_integer(): Big_Integer;
     /**
-     * Converts this number to a BigDecimal.
+     * Converts this number to a Big_Decimal.
      *
-     * @throws RoundingNecessaryException If this number cannot be converted to a BigDecimal without rounding.
+     * @throws Rounding_Necessary_Exception If this number cannot be converted to a Big_Decimal without rounding.
      *
      * @pure
      */
     abstract public function to_big_decimal(): Big_Decimal;
     /**
-     * Converts this number to a BigRational.
+     * Converts this number to a Big_Rational.
      *
      * @pure
      */
     abstract public function to_big_rational(): Big_Rational;
     /**
-     * Converts this number to a BigDecimal with the given scale, using rounding if necessary.
+     * Converts this number to a Big_Decimal with the given scale, using rounding if necessary.
      *
-     * @param non-negative-int $scale        The scale of the resulting `BigDecimal`. Must be non-negative.
-     * @param RoundingMode     $roundingMode An optional rounding mode, defaults to Unnecessary.
+     * @param non-negative-int $scale        The scale of the resulting `Big_Decimal`. Must be non-negative.
+     * @param Rounding_Mode     $rounding_mode An optional rounding mode, defaults to Unnecessary.
      *
-     * @throws InvalidArgumentException   If the scale is negative.
-     * @throws RoundingNecessaryException If RoundingMode::Unnecessary is used, and this number cannot be converted to
+     * @throws Invalid_Argument_Exception   If the scale is negative.
+     * @throws Rounding_Necessary_Exception If Rounding_Mode::Unnecessary is used, and this number cannot be converted to
      *                                    the given scale without rounding.
      *
      * @pure
@@ -383,8 +383,8 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
      * If this number cannot be converted to a native integer without losing precision, an exception is thrown.
      * Note that the acceptable range for an integer depends on the platform and differs for 32-bit and 64-bit.
      *
-     * @throws RoundingNecessaryException If this number cannot be converted to an integer without rounding.
-     * @throws IntegerOverflowException   If this number is too large to fit in a native integer.
+     * @throws Rounding_Necessary_Exception If this number cannot be converted to an integer without rounding.
+     * @throws Integer_Overflow_Exception   If this number is too large to fit in a native integer.
      *
      * @pure
      */
@@ -406,7 +406,7 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
      * Returns a string representation of this number.
      *
      * The output of this method can be parsed by the `of()` factory method; this will yield an object equal to this
-     * one, but possibly of a different type if instantiated through `BigNumber::of()`.
+     * one, but possibly of a different type if instantiated through `Big_Number::of()`.
      *
      * @return non-empty-string
      *
@@ -432,15 +432,15 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
         return $this->to_string();
     }
     /**
-     * Overridden by subclasses to convert a BigNumber to an instance of the subclass.
+     * Overridden by subclasses to convert a Big_Number to an instance of the subclass.
      *
-     * @throws RoundingNecessaryException If the value cannot be converted.
+     * @throws Rounding_Necessary_Exception If the value cannot be converted.
      *
      * @pure
      */
     abstract protected static function from(Big_Number $number): static;
     /**
-     * Proxy method to access BigInteger's protected constructor from sibling classes.
+     * Proxy method to access Big_Integer's protected constructor from sibling classes.
      *
      * @internal
      *
@@ -451,7 +451,7 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
         return new Big_Integer($value);
     }
     /**
-     * Proxy method to access BigDecimal's protected constructor from sibling classes.
+     * Proxy method to access Big_Decimal's protected constructor from sibling classes.
      *
      * @internal
      *
@@ -464,7 +464,7 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
         return new Big_Decimal($value, $scale);
     }
     /**
-     * Proxy method to access BigRational's protected constructor from sibling classes.
+     * Proxy method to access Big_Rational's protected constructor from sibling classes.
      *
      * @internal
      *
@@ -475,8 +475,8 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
         return new Big_Rational($numerator, $denominator, $check_denominator, $simplify);
     }
     /**
-     * @throws NumberFormatException   If the format of the number is not valid.
-     * @throws DivisionByZeroException If the value represents a rational number with a denominator of zero.
+     * @throws Number_Format_Exception   If the format of the number is not valid.
+     * @throws Division_By_Zero_Exception If the value represents a rational number with a denominator of zero.
      *
      * @pure
      */
@@ -573,7 +573,7 @@ abstract readonly class Big_Number implements JsonSerializable, Stringable
         return $sign === '-' ? '-' . $number : $number;
     }
     /**
-     * Adds two BigNumber instances in the correct order to avoid a RoundingNecessaryException.
+     * Adds two Big_Number instances in the correct order to avoid a Rounding_Necessary_Exception.
      *
      * @pure
      */
